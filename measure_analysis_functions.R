@@ -62,7 +62,7 @@ analyze_subsamples <- function(df, type, q.range, n.splits, n.resamples, n.draws
   names(df) <- c("id", "site", "y")
   sites = unique(df$site)
   
-  results = array(data = NA, dim = c(11, length(q.range), n.draws))
+  results = array(data = NA, dim = c(14, length(q.range), n.draws))
   
   for (q in 1:length(q.range)){
     
@@ -104,7 +104,7 @@ analyze_subsamples <- function(df, type, q.range, n.splits, n.resamples, n.draws
         out.varying.sample$estimate
       }
       
-      results[,q,] = matrix(r, nrow = 11, ncol = n.draws)
+      results[,q,] = matrix(r, nrow = 14, ncol = n.draws)
     }
   }
   parallel::stopCluster(cl)
