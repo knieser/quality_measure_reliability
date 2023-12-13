@@ -92,6 +92,9 @@ calcReliability <- function(df0, type, reps, resamples, n.cores){
   n0 = 1 / (n.providers - 1) * (sum(n.pts) - sum(n.pts^2) / sum(n.pts))
 
   # initialize
+  est.HLGM.model = NA
+  est.HLGM.FE.model = NA
+  est.HLGM.RE.model = NA
   est.HLGM = NA
   est.HLGM.FE = NA
   est.HLGM.RE = NA
@@ -131,8 +134,16 @@ calcReliability <- function(df0, type, reps, resamples, n.cores){
   # hierarchical logistic regression
   if (type == 'binary'){
     mod.HLGM.RE <- lme4::glmer(y ~ (1|provider), data = df, family = 'binomial')
-    marg.p <- plogis(lme4::fixef(mod.HLGM.RE))
     var.b.HLGM <- lme4::VarCorr(mod.HLGM.RE)$provider[1,1]
+    
+    # calculate based on model
+    marg.p.model <- plogis(mean(predict(mod.HLGM.RE, newdata = df, re.form = NA)))
+    var.b.HLGM.pscale.model <- marg.p.model^2 * (1 - marg.p.model)^2 * var.b.HLGM
+    var.w.HLGM.model = marg.p.model * (1 - marg.p.model) / n.pts
+    est.HLGM.model = var.b.HLGM.pscale.model / (var.b.HLGM.pscale.model + var.w.HLGM.model)
+    
+    # use simple estimate for overall proportion
+    marg.p <- mean(df$y)
     var.b.HLGM.pscale <- marg.p^2 * (1 - marg.p)^2 * var.b.HLGM
     var.w.HLGM = marg.p * (1 - marg.p) / n.pts
     est.HLGM = var.b.HLGM.pscale / (var.b.HLGM.pscale + var.w.HLGM)
@@ -141,12 +152,14 @@ calcReliability <- function(df0, type, reps, resamples, n.cores){
     logit.re <- coef(mod.HLGM.RE)$provider[,1]
     p.re <- 1 / (1 + exp(-logit.re))
     var.w.RE <- p.re * (1 - p.re) / n.pts
+    est.HLGM.RE.model <- var.b.HLGM.pscale.model / (var.b.HLGM.pscale.model + var.w.RE)
     est.HLGM.RE <- var.b.HLGM.pscale / (var.b.HLGM.pscale + var.w.RE)
     
     # within variance from fixed effects model
     mod.HLGM.FE <- glm(y ~ provider, data = df, family = 'binomial')
     p.fe <- as.vector(predict.glm(mod.HLGM.FE, data.frame(provider = levels(df$provider)), type = 'response'))
     var.w.FE <- p.fe * (1 - p.fe) / n.pts
+    est.HLGM.FE.model <- var.b.HLGM.pscale.model / (var.b.HLGM.pscale.model + var.w.FE)
     est.HLGM.FE <- var.b.HLGM.pscale / (var.b.HLGM.pscale + var.w.FE)
     
     # Beta-Binomial
@@ -169,9 +182,12 @@ calcReliability <- function(df0, type, reps, resamples, n.cores){
       'Perm-SSR', 
       'ANOVA',
       'Hier. Linear', 
-      'Hier. Logit', 
-      'Hier. Logit - FE',
-      'Hier. Logit - RE',
+      'Hier. Logit 1', 
+      'Hier. Logit - FE 1',
+      'Hier. Logit - RE 1',
+      'Hier. Logit 2', 
+      'Hier. Logit - FE 2',
+      'Hier. Logit - RE 2',
       'Beta-Binomial',
       'Beta-Binomial - FE',
       'Beta-Binomial - RE',
@@ -181,6 +197,9 @@ calcReliability <- function(df0, type, reps, resamples, n.cores){
       est.PSSR,
       median(est.aov),
       median(est.HLM), 
+      median(est.HLGM.model), 
+      median(est.HLGM.FE.model), 
+      median(est.HLGM.RE.model), 
       median(est.HLGM), 
       median(est.HLGM.FE), 
       median(est.HLGM.RE), 
