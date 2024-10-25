@@ -1,6 +1,7 @@
 # Quality measure reliability
 
-This repository contains code for calculating reliability of health care quality measures.
+This repository contains code for calculating reliability of health care quality measures. More detail on each method can be found in 
+[Comparing methods for assessing the reliability of health care quality measures](https://doi.org/10.1002/sim.10197).
 
 The function `calcReliability()` within `reliability_functions.R` estimates reliability 14 different ways for
 measures with binary outcomes (e.g. follow-up visit occurred or not) and 4 different ways for measures with continuous outcomes. This function takes 5 parameters:
