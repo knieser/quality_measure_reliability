@@ -1,0 +1,174 @@
+#' Calculate reliability using split-sample method
+#' @description
+#' This function estimates reliability using the split-sample method.
+#' @param df dataframe; if null, will use the dataframe in the model object
+#' @param model model; if null, will use an unadjusted model
+#' @param y variable to use as the outcome
+#' @param provider variable to use as the accountable entity
+#' @param ctrPerf parameters to control performance measure calculation
+#' @param ctrRel parameters to control reliability estimation
+#' @returns A list with the following components:
+#'  \item{var.b.aov}{between-entity variance}
+#' @returns The plot function can be used to plot the provider-level reliability estimates.
+#' @author Kenneth Nieser (nieser@stanford.edu)
+#' @references None
+#' @examples
+#' # TBD
+#' @importFrom parallel makeCluster
+#' @importFrom doParallel registerDoParallel
+#' @importFrom foreach foreach
+#' @importFrom psych ICC
+#' @export
+calcSSR <- function(df = NULL, model = NULL, y, provider, ctrPerf = controlPerf(), ctrRel = controlRel()){
+  if (is.null(df) & is.null(model)) stop ('Please provide either a dataframe or a model object')
+  if (is.null(df)){df <- model@frame}
+
+  fn <- ctrRel$fn
+  if(is.na(fn)){fn = function(x){mean(x)}}
+  n.cores     <- ctrRel$n.cores
+  method      <- ctrRel$method
+  n.resamples <- ctrRel$n.resamples
+  boots       <- ctrRel$n.boots
+
+  data.out <- calcDataSummary(df, model, y, provider, ctrPerf)
+  df <- data.out$df
+
+  providers = unique(df$provider)
+  n.providers = length(providers)
+
+  cl <- parallel::makeCluster(n.cores)
+  doParallel::registerDoParallel(cl)
+
+  out <- foreach::foreach(s = 1:n.resamples, .combine = rbind, .packages = c('psych')) %dopar% {
+
+  if (method=='permutation'){
+    # randomly assign each record into either s=1 or s=2 for each provider
+    df$s <- 1
+    for (j in 1:n.providers){
+      provider.df <- df[df$provider == providers[j], ]
+      provider.df$s[sample(nrow(provider.df), nrow(provider.df)/2, replace = F)] <- 2
+      df$s[df$provider == providers[j]] <- provider.df$s
+      }
+    df$s <- as.factor(df$s)
+
+    # calculate performance by provider and split-half
+    provider.means <- aggregate(y ~ provider + s, data = df, function(x) fn(x))
+    provider.means.wide <- reshape(provider.means, idvar = "provider", timevar = "s", direction = "wide")
+
+    agg   <- aggregate(y ~ provider + s, data = df, sum)
+    agg$obs   <- agg$y
+    agg$pred  <- aggregate(predict ~ provider + s, data = df, sum)$predict
+    agg$exp   <- aggregate(expect ~ provider + s, data = df, sum)$expect
+    agg$oe    <- agg$obs / agg$exp
+    agg$pe    <- agg$pred / agg$exp
+    provider.means.wide.adj <- reshape(agg, idvar = "provider", timevar = "s", direction = "wide")
+
+    # calculate ICCs using psych package
+    aov.out  <- psych::ICC(provider.means.wide[,-1], lmer = F)
+    aov.ICC = aov.out$results$ICC
+    aov.ICC.lb = aov.out$results$`lower bound`
+    aov.ICC.ub = aov.out$results$`upper bound`
+    aov.summary = matrix(unlist(aov.out$summary), ncol = 3, byrow = T)
+    aov.var.w = (aov.summary[2,2] + aov.summary[2,3])/(aov.summary[1,2] + aov.summary[1,3])
+    aov.var.b = (aov.summary[3,1] - aov.var.w) / 2
+
+    aov.out.oe  <- psych::ICC(provider.means.wide.adj[,c('oe.1', 'oe.2')], lmer = F)
+    aov.ICC.oe = aov.out.oe$results$ICC
+    aov.ICC.oe.lb = aov.out.oe$results$`lower bound`
+    aov.ICC.oe.ub = aov.out.oe$results$`upper bound`
+    aov.oe.summary = matrix(unlist(aov.out.oe$summary), ncol = 3, byrow = T)
+    aov.oe.var.w = (aov.oe.summary[2,2] + aov.oe.summary[2,3])/(aov.oe.summary[1,2] + aov.oe.summary[1,3])
+    aov.oe.var.b = (aov.oe.summary[3,1] - aov.oe.var.w) / 2
+
+    aov.out.pe  <- psych::ICC(provider.means.wide.adj[,c('pe.1', 'pe.2')], lmer = F)
+    aov.ICC.pe = aov.out.pe$results$ICC
+    aov.ICC.pe.lb = aov.out.pe$results$`lower bound`
+    aov.ICC.pe.ub = aov.out.pe$results$`upper bound`
+    aov.pe.summary = matrix(unlist(aov.out.pe$summary), ncol = 3, byrow = T)
+    aov.pe.var.w = (aov.pe.summary[2,2] + aov.pe.summary[2,3])/(aov.pe.summary[1,2] + aov.pe.summary[1,3])
+    aov.pe.var.b = (aov.pe.summary[3,1] - aov.pe.var.w) / 2
+  }
+
+  if(method == 'bootstrap'){
+    # resample data within each provider with replacement
+    df.boots <- data.frame(matrix(ncol = 4, nrow = 0))
+    names(df.boots) <- c('id', 'provider', 'boot', 'y')
+
+    for (j in 1:n.providers){
+      provider.df <- df[df$provider == providers[j], ]
+      provider.boots <- replicate(boots, {provider.df$y[sample(nrow(provider.df), nrow(provider.df), replace = T)]})
+      df.boots <- rbind(df.boots,
+                        data.frame(id = rep(provider.df$id, boots),
+                                   provider = rep(providers[j], boots),
+                                   boot = rep(1:boots, each = nrow(provider.df)),
+                                   y = c(provider.boots)
+                                   )
+                        )
+    }
+    provider.means <- aggregate(y ~ provider + boot, data = df.boots, function(x) fn(x))
+    provider.means.wide <- reshape(provider.means, idvar = "provider", timevar = "boot", direction = "wide")
+  }
+
+  if (method == 'permutation'){
+    icc.aov       = c(aov.ICC[4]) # Spearman-Brown correction
+    icc.aov.lb    = c(aov.ICC.lb[4])
+    icc.aov.ub    = c(aov.ICC.ub[4])
+    icc.aov.oe    = c(aov.ICC.oe[4])
+    icc.aov.oe.lb = c(aov.ICC.oe.lb[4])
+    icc.aov.oe.ub = c(aov.ICC.oe.ub[4])
+    icc.aov.pe    = c(aov.ICC.pe[4])
+    icc.aov.pe.lb = c(aov.ICC.pe.lb[4])
+    icc.aov.pe.ub = c(aov.ICC.pe.ub[4])
+
+    list(icc.aov       = icc.aov,
+         icc.aov.lb    = icc.aov.lb,
+         icc.aov.ub    = icc.aov.ub,
+         var.b.aov     = aov.var.b,
+         var.w.aov     = aov.var.w,
+         icc.aov.oe    = icc.aov.oe,
+         icc.aov.oe.lb = icc.aov.oe.lb,
+         icc.aov.oe.ub = icc.aov.oe.ub,
+         var.b.aov.oe  = aov.oe.var.b,
+         var.w.aov.oe  = aov.oe.var.w,
+         icc.aov.pe    = icc.aov.pe,
+         icc.aov.pe.lb = icc.aov.pe.lb,
+         icc.aov.pe.ub = icc.aov.pe.ub,
+         var.b.aov.pe  = aov.pe.var.b,
+         var.w.aov.pe  = aov.pe.var.w
+    )
+  } else {
+    icc.aov = c(aov.ICC[1]) # no Spearman-Brown correction
+    icc.aov.lb = c(aov.ICC.lb[1])
+    icc.aov.ub = c(aov.ICC.ub[1])
+  }
+  }
+  parallel::stopCluster(cl)
+
+  out <- as.data.frame(out)
+
+  output = list(
+      icc = as.vector(unlist(out$icc.aov)),
+      icc.lb = as.vector(unlist(out$icc.aov.lb)),
+      icc.ub = as.vector(unlist(out$icc.aov.ub)),
+      var.b.aov = as.vector(unlist(out$var.b.aov)),
+      var.w.aov = as.vector(unlist(out$var.w.aov)),
+      icc.oe = as.vector(unlist(out$icc.aov.oe)),
+      icc.oe.lb = as.vector(unlist(out$icc.aov.oe.lb)),
+      icc.oe.ub = as.vector(unlist(out$icc.aov.oe.ub)),
+      var.b.aov.oe = as.vector(unlist(out$var.b.aov.oe)),
+      var.w.aov.oe = as.vector(unlist(out$var.w.aov.oe)),
+      icc.pe = as.vector(unlist(out$icc.aov.pe)),
+      icc.pe.lb = as.vector(unlist(out$icc.aov.pe.lb)),
+      icc.pe.ub = as.vector(unlist(out$icc.aov.pe.ub)),
+      var.b.aov.pe = as.vector(unlist(out$var.b.aov.pe)),
+      var.w.aov.pe = as.vector(unlist(out$var.w.aov.pe))
+    )
+    output$est.SSR = output$icc[1]
+    output$est.PSSR = mean(output$icc)
+    output$est.SSR.oe = output$icc.oe[1]
+    output$est.PSSR.oe = mean(output$icc.oe)
+    output$est.SSR.pe  <- output$icc.pe[1]
+    output$est.PSSR.pe <- mean(output$icc.pe)
+
+  return(output)
+}

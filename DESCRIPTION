@@ -1,0 +1,14 @@
+Package: QMRel
+Title: Estimating Reliability of Quality Measures
+Version: 0.0.0.9000
+Authors@R: 
+    person("Kenneth", "Nieser", , "nieser@stanford.edu", role = c("aut", "cre"))
+Description: This package contains functions useful for analyzing quality measures and estimating reliability of quality measures.
+License: GPL (>= 3)
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
