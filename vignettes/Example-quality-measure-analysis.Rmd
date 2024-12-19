@@ -1,0 +1,74 @@
+---
+title: "Example-quality-measure-analysis"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Example-quality-measure-analysis}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(qmrel)
+```
+
+
+# Introduction
+This vignette shows how to use the functions in qmrel to analzye quality measure performance.
+
+First we'll simulate some data.
+
+```{r}
+n.providers = 100
+n = rep(200, n.providers)
+p = rbeta(n.providers, 0.5, 0.5) 
+df <- simulateData(n = n, p = p)
+```
+
+
+# Calculate measure performance
+
+```{r}
+perf.results <- calcPerformance(df = df, y = "y", provider = "provider")
+```
+
+# Plot number of observations per provider
+
+```{r}
+plotN(perf.results$perf.results$n)
+```
+
+# Plot measure performance
+
+```{r}
+plotPerformance(perf.results$perf.results)
+```
+
+
+# Identify high- and low-performing entities
+
+
+# Calculate risk-standardized performance
+
+
+# Plot risk-standardized performance
+
+
+
+# Identify high- and low-performing entities after risk-adjustment
+
+
+# Calculate reliability
+
+```{r}
+rel.results <- calcReliability(df = df, y = "y", provider = "provider")
+```
+
+
+
