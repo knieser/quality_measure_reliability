@@ -1,5 +1,5 @@
-Package: QMRel
-Title: Estimating Reliability of Quality Measures
+Package: qmrel
+Title: Estimate Reliability of Quality Measures
 Version: 0.0.0.9000
 Authors@R: 
     person("Kenneth", "Nieser", , "nieser@stanford.edu", role = c("aut", "cre"))
