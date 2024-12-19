@@ -1,8 +1,7 @@
 #' Simulate data
 #' @description
 #' This function simulates some data.
-#' @param n.providers the number of accountable entities
-#' @param n.pts the number of observations for each accountable entity
+#' @param n a vector of the number of observations for each accountable entity
 #' @param type variable type of the observations (e.g., binary)
 #' @returns A dataframe with the following columns:
 #'  \item{provider}{the accountable entity}
@@ -15,25 +14,25 @@
 #' @importFrom stats aov
 #' @export
 
-simulateData <- function(n.providers, n.pts, type = 'binary', p = NA, var.w = NA, lambda = NA){
+simulateData <- function(n, type = 'binary', p = NA, var.w = NA, lambda = NA){
 
-  n = sum(n.pts)
-  provider = rep(1:n.providers, times = n.pts)
+  n.providers = length(n)
+  provider = rep(1:n.providers, times = n)
   y <- vector()
 
   if (type == 'binary'){
     for (j in 1:n.providers){
-      provider_y <- rbinom(n.pts[j], 1, p[j])
+      provider_y <- rbinom(n[j], 1, p[j])
       ifelse(length(y)==0, y <- provider_y, y <- c(y, provider_y))
     }
   } else if (type == 'normal'){
     for (j in 1:n.providers){
-      provider_y <- rnorm(n.pts[j], p[j], sqrt(var.w))
+      provider_y <- rnorm(n[j], p[j], sqrt(var.w))
       ifelse(length(y)==0, y <- provider_y, y <- c(y, provider_y))
     }
   } else if (type == 'count'){
     for (j in 1:n.providers){
-      provider_y <- rpois(n.pts[j], lambda[j])
+      provider_y <- rpois(n[j], lambda[j])
       ifelse(length(y)==0, y <- provider_y, y <- c(y, provider_y))
     }
   }

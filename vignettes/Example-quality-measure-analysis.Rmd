@@ -15,6 +15,13 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
+library(devtools)
+library(ggplot2)
+library(doParallel)
+library(lme4)
+library(psych)
+
+document()
 library(qmrel)
 ```
 
@@ -26,49 +33,33 @@ First we'll simulate some data.
 
 ```{r}
 n.providers = 100
-n = rep(200, n.providers)
-p = rbeta(n.providers, 0.5, 0.5) 
+n = rpois(n.providers, 200)
+p = rbeta(n.providers, 1, 50) 
 df <- simulateData(n = n, p = p)
 ```
-
-
-# Calculate measure performance
-
-```{r}
-perf.results <- calcPerformance(df = df, y = "y", provider = "provider")
-```
-
-# Plot number of observations per provider
-
-```{r}
-plotN(perf.results$perf.results$n)
-```
-
-# Plot measure performance
-
-```{r}
-plotPerformance(perf.results$perf.results)
-```
-
-
-# Identify high- and low-performing entities
-
-
-# Calculate risk-standardized performance
-
-
-# Plot risk-standardized performance
-
-
-
-# Identify high- and low-performing entities after risk-adjustment
 
 
 # Calculate reliability
 
 ```{r}
-rel.results <- calcReliability(df = df, y = "y", provider = "provider")
+rel.results <- calcReliability(df = df)
 ```
 
 
+# Plot number of observations per provider
 
+```{r}
+plotN(rel.results$perf.res$perf.results$n)
+```
+
+# Plot measure performance
+
+```{r}
+plotPerformance(rel.results$perf.res$perf.results)
+```
+
+# Reliability estimates
+
+```{r}
+rel.results$rel.results
+```

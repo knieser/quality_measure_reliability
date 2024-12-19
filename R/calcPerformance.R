@@ -1,10 +1,10 @@
-#' Calculates measure performance by accountable entity
+#' Calculate measure performance by accountable entity
 #' @description
 #' This function calculates measure performance by accountable entity.
 #' @param df dataframe; if null, will use the dataframe in the model object
 #' @param model model; if null, will use an unadjusted model
-#' @param y variable to use as the outcome
-#' @param provider variable to use as the accountable entity
+#' @param y variable to use as the outcome; default = "y"
+#' @param provider variable to use as the accountable entity; default = "provider"
 #' @param ctrPerf parameters to control performance measure calculation
 #' @returns A list with the following components:
 #'  \item{var.b.aov}{between-entity variance}
@@ -17,7 +17,7 @@
 #' @importFrom lme4 bootMer
 #' @export
 
-calcPerformance <- function(df = NULL, model = NULL, y, provider, ctrPerf = controlPerf()){
+calcPerformance <- function(df = NULL, model = NULL, y = "y", provider = "provider", ctrPerf = controlPerf()){
   if (is.null(df) & is.null(model)) stop ('Please provide either a dataframe or a model object')
 
   data.out <- calcDataSummary(df, model, y, provider, ctrPerf)

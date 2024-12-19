@@ -26,9 +26,8 @@ calcSSR <- function(df = NULL, model = NULL, y, provider, ctrPerf = controlPerf(
   fn <- ctrRel$fn
   if(is.na(fn)){fn = function(x){mean(x)}}
   n.cores     <- ctrRel$n.cores
-  method      <- ctrRel$method
   n.resamples <- ctrRel$n.resamples
-  boots       <- ctrRel$n.boots
+  method      <- ctrRel$SSRmethod
 
   data.out <- calcDataSummary(df, model, y, provider, ctrPerf)
   df <- data.out$df

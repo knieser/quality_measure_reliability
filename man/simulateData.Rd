@@ -4,19 +4,10 @@
 \alias{simulateData}
 \title{Simulate data}
 \usage{
-simulateData(
-  n.providers,
-  n.pts,
-  type = "binary",
-  p = NA,
-  var.w = NA,
-  lambda = NA
-)
+simulateData(n, type = "binary", p = NA, var.w = NA, lambda = NA)
 }
 \arguments{
-\item{n.providers}{the number of accountable entities}
-
-\item{n.pts}{the number of observations for each accountable entity}
+\item{n}{a vector of the number of observations for each accountable entity}
 
 \item{type}{variable type of the observations (e.g., binary)}
 }

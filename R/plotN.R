@@ -1,7 +1,19 @@
+#' Plot sample size distribution across accountable entities
+#' @description
+#' This function creates a histogram of entity sample sizes.
+#' @param n vector of sample sizes
+#' @returns A ggplot figure
+#' @author Kenneth Nieser (nieser@stanford.edu)
+#' @references None
+#' @examples
+#' # TBD
+#' @importFrom ggplot2 ggplot
+#' @export
+
 plotN <- function(n){
   df <- data.frame(n)
-  fig <- ggplot(data = df, aes(n)) +
-    geom_histogram(binwidth = 100, color = 'white', fill = 'black') +
+  fig <- ggplot2::ggplot(data = df, aes(n)) +
+    geom_histogram(color = 'white', fill = 'black') +
     scale_y_continuous(expand = c(0,0)) +
     xlab('Number of cases') +
     ylab('Providers') +

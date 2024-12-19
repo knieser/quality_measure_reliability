@@ -1,11 +1,9 @@
-controlRel <- function(n.resamples = 10, n.cores = 4, method = 'permutation', fn = NA, n.boots = 10){
+controlRel <- function(n.cores = 4, n.resamples = 10, SSRmethod = 'permutation', fn = NA){
   output = list()
-  output$n.resamples <- n.resamples
   output$n.cores <- n.cores
-  output$method <- method
+  output$n.resamples <- n.resamples
+  output$SSRmethod <- SSRmethod
   output$fn <- fn
-  output$n.boots <- n.boots
   return(output)
 }
-  
-  
+
