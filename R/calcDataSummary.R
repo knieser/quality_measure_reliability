@@ -7,7 +7,7 @@ calcDataSummary <- function(df = NULL, model = NULL, entity = 'entity', y = "y",
   df <- cleanData(df, entity, y, ctrPerf)
   if (is.null(model)){
     f = paste0(y, ' ~ (1|', entity, ')')
-    model <- glmer(f, data = df, family = binomial, control = glmerControl(optimizer = "bobyqa"), nAGQ = 1)
+    model <- lme4::glmer(f, data = df, family = binomial, control = glmerControl(optimizer = "bobyqa"), nAGQ = 1)
   }
 
   df$expect  <- predict(model, newdata = df, type = 'response', re.form = ~0)
