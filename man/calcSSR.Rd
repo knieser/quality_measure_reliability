@@ -7,8 +7,8 @@
 calcSSR(
   df = NULL,
   model = NULL,
-  y,
-  provider,
+  y = "y",
+  provider = "provider",
   ctrPerf = controlPerf(),
   ctrRel = controlRel()
 )

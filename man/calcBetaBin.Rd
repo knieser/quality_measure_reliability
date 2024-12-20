@@ -4,7 +4,13 @@
 \alias{calcBetaBin}
 \title{Calculate reliability using a Beta-Binomial model}
 \usage{
-calcBetaBin(df = NULL, model = NULL, y, provider, ctrPerf = controlPerf())
+calcBetaBin(
+  df = NULL,
+  model = NULL,
+  y = "y",
+  provider = "provider",
+  ctrPerf = controlPerf()
+)
 }
 \arguments{
 \item{df}{dataframe; if null, will use the dataframe in the model object}

@@ -19,7 +19,7 @@
 #' @importFrom foreach foreach
 #' @importFrom psych ICC
 #' @export
-calcSSR <- function(df = NULL, model = NULL, y, provider, ctrPerf = controlPerf(), ctrRel = controlRel()){
+calcSSR <- function(df = NULL, model = NULL, y = 'y', provider = 'provider', ctrPerf = controlPerf(), ctrRel = controlRel()){
   if (is.null(df) & is.null(model)) stop ('Please provide either a dataframe or a model object')
   if (is.null(df)){df <- model@frame}
 

@@ -20,7 +20,7 @@
 #' @importFrom stats aggregate
 #' @export
 
-calcResamplingIUR <- function(df = NULL, model = NULL, y, provider, ctrPerf = controlPerf(), ctrRel = controlRel()){
+calcResamplingIUR <- function(df = NULL, model = NULL, y = 'y', provider = 'provider', ctrPerf = controlPerf(), ctrRel = controlRel()){
   if (is.null(df) & is.null(model)) stop ('Please provide either a dataframe or a model object')
   if (is.null(df)){df <- model@frame}
 
@@ -51,11 +51,10 @@ calcResamplingIUR <- function(df = NULL, model = NULL, y, provider, ctrPerf = co
     }
 
     # calculate measure by provider
-    provider.obs <- aggregate(y ~ provider, data = df.resample, sum)
-    provider.exp <- aggregate(expect ~ provider, data = df.resample, sum)
-    provider.OE <- merge(provider.obs, provider.exp, by = 'provider')
-
-    provider.means[,j] = provider.OE$y / provider.OE$expect
+    #obs <- aggregate(y ~ provider, data = df.resample, sum)$y
+    #exp <- aggregate(expect ~ provider, data = df.resample, sum)$expect
+    #provider.means[,j] = obs / exp
+    provider.means[,j] = aggregate(y ~ provider, data = df.resample, mean)$y
   }
 
   bootstrap.means = apply(provider.means, 1, mean)

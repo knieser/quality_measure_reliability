@@ -18,7 +18,7 @@
 #' @importFrom stats aov
 #' @export
 
-calcAOV <- function(df = NULL, model = NULL, y, provider, ctrPerf = controlPerf()){
+calcAOV <- function(df = NULL, model = NULL, y = 'y', provider = 'provider', ctrPerf = controlPerf()){
   if (is.null(df) & is.null(model)) stop ('Please provide either a dataframe or a model object')
   if (is.null(df)){df <- model@frame}
 

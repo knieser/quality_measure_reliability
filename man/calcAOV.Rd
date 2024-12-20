@@ -4,7 +4,13 @@
 \alias{calcAOV}
 \title{Calculate reliability using ANOVA method}
 \usage{
-calcAOV(df = NULL, model = NULL, y, provider, ctrPerf = controlPerf())
+calcAOV(
+  df = NULL,
+  model = NULL,
+  y = "y",
+  provider = "provider",
+  ctrPerf = controlPerf()
+)
 }
 \arguments{
 \item{df}{dataframe; if null, will use the dataframe in the model object}
