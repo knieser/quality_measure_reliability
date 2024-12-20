@@ -17,7 +17,7 @@
 #' @importFrom foreach foreach
 #' @importFrom psych ICC
 #' @export
-calcSSR <- function(df = NULL, model = NULL, y = 'y', entity = 'entity', ctrPerf = controlPerf(), ctrRel = controlRel()){
+calcSSR <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', ctrPerf = controlPerf(), ctrRel = controlRel()){
   if (is.null(df) & is.null(model)) stop ('Please provide either a dataframe or a model object')
   if (is.null(df)){df <- model@frame}
 
@@ -30,8 +30,8 @@ calcSSR <- function(df = NULL, model = NULL, y = 'y', entity = 'entity', ctrPerf
   data.out <- calcDataSummary(df, model, entity, y, ctrPerf)
   df <- data.out$df
 
-  entity = unique(df$entity)
-  n.entity = length(entity)
+  entities = unique(df$entity)
+  n.entity = length(entities)
 
   cl <- parallel::makeCluster(n.cores)
   doParallel::registerDoParallel(cl)
@@ -42,9 +42,9 @@ calcSSR <- function(df = NULL, model = NULL, y = 'y', entity = 'entity', ctrPerf
     # randomly assign each record into either s=1 or s=2 for each entity
     df$s <- 1
     for (j in 1:n.entity){
-      entity.df <- df[df$entity == entity[j], ]
+      entity.df <- df[df$entity == entities[j], ]
       entity.df$s[sample(nrow(entity.df), nrow(entity.df)/2, replace = F)] <- 2
-      df$s[df$entity == entity[j]] <- entity.df$s
+      df$s[df$entity == entities[j]] <- entity.df$s
       }
     df$s <- as.factor(df$s)
 
@@ -92,11 +92,11 @@ calcSSR <- function(df = NULL, model = NULL, y = 'y', entity = 'entity', ctrPerf
     names(df.boots) <- c('id', 'entity', 'boot', 'y')
 
     for (j in 1:n.entity){
-      entity.df <- df[df$entity == entity[j], ]
+      entity.df <- df[df$entity == entities[j], ]
       entity.boots <- replicate(boots, {entity.df$y[sample(nrow(entity.df), nrow(entity.df), replace = T)]})
       df.boots <- rbind(df.boots,
                         data.frame(id = rep(entity.df$id, boots),
-                                   entity = rep(entity[j], boots),
+                                   entity = rep(entities[j], boots),
                                    boot = rep(1:boots, each = nrow(entity.df)),
                                    y = c(entity.boots)
                                    )

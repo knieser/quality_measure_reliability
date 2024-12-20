@@ -9,10 +9,7 @@ plotPerformance(df, plot.y = "p")
 \arguments{
 \item{df}{perf.results dataframe from calcPerformance() output}
 
-\item{plot.y}{'p' plots the unadjusted performance, 'oe' plots the observed-to-expected ratio based on the risk-adjustment model}
-}
-\value{
-A ggplot figure
+\item{plot.y}{'p' plots the unadjusted performance, 'oe' plots the observed-to-expected ratio, 'rs' plots the risk-standardized rate, and 'pe' plots the predicted-to-expected ratio'}
 }
 \description{
 This function creates a plot of measure performance across accountable entities, using the perf.results dataframe from calcPerformance() output.

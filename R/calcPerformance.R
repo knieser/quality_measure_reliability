@@ -23,7 +23,7 @@ calcPerformance <- function(df = NULL, model = NULL, entity = "entity", y = "y",
   model = data.out$model
   marg.p <- data.out$marg.p
   marg.p.model <- data.out$marg.p.model
-  entity <- data.out$entity
+  entities <- data.out$entities
   n  <- data.out$n
   obs <- data.out$obs
   p <- data.out$p
@@ -36,9 +36,10 @@ calcPerformance <- function(df = NULL, model = NULL, entity = "entity", y = "y",
 
   oe      <- obs / exp
   pe      <- pred / exp
-  rs.p    <- oe * marg.p
+  rs      <- oe * marg.p
   rank.oe <- rank(oe, ties.method = "random")
   rank.pe <- rank(pe, ties.method = "random")
+  rank.rs <- rank(rs, ties.method = "random")
   pred.se <- sqrt(aggregate(predict.var ~ entity, data = df, sum)$predict.var)
   obs.se  <- sqrt(pred.se * (1 + 1/n))
   oe.lwr  <- (obs - 1.96*obs.se) / exp
@@ -53,22 +54,31 @@ calcPerformance <- function(df = NULL, model = NULL, entity = "entity", y = "y",
     data$entity <- data[[entity]]
     data$expect <- predict(x, newdata = data, type = 'response', re.form = ~0)
     data$predict <- predict(x, newdata = data, type = 'response')
-    marg.p  <- mean(data$y)
-    obs     <- aggregate(y ~ entity, data = data, sum)$y
-    pred    <- aggregate(predict ~ entity, data = data, sum)$predict
-    exp     <- aggregate(expect ~ entity, data = data, sum)$expect
-    oe      <- obs / exp
-    pe      <- pred / exp
-    rs.p    <- oe * marg.p
-    return(oe)
+    marg.p <- mean(data$y)
+    obs    <- aggregate(y ~ entity, data = data, sum)$y
+    pred   <- aggregate(predict ~ entity, data = data, sum)$predict
+    exp    <- aggregate(expect ~ entity, data = data, sum)$expect
+    oe     <- obs / exp
+    pe     <- pred / exp
+    rs     <- oe * marg.p
+    out    <- c(oe, pe, rs)
+    return(out)
   }
-  b <- lme4::bootMer(model, FUN = g, seed = 110, nsim = n.sims,
-               use.u = TRUE, parallel = 'multicore', ncpus = n.cores)
-  bootmer_res <- t(apply(as.data.frame(b), 2, quantile, c(0.5, 0.025, 0.975)))
-  bootmer_res <- setNames(as.data.frame(bootmer_res), c('est', 'lwr', 'upr'))
+  b <- lme4::bootMer(model, FUN = g, nsim = n.sims, use.u = TRUE, parallel = 'multicore', ncpus = n.cores)
+  oe.boot <- as.data.frame(b$t[,1:length(n)])
+  pe.boot <- as.data.frame(b$t[,(length(n) + 1):(2*length(n))])
+  rs.boot <- as.data.frame(b$t[,(2*length(n)+1):ncol(b$t)])
+
+  bootmer.res.oe <- t(apply(oe.boot, 2, quantile, c(0.5, 0.025, 0.975)))
+  bootmer.res.pe <- t(apply(pe.boot, 2, quantile, c(0.5, 0.025, 0.975)))
+  bootmer.res.rs <- t(apply(rs.boot, 2, quantile, c(0.5, 0.025, 0.975)))
+
+  bootmer.res.oe <- setNames(as.data.frame(bootmer.res.oe), c('est', 'lwr', 'upr'))
+  bootmer.res.pe <- setNames(as.data.frame(bootmer.res.pe), c('est', 'lwr', 'upr'))
+  bootmer.res.rs <- setNames(as.data.frame(bootmer.res.rs), c('est', 'lwr', 'upr'))
 
   perf.results <- data.frame(
-    entity = entity,
+    entities = entities,
     n = n,
     observed = obs,
     predicted = pred,
@@ -81,13 +91,17 @@ calcPerformance <- function(df = NULL, model = NULL, entity = "entity", y = "y",
     oe = oe,
     oe.lwr = oe.lwr,
     oe.upr = oe.upr,
-    oe.boot = bootmer_res$est,
-    oe.boot.lwr = bootmer_res$lwr,
-    oe.boot.upr = bootmer_res$upr,
-    pe = pe,
+    oe.boot.lwr = bootmer.res.oe$lwr,
+    oe.boot.upr = bootmer.res.oe$upr,
     rank.oe = rank.oe,
+    pe = pe,
+    pe.lwr = bootmer.res.pe$lwr,
+    pe.upr = bootmer.res.pe$upr,
     rank.pe = rank.pe,
-    rs.p = rs.p
+    rs = rs,
+    rs.lwr = bootmer.res.rs$lwr,
+    rs.upr = bootmer.res.rs$upr,
+    rank.rs = rank.rs
   )
   output = list(df = df, model = model, marg.p = marg.p, marg.p.model = marg.p.model, perf.results = perf.results)
 

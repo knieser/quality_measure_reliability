@@ -32,9 +32,9 @@ This vignette shows how to use the functions in qmrel to analzye quality measure
 First we'll simulate some data.
 
 ```{r}
-n.providers = 100
-n = rpois(n.providers, 200)
-p = rbeta(n.providers, 1, 50) 
+n.entity = 100
+n = rpois(n.entity, 200)
+p = rbeta(n.entity, 1, 50) 
 df <- simulateData(n = n, p = p)
 ```
 
@@ -56,6 +56,8 @@ plotN(rel.results$perf.res$perf.results$n)
 
 ```{r}
 plotPerformance(rel.results$perf.res$perf.results)
+plotPerformance(rel.results$perf.res$perf.results, 'rs')
+
 ```
 
 # Reliability estimates

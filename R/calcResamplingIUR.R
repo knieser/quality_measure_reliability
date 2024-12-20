@@ -32,8 +32,8 @@ calcResamplingIUR <- function(df = NULL, model = NULL,  entity = 'entity', y = '
   n0 <- 1 / (length(n) - 1) * (sum(n) - sum(n^2) / sum(n))
   marg.p <- data.out$marg.p
 
-  entity = unique(df$entity)
-  n.entity = length(entity)
+  entities = unique(df$entity)
+  n.entity = length(entities)
 
   entity.means0 = aggregate(y ~ entity, data = df, mean)$y
   var.total = 1/(n0*(n.entity - 1)) * sum(n * (entity.means0 - marg.p)^2)
@@ -44,7 +44,7 @@ calcResamplingIUR <- function(df = NULL, model = NULL,  entity = 'entity', y = '
     # take a bootstrap resample within each entity separately
     df.resample = data.frame()
     for (i in 1:n.entity){
-      entity.df <- df[df$entity == entity[i], ]
+      entity.df <- df[df$entity == entities[i], ]
       entity.df.resample <- entity.df[sample(nrow(entity.df), nrow(entity.df), replace = T), ]
       df.resample <- rbind(df.resample, entity.df.resample)
     }

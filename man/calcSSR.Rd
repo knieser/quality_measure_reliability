@@ -7,8 +7,8 @@
 calcSSR(
   df = NULL,
   model = NULL,
-  y = "y",
   entity = "entity",
+  y = "y",
   ctrPerf = controlPerf(),
   ctrRel = controlRel()
 )
@@ -18,9 +18,9 @@ calcSSR(
 
 \item{model}{model; if null, will use an unadjusted model}
 
-\item{y}{variable to use as the outcome}
-
 \item{entity}{variable to use as the accountable entity}
+
+\item{y}{variable to use as the outcome}
 
 \item{ctrPerf}{parameters to control performance measure calculation}
 
