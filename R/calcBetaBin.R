@@ -3,12 +3,10 @@
 #' This function estimates reliability using a Beta-Binomial model.
 #' @param df dataframe; if null, will use the dataframe in the model object
 #' @param model model; if null, will use an unadjusted model
+#' @param entity variable to use as the accountable entity
 #' @param y variable to use as the outcome
-#' @param provider variable to use as the accountable entity
 #' @param ctrPerf parameters to control performance measure calculation
-#' @returns A list with the following components:
-#'  \item{var.b.aov}{between-entity variance}
-#' @returns The plot function can be used to plot the provider-level reliability estimates.
+#' @returns Estimated parameters from the Beta-Binomial model, estimates of between and within-entity variance, and estimates of entity-specific reliability
 #' @author Kenneth Nieser (nieser@stanford.edu)
 #' @references None
 #' @examples
@@ -16,11 +14,11 @@
 #' @importFrom stats optim median
 #' @export
 
-calcBetaBin <- function(df = NULL, model = NULL, y = 'y', provider = 'provider', ctrPerf = controlPerf()){
+calcBetaBin <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', ctrPerf = controlPerf()){
   if (is.null(df) & is.null(model)) stop ('Please provide either a dataframe or a model object')
   if (is.null(df)){df <- model@frame}
 
-  data.out <- calcDataSummary(df, model, y, provider, ctrPerf)
+  data.out <- calcDataSummary(df, model, entity, y, ctrPerf)
   df <- data.out$df
   marg.p <- data.out$marg.p
   marg.p.model <- data.out$marg.p.model

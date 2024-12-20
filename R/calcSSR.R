@@ -3,13 +3,11 @@
 #' This function estimates reliability using the split-sample method.
 #' @param df dataframe; if null, will use the dataframe in the model object
 #' @param model model; if null, will use an unadjusted model
+#' @param entity variable to use as the accountable entity
 #' @param y variable to use as the outcome
-#' @param provider variable to use as the accountable entity
 #' @param ctrPerf parameters to control performance measure calculation
 #' @param ctrRel parameters to control reliability estimation
-#' @returns A list with the following components:
-#'  \item{var.b.aov}{between-entity variance}
-#' @returns The plot function can be used to plot the provider-level reliability estimates.
+#' @returns SSR reliability estimates
 #' @author Kenneth Nieser (nieser@stanford.edu)
 #' @references None
 #' @examples
@@ -19,7 +17,7 @@
 #' @importFrom foreach foreach
 #' @importFrom psych ICC
 #' @export
-calcSSR <- function(df = NULL, model = NULL, y = 'y', provider = 'provider', ctrPerf = controlPerf(), ctrRel = controlRel()){
+calcSSR <- function(df = NULL, model = NULL, y = 'y', entity = 'entity', ctrPerf = controlPerf(), ctrRel = controlRel()){
   if (is.null(df) & is.null(model)) stop ('Please provide either a dataframe or a model object')
   if (is.null(df)){df <- model@frame}
 
@@ -29,11 +27,11 @@ calcSSR <- function(df = NULL, model = NULL, y = 'y', provider = 'provider', ctr
   n.resamples <- ctrRel$n.resamples
   method      <- ctrRel$SSRmethod
 
-  data.out <- calcDataSummary(df, model, y, provider, ctrPerf)
+  data.out <- calcDataSummary(df, model, entity, y, ctrPerf)
   df <- data.out$df
 
-  providers = unique(df$provider)
-  n.providers = length(providers)
+  entity = unique(df$entity)
+  n.entity = length(entity)
 
   cl <- parallel::makeCluster(n.cores)
   doParallel::registerDoParallel(cl)
@@ -41,29 +39,29 @@ calcSSR <- function(df = NULL, model = NULL, y = 'y', provider = 'provider', ctr
   out <- foreach::foreach(s = 1:n.resamples, .combine = rbind, .packages = c('psych')) %dopar% {
 
   if (method=='permutation'){
-    # randomly assign each record into either s=1 or s=2 for each provider
+    # randomly assign each record into either s=1 or s=2 for each entity
     df$s <- 1
-    for (j in 1:n.providers){
-      provider.df <- df[df$provider == providers[j], ]
-      provider.df$s[sample(nrow(provider.df), nrow(provider.df)/2, replace = F)] <- 2
-      df$s[df$provider == providers[j]] <- provider.df$s
+    for (j in 1:n.entity){
+      entity.df <- df[df$entity == entity[j], ]
+      entity.df$s[sample(nrow(entity.df), nrow(entity.df)/2, replace = F)] <- 2
+      df$s[df$entity == entity[j]] <- entity.df$s
       }
     df$s <- as.factor(df$s)
 
-    # calculate performance by provider and split-half
-    provider.means <- aggregate(y ~ provider + s, data = df, function(x) fn(x))
-    provider.means.wide <- reshape(provider.means, idvar = "provider", timevar = "s", direction = "wide")
+    # calculate performance by entity and split-half
+    entity.means <- aggregate(y ~ entity + s, data = df, function(x) fn(x))
+    entity.means.wide <- reshape(entity.means, idvar = "entity", timevar = "s", direction = "wide")
 
-    agg   <- aggregate(y ~ provider + s, data = df, sum)
+    agg   <- aggregate(y ~ entity + s, data = df, sum)
     agg$obs   <- agg$y
-    agg$pred  <- aggregate(predict ~ provider + s, data = df, sum)$predict
-    agg$exp   <- aggregate(expect ~ provider + s, data = df, sum)$expect
+    agg$pred  <- aggregate(predict ~ entity + s, data = df, sum)$predict
+    agg$exp   <- aggregate(expect ~ entity + s, data = df, sum)$expect
     agg$oe    <- agg$obs / agg$exp
     agg$pe    <- agg$pred / agg$exp
-    provider.means.wide.adj <- reshape(agg, idvar = "provider", timevar = "s", direction = "wide")
+    entity.means.wide.adj <- reshape(agg, idvar = "entity", timevar = "s", direction = "wide")
 
     # calculate ICCs using psych package
-    aov.out  <- psych::ICC(provider.means.wide[,-1], lmer = F)
+    aov.out  <- psych::ICC(entity.means.wide[,-1], lmer = F)
     aov.ICC = aov.out$results$ICC
     aov.ICC.lb = aov.out$results$`lower bound`
     aov.ICC.ub = aov.out$results$`upper bound`
@@ -71,7 +69,7 @@ calcSSR <- function(df = NULL, model = NULL, y = 'y', provider = 'provider', ctr
     aov.var.w = (aov.summary[2,2] + aov.summary[2,3])/(aov.summary[1,2] + aov.summary[1,3])
     aov.var.b = (aov.summary[3,1] - aov.var.w) / 2
 
-    aov.out.oe  <- psych::ICC(provider.means.wide.adj[,c('oe.1', 'oe.2')], lmer = F)
+    aov.out.oe  <- psych::ICC(entity.means.wide.adj[,c('oe.1', 'oe.2')], lmer = F)
     aov.ICC.oe = aov.out.oe$results$ICC
     aov.ICC.oe.lb = aov.out.oe$results$`lower bound`
     aov.ICC.oe.ub = aov.out.oe$results$`upper bound`
@@ -79,7 +77,7 @@ calcSSR <- function(df = NULL, model = NULL, y = 'y', provider = 'provider', ctr
     aov.oe.var.w = (aov.oe.summary[2,2] + aov.oe.summary[2,3])/(aov.oe.summary[1,2] + aov.oe.summary[1,3])
     aov.oe.var.b = (aov.oe.summary[3,1] - aov.oe.var.w) / 2
 
-    aov.out.pe  <- psych::ICC(provider.means.wide.adj[,c('pe.1', 'pe.2')], lmer = F)
+    aov.out.pe  <- psych::ICC(entity.means.wide.adj[,c('pe.1', 'pe.2')], lmer = F)
     aov.ICC.pe = aov.out.pe$results$ICC
     aov.ICC.pe.lb = aov.out.pe$results$`lower bound`
     aov.ICC.pe.ub = aov.out.pe$results$`upper bound`
@@ -89,23 +87,23 @@ calcSSR <- function(df = NULL, model = NULL, y = 'y', provider = 'provider', ctr
   }
 
   if(method == 'bootstrap'){
-    # resample data within each provider with replacement
+    # resample data within each entity with replacement
     df.boots <- data.frame(matrix(ncol = 4, nrow = 0))
-    names(df.boots) <- c('id', 'provider', 'boot', 'y')
+    names(df.boots) <- c('id', 'entity', 'boot', 'y')
 
-    for (j in 1:n.providers){
-      provider.df <- df[df$provider == providers[j], ]
-      provider.boots <- replicate(boots, {provider.df$y[sample(nrow(provider.df), nrow(provider.df), replace = T)]})
+    for (j in 1:n.entity){
+      entity.df <- df[df$entity == entity[j], ]
+      entity.boots <- replicate(boots, {entity.df$y[sample(nrow(entity.df), nrow(entity.df), replace = T)]})
       df.boots <- rbind(df.boots,
-                        data.frame(id = rep(provider.df$id, boots),
-                                   provider = rep(providers[j], boots),
-                                   boot = rep(1:boots, each = nrow(provider.df)),
-                                   y = c(provider.boots)
+                        data.frame(id = rep(entity.df$id, boots),
+                                   entity = rep(entity[j], boots),
+                                   boot = rep(1:boots, each = nrow(entity.df)),
+                                   y = c(entity.boots)
                                    )
                         )
     }
-    provider.means <- aggregate(y ~ provider + boot, data = df.boots, function(x) fn(x))
-    provider.means.wide <- reshape(provider.means, idvar = "provider", timevar = "boot", direction = "wide")
+    entity.means <- aggregate(y ~ entity + boot, data = df.boots, function(x) fn(x))
+    entity.means.wide <- reshape(entity.means, idvar = "entity", timevar = "boot", direction = "wide")
   }
 
   if (method == 'permutation'){

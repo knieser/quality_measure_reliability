@@ -16,7 +16,7 @@ plotN <- function(n){
     geom_histogram(color = 'white', fill = 'black') +
     scale_y_continuous(expand = c(0,0)) +
     xlab('Number of cases') +
-    ylab('Providers') +
+    ylab('Entities') +
     ggtitle('Sample size distribution') +
     theme_classic() +
     theme(

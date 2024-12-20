@@ -3,12 +3,11 @@
 #' This function estimates reliability using a multilevel logistic regression model.
 #' @param df dataframe; if null, will use the dataframe in the model object
 #' @param model model; if null, will use an unadjusted model
+#' @param entity variable to use as the accountable entity
 #' @param y variable to use as the outcome
-#' @param provider variable to use as the accountable entity
 #' @param ctrPerf parameters to control performance measure calculation
-#' @returns A list with the following components:
+#' @returns Estimated parameters and reliability
 #'  \item{var.b.aov}{between-entity variance}
-#' @returns The plot function can be used to plot the provider-level reliability estimates.
 #' @author Kenneth Nieser (nieser@stanford.edu)
 #' @references None
 #' @examples
@@ -16,11 +15,11 @@
 #' @importFrom lme4 VarCorr
 #' @export
 
-calcHLGMRel <- function(df = NULL, model = NULL, y = 'y', provider = 'provider', ctrPerf = controlPerf()){
+calcHLGMRel <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', ctrPerf = controlPerf()){
   if (is.null(df) & is.null(model)) stop ('Please provide either a dataframe or a model object')
   if (is.null(df)){df <- model@frame}
 
-  data.out <- calcDataSummary(df, model, y, provider, ctrPerf)
+  data.out <- calcDataSummary(df, model, entity, y, ctrPerf)
   df <- data.out$df
   model <- data.out$model
   marg.p <- data.out$marg.p
@@ -30,7 +29,7 @@ calcHLGMRel <- function(df = NULL, model = NULL, y = 'y', provider = 'provider',
   p.re <- data.out$p.re
 
   # calculate between-variance based on model
-  var.b.HLGM <- lme4::VarCorr(model)[[provider]][1,1]
+  var.b.HLGM <- lme4::VarCorr(model)[[entity]][1,1]
   var.b.HLGM.pscale.model <- marg.p^2 * (1 - marg.p)^2 * var.b.HLGM
 
   # within-variance based on sample proportion estimates

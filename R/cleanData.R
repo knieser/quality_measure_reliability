@@ -1,20 +1,20 @@
-cleanData <- function(df, y = "y", provider = "provider", ctrPerf = controlPerf()){
+cleanData <- function(df, entity = "entity", y = "y", ctrPerf = controlPerf()){
   min.n <- ctrPerf$min.n
 
   # fix columns
   df$y <- df[[y]]
-  df$provider <- df[[provider]]
+  df$entity <- df[[entity]]
 
-  # drop providers with less than the minimum number of observations
-  sample.size <- aggregate(y ~ provider, data = df, length)
-  small.providers <- sample.size[sample.size[,2] < min.n, 1]
-  if(length(small.providers) > 0){
-    message(paste0('Dropping entities with insufficient sample size...', c(small.providers)))
-    message(paste0(length(small.providers), ' entities have been dropped.'))
+  # drop entities with less than the minimum number of observations
+  sample.size <- aggregate(y ~ entity, data = df, length)
+  small.entities <- sample.size[sample.size[,2] < min.n, 1]
+  if(length(small.entities) > 0){
+    message(paste0('Dropping entities with insufficient sample size...', c(small.entities)))
+    message(paste0(length(small.entities), ' entities have been dropped.'))
     }
-  df <- df[!(df$provider %in% small.providers), ]
+  df <- df[!(df$entity %in% small.entities), ]
 
-  df$provider = factor(df$provider)
+  df$entity = factor(df$entity)
 
   return(df)
 }

@@ -3,12 +3,10 @@
 #' This function calculates measure performance by accountable entity.
 #' @param df dataframe; if null, will use the dataframe in the model object
 #' @param model model; if null, will use an unadjusted model
+#' @param entity variable to use as the accountable entity; default = "entity"
 #' @param y variable to use as the outcome; default = "y"
-#' @param provider variable to use as the accountable entity; default = "provider"
 #' @param ctrPerf parameters to control performance measure calculation
-#' @returns A list with the following components:
-#'  \item{var.b.aov}{between-entity variance}
-#' @returns The plot function can be used to plot the provider-level reliability estimates.
+#' @returns Estimated measure performance by accountable entity
 #' @author Kenneth Nieser (nieser@stanford.edu)
 #' @references None
 #' @examples
@@ -17,15 +15,15 @@
 #' @importFrom lme4 bootMer
 #' @export
 
-calcPerformance <- function(df = NULL, model = NULL, y = "y", provider = "provider", ctrPerf = controlPerf()){
+calcPerformance <- function(df = NULL, model = NULL, entity = "entity", y = "y", ctrPerf = controlPerf()){
   if (is.null(df) & is.null(model)) stop ('Please provide either a dataframe or a model object')
 
-  data.out <- calcDataSummary(df, model, y, provider, ctrPerf)
+  data.out <- calcDataSummary(df, model, entity, y, ctrPerf)
   df <- data.out$df
   model = data.out$model
   marg.p <- data.out$marg.p
   marg.p.model <- data.out$marg.p.model
-  entity <- data.out$provider
+  entity <- data.out$entity
   n  <- data.out$n
   obs <- data.out$obs
   p <- data.out$p
@@ -41,7 +39,7 @@ calcPerformance <- function(df = NULL, model = NULL, y = "y", provider = "provid
   rs.p    <- oe * marg.p
   rank.oe <- rank(oe, ties.method = "random")
   rank.pe <- rank(pe, ties.method = "random")
-  pred.se <- sqrt(aggregate(predict.var ~ provider, data = df, sum)$predict.var)
+  pred.se <- sqrt(aggregate(predict.var ~ entity, data = df, sum)$predict.var)
   obs.se  <- sqrt(pred.se * (1 + 1/n))
   oe.lwr  <- (obs - 1.96*obs.se) / exp
   oe.upr  <- (obs + 1.96*obs.se) / exp
@@ -52,13 +50,13 @@ calcPerformance <- function(df = NULL, model = NULL, y = "y", provider = "provid
   g <- function(x) {
     data <- x@frame
     data$y <- data[[y]]
-    data$provider <- data[[provider]]
+    data$entity <- data[[entity]]
     data$expect <- predict(x, newdata = data, type = 'response', re.form = ~0)
     data$predict <- predict(x, newdata = data, type = 'response')
     marg.p  <- mean(data$y)
-    obs     <- aggregate(y ~ provider, data = data, sum)$y
-    pred    <- aggregate(predict ~ provider, data = data, sum)$predict
-    exp     <- aggregate(expect ~ provider, data = data, sum)$expect
+    obs     <- aggregate(y ~ entity, data = data, sum)$y
+    pred    <- aggregate(predict ~ entity, data = data, sum)$predict
+    exp     <- aggregate(expect ~ entity, data = data, sum)$expect
     oe      <- obs / exp
     pe      <- pred / exp
     rs.p    <- oe * marg.p
@@ -70,7 +68,7 @@ calcPerformance <- function(df = NULL, model = NULL, y = "y", provider = "provid
   bootmer_res <- setNames(as.data.frame(bootmer_res), c('est', 'lwr', 'upr'))
 
   perf.results <- data.frame(
-    provider = entity,
+    entity = entity,
     n = n,
     observed = obs,
     predicted = pred,

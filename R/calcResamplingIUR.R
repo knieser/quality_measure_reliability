@@ -3,8 +3,8 @@
 #' This function estimates reliability using the resampling inter-unit reliability method.
 #' @param df dataframe; if null, will use the dataframe in the model object
 #' @param model model; if null, will use an unadjusted model
+#' @param entity variable to use as the accountable entity
 #' @param y variable to use as the outcome
-#' @param provider variable to use as the accountable entity
 #' @param ctrPerf parameters to control performance measure calculation
 #' @param ctrRel parameters to control reliability estimation
 #' @returns A list with the following components:
@@ -12,7 +12,6 @@
 #'  \item{var.w}{within-entity variance}
 #'  \item{var.total}{total variance}
 #'  \item{IUR}{estimate of IUR}
-#' @returns The plot function can be used to plot the provider-level reliability estimates.
 #' @author Kenneth Nieser (nieser@stanford.edu)
 #' @references None
 #' @examples
@@ -20,47 +19,47 @@
 #' @importFrom stats aggregate
 #' @export
 
-calcResamplingIUR <- function(df = NULL, model = NULL, y = 'y', provider = 'provider', ctrPerf = controlPerf(), ctrRel = controlRel()){
+calcResamplingIUR <- function(df = NULL, model = NULL,  entity = 'entity', y = 'y', ctrPerf = controlPerf(), ctrRel = controlRel()){
   if (is.null(df) & is.null(model)) stop ('Please provide either a dataframe or a model object')
   if (is.null(df)){df <- model@frame}
 
   n.cores     <- ctrRel$n.cores
   n.resamples <- ctrRel$n.resamples
 
-  data.out <- calcDataSummary(df, model, y, provider, ctrPerf)
+  data.out <- calcDataSummary(df, model, entity, y, ctrPerf)
   df <- data.out$df
   n  <- data.out$n
   n0 <- 1 / (length(n) - 1) * (sum(n) - sum(n^2) / sum(n))
   marg.p <- data.out$marg.p
 
-  providers = unique(df$provider)
-  n.providers = length(providers)
+  entity = unique(df$entity)
+  n.entity = length(entity)
 
-  provider.means0 = aggregate(y ~ provider, data = df, mean)$y
-  var.total = 1/(n0*(n.providers - 1)) * sum(n * (provider.means0 - marg.p)^2)
+  entity.means0 = aggregate(y ~ entity, data = df, mean)$y
+  var.total = 1/(n0*(n.entity - 1)) * sum(n * (entity.means0 - marg.p)^2)
 
-  provider.means = matrix(data = NA, nrow = n.providers, ncol = n.resamples)
+  entity.means = matrix(data = NA, nrow = n.entity, ncol = n.resamples)
 
   for (j in 1:n.resamples){
-    # take a bootstrap resample within each provider separately
+    # take a bootstrap resample within each entity separately
     df.resample = data.frame()
-    for (i in 1:n.providers){
-      provider.df <- df[df$provider == providers[i], ]
-      provider.df.resample <- provider.df[sample(nrow(provider.df), nrow(provider.df), replace = T), ]
-      df.resample <- rbind(df.resample, provider.df.resample)
+    for (i in 1:n.entity){
+      entity.df <- df[df$entity == entity[i], ]
+      entity.df.resample <- entity.df[sample(nrow(entity.df), nrow(entity.df), replace = T), ]
+      df.resample <- rbind(df.resample, entity.df.resample)
     }
 
-    # calculate measure by provider
-    #obs <- aggregate(y ~ provider, data = df.resample, sum)$y
-    #exp <- aggregate(expect ~ provider, data = df.resample, sum)$expect
-    #provider.means[,j] = obs / exp
-    provider.means[,j] = aggregate(y ~ provider, data = df.resample, mean)$y
+    # calculate measure by entity
+    #obs <- aggregate(y ~ entity, data = df.resample, sum)$y
+    #exp <- aggregate(expect ~ entity, data = df.resample, sum)$expect
+    #entity.means[,j] = obs / exp
+    entity.means[,j] = aggregate(y ~ entity, data = df.resample, mean)$y
   }
 
-  bootstrap.means = apply(provider.means, 1, mean)
-  bootstrap.sqrd.resid = apply(provider.means, 2, function(x) (x - bootstrap.means)^2)
+  bootstrap.means = apply(entity.means, 1, mean)
+  bootstrap.sqrd.resid = apply(entity.means, 2, function(x) (x - bootstrap.means)^2)
   bootstrap.var = 1/(n.resamples - 1) * apply(bootstrap.sqrd.resid, 1, sum)
-  var.w = sum((n - 1) * bootstrap.var) / (sum(n) - n.providers)
+  var.w = sum((n - 1) * bootstrap.var) / (sum(n) - n.entity)
 
   IUR = (var.total - var.w) / var.total
 
