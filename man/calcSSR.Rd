@@ -8,7 +8,7 @@ calcSSR(
   df = NULL,
   model = NULL,
   y = "y",
-  provider = "provider",
+  entity = "entity",
   ctrPerf = controlPerf(),
   ctrRel = controlRel()
 )
@@ -20,17 +20,14 @@ calcSSR(
 
 \item{y}{variable to use as the outcome}
 
-\item{provider}{variable to use as the accountable entity}
+\item{entity}{variable to use as the accountable entity}
 
 \item{ctrPerf}{parameters to control performance measure calculation}
 
 \item{ctrRel}{parameters to control reliability estimation}
 }
 \value{
-A list with the following components:
-\item{var.b.aov}{between-entity variance}
-
-The plot function can be used to plot the provider-level reliability estimates.
+SSR reliability estimates
 }
 \description{
 This function estimates reliability using the split-sample method.

@@ -7,8 +7,8 @@
 calcPerformance(
   df = NULL,
   model = NULL,
+  entity = "entity",
   y = "y",
-  provider = "provider",
   ctrPerf = controlPerf()
 )
 }
@@ -17,17 +17,14 @@ calcPerformance(
 
 \item{model}{model; if null, will use an unadjusted model}
 
-\item{y}{variable to use as the outcome; default = "y"}
+\item{entity}{variable to use as the accountable entity; default = "entity"}
 
-\item{provider}{variable to use as the accountable entity; default = "provider"}
+\item{y}{variable to use as the outcome; default = "y"}
 
 \item{ctrPerf}{parameters to control performance measure calculation}
 }
 \value{
-A list with the following components:
-\item{var.b.aov}{between-entity variance}
-
-The plot function can be used to plot the provider-level reliability estimates.
+Estimated measure performance by accountable entity
 }
 \description{
 This function calculates measure performance by accountable entity.

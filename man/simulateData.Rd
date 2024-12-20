@@ -13,10 +13,8 @@ simulateData(n, type = "binary", p = NA, var.w = NA, lambda = NA)
 }
 \value{
 A dataframe with the following columns:
-\item{provider}{the accountable entity}
+\item{entity}{the accountable entity}
 \item{y}{outcome}
-
-The summary function can be used to...
 }
 \description{
 This function simulates some data.

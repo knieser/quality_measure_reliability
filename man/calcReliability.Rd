@@ -7,8 +7,8 @@
 calcReliability(
   df = NULL,
   model = NULL,
+  entity = "entity",
   y = "y",
-  provider = "provider",
   ctrPerf = controlPerf(),
   ctrRel = controlRel()
 )
@@ -18,9 +18,9 @@ calcReliability(
 
 \item{model}{model; if null, will use an unadjusted model}
 
-\item{y}{variable to use as the outcome; default = "y"}
+\item{entity}{variable to use as the accountable entity; default = "entity"}
 
-\item{provider}{variable to use as the accountable entity; default = "provider"}
+\item{y}{variable to use as the outcome; default = "y"}
 
 \item{ctrPerf}{parameters to control performance measure calculation}
 
@@ -30,8 +30,6 @@ calcReliability(
 A list with the following components:
 \item{perf.res}{list of measure performance results}
 \item{rel.results}{table of reliability estimates by method}
-
-The plot function can be used to plot the provider-level reliability estimates.
 }
 \description{
 This function calculates several estimates of quality measure performance.

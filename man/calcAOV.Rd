@@ -7,8 +7,8 @@
 calcAOV(
   df = NULL,
   model = NULL,
+  entity = "entity",
   y = "y",
-  provider = "provider",
   ctrPerf = controlPerf()
 )
 }
@@ -17,9 +17,9 @@ calcAOV(
 
 \item{model}{model; if null, will use an unadjusted model}
 
-\item{y}{variable to use as the outcome}
+\item{entity}{variable to use as the accountable entity}
 
-\item{provider}{variable to use as the accountable entity}
+\item{y}{variable to use as the outcome}
 
 \item{ctrPerf}{parameters to control performance measure calculation}
 }
@@ -28,8 +28,6 @@ A list with the following components:
 \item{var.b.aov}{between-entity variance}
 \item{var.w.aov}{within-entity variance}
 \item{est.aov}{reliability estimate}
-
-The plot function can be used to plot the provider-level reliability estimates.
 }
 \description{
 This function estimates reliability using the ANOVA method.
