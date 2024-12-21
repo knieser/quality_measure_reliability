@@ -1,13 +1,14 @@
-calcDataSummary <- function(df = NULL, model = NULL, entity = 'entity', y = "y", ctrPerf = controlPerf()){
+calcDataSummary <- function(df, model = NULL, entity = 'entity', y = "y", ctrPerf = controlPerf()){
   if (is.null(df) & is.null(model)) stop ('Please provide either a dataframe or a model object')
-  if (is.null(df)){df <- model@frame}
 
   cl <- ctrPerf$cl
 
   df <- cleanData(df, entity, y, ctrPerf)
   if (is.null(model)){
     f = paste0(y, ' ~ (1|', entity, ')')
-    model <- lme4::glmer(f, data = df, family = binomial, control = glmerControl(optimizer = "bobyqa"), nAGQ = 1)
+    model <- lme4::glmer(f, data = df, family = 'binomial', control = glmerControl(optimizer = "bobyqa"), nAGQ = 1)
+  } else {
+    model <- lme4::glmer(formula = model, data = df, family = 'binomial', control = glmerControl(optimizer = "bobyqa"), nAGQ = 0)
   }
 
   df$expect  <- predict(model, newdata = df, type = 'response', re.form = ~0)
