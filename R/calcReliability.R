@@ -21,6 +21,7 @@ calcReliability <- function(df = NULL, model = NULL, entity = "entity", y = "y",
   #### calculate measure performance ####
   message('calculating measure performance...')
   res <- calcPerformance(df, model, entity, y, ctrPerf)
+  df = res$df
   model = res$model
   message('...done')
 

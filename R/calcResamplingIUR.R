@@ -50,9 +50,6 @@ calcResamplingIUR <- function(df = NULL, model = NULL,  entity = 'entity', y = '
     }
 
     # calculate measure by entity
-    #obs <- aggregate(y ~ entity, data = df.resample, sum)$y
-    #exp <- aggregate(expect ~ entity, data = df.resample, sum)$expect
-    #entity.means[,j] = obs / exp
     entity.means[,j] = aggregate(y ~ entity, data = df.resample, mean)$y
   }
 

@@ -6,13 +6,13 @@ calcDataSummary <- function(df, model = NULL, entity = 'entity', y = "y", ctrPer
   df <- cleanData(df, entity, y, ctrPerf)
   if (is.null(model)){
     f = paste0(y, ' ~ (1|', entity, ')')
-    model <- lme4::glmer(f, data = df, family = 'binomial', control = glmerControl(optimizer = "bobyqa"), nAGQ = 1)
+    fit <- lme4::glmer(f, data = df, family = 'binomial', control = glmerControl(optimizer = "bobyqa"), nAGQ = 1)
   } else {
-    model <- lme4::glmer(formula = model, data = df, family = 'binomial', control = glmerControl(optimizer = "bobyqa"), nAGQ = 0)
+    fit <- lme4::glmer(formula = model, data = df, family = 'binomial', control = glmerControl(optimizer = "bobyqa"), nAGQ = 0)
   }
 
-  df$expect  <- predict(model, newdata = df, type = 'response', re.form = ~0)
-  df$predict <- predict(model, newdata = df, type = 'response')
+  df$expect  <- predict(fit, newdata = df, type = 'response', re.form = ~0)
+  df$predict <- predict(fit, newdata = df, type = 'response')
   df$predict.var <- df$predict * (1 - df$predict)
 
   n        <- aggregate(y ~ entity, data = df, length)$y
@@ -31,7 +31,7 @@ calcDataSummary <- function(df, model = NULL, entity = 'entity', y = "y", ctrPer
   marg.p = mean(df$y)
   marg.p.model = mean(df$predict)
 
-  output = list(df = df, model = model, marg.p = marg.p, marg.p.model = marg.p.model, entities = entities, n = n, obs = obs, p = p, p.lwr = p.lwr,
+  output = list(df = df, model = model, fit = fit, marg.p = marg.p, marg.p.model = marg.p.model, entities = entities, n = n, obs = obs, p = p, p.lwr = p.lwr,
                 p.upr = p.upr, pred = pred, p.re = p.re, exp = exp, rank = rank)
   return(output)
 }

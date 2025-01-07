@@ -19,8 +19,9 @@ calcPerformance <- function(df = NULL, model = NULL, entity = "entity", y = "y",
   if (is.null(df) & is.null(model)) stop ('Please provide either a dataframe or a model object')
 
   data.out <- calcDataSummary(df, model, entity, y, ctrPerf)
-  df <- data.out$df
+  df = data.out$df
   model = data.out$model
+  fit = data.out$fit
   marg.p <- data.out$marg.p
   marg.p.model <- data.out$marg.p.model
   entities <- data.out$entities
@@ -64,7 +65,7 @@ calcPerformance <- function(df = NULL, model = NULL, entity = "entity", y = "y",
     out    <- c(oe, pe, rs)
     return(out)
   }
-  b <- lme4::bootMer(model, FUN = g, nsim = n.sims, use.u = TRUE, parallel = 'multicore', ncpus = n.cores)
+  b <- lme4::bootMer(fit, FUN = g, nsim = n.sims, use.u = TRUE, parallel = 'multicore', ncpus = n.cores)
   oe.boot <- as.data.frame(b$t[,1:length(n)])
   pe.boot <- as.data.frame(b$t[,(length(n) + 1):(2*length(n))])
   rs.boot <- as.data.frame(b$t[,(2*length(n)+1):ncol(b$t)])
@@ -103,7 +104,7 @@ calcPerformance <- function(df = NULL, model = NULL, entity = "entity", y = "y",
     rs.upr = bootmer.res.rs$upr,
     rank.rs = rank.rs
   )
-  output = list(df = df, model = model, marg.p = marg.p, marg.p.model = marg.p.model, perf.results = perf.results)
+  output = list(df = df, model = model, fit = fit, marg.p = marg.p, marg.p.model = marg.p.model, perf.results = perf.results)
 
   return(output)
 }

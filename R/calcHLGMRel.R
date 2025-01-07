@@ -21,7 +21,7 @@ calcHLGMRel <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', ctr
 
   data.out <- calcDataSummary(df, model, entity, y, ctrPerf)
   df <- data.out$df
-  model <- data.out$model
+  fit <- data.out$fit
   marg.p <- data.out$marg.p
   marg.p.model <- data.out$marg.p.model
   n  <- data.out$n
@@ -29,7 +29,7 @@ calcHLGMRel <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', ctr
   p.re <- data.out$p.re
 
   # calculate between-variance based on model
-  var.b.HLGM <- lme4::VarCorr(model)[[entity]][1,1]
+  var.b.HLGM <- lme4::VarCorr(fit)[[entity]][1,1]
   var.b.HLGM.pscale.model <- marg.p^2 * (1 - marg.p)^2 * var.b.HLGM
 
   # within-variance based on sample proportion estimates
