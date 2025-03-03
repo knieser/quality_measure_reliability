@@ -13,32 +13,26 @@
 plotPerformance <- function(df, plot.y = 'p'){
   if (plot.y == 'p') {
     df$y = df$p
-    df$rank = df$rank
+    df$rank = df$rank.p
     df$lwr = df$p.lwr
     df$upr = df$p.upr
-    ylab = 'Measure performance'
+    ylab = 'Unadjusted rate'
   } else if (plot.y == 'oe') {
-    df$y = df$oe
+    df$y = df$rs.oe.est
     df$rank = df$rank.oe
-    df$lwr = df$oe.boot.lwr
-    df$upr = df$oe.boot.upr
-    ylab = 'O/E ratio'
+    df$lwr = df$rs.oe.lwr
+    df$upr = df$rs.oe.upr
+    ylab = 'OE risk-standardized rate'
   } else if (plot.y == 'pe') {
-    df$y = df$pe
+    df$y = df$rs.pe.est
     df$rank = df$rank.pe
-    df$lwr = df$pe.lwr
-    df$upr = df$pe.upr
-    ylab = 'P/E ratio'
-  } else if (plot.y == 'rs') {
-    df$y = df$rs
-    df$rank = df$rank.rs
-    df$lwr = df$rs.lwr
-    df$upr = df$rs.upr
-    ylab = 'Risk-standardized performance'
-  }
+    df$lwr = df$rs.pe.lwr
+    df$upr = df$rs.pe.lwr
+    ylab = 'PE risk-standardized rate'
+  } 
 
   fig <- ggplot2::ggplot(data = df, aes(x = rank, y = y)) +
-    geom_point(color = 'Red') +
+    geom_point(color = 'darkblue') +
     geom_errorbar(aes(ymin = lwr, ymax = upr), width = 0.1) +
     xlab('Rank') +
     ylab(ylab) +

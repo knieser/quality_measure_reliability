@@ -50,6 +50,7 @@ calcBetaBin <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', ctr
 
   # calculate variance ratio
   var.b.BB = a * b / (a + b + 1) / (a + b)^2
+  var.w.BB = a * b / ((a + b + 1) * (a + b) * n)
   est.BB = n / (a + b + n)
 
   var.w.FE <- p * (1 - p) / n
@@ -66,6 +67,7 @@ calcBetaBin <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', ctr
   results <- list(alpha = a,
                   beta = b,
                   var.b.BB = var.b.BB,
+                  var.w.BB = var.w.BB,
                   var.w.FE = var.w.FE,
                   var.w.RE = var.w.RE,
                   var.w.J = var.w.J,

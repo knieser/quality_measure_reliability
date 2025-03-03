@@ -31,8 +31,8 @@ calcAOV <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', ctrPerf
   MSB = aov.summary[3,1]
   MSW = aov.summary[3,2]
   var.b.aov = (MSB - MSW) / n0
-  var.w.aov = MSW
-  est.aov   = var.b.aov / (var.b.aov + var.w.aov / n)
+  var.w.aov = MSW / n
+  est.aov   = var.b.aov / (var.b.aov + var.w.aov)
 
   output = list(var.b.aov = var.b.aov, var.w.aov = var.w.aov, est.aov = est.aov)
 

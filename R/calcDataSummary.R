@@ -11,6 +11,7 @@ calcDataSummary <- function(df, model = NULL, entity = 'entity', y = "y", ctrPer
     fit <- lme4::glmer(formula = model, data = df, family = 'binomial', control = glmerControl(optimizer = "bobyqa"), nAGQ = 0)
   }
 
+  
   df$expect  <- predict(fit, newdata = df, type = 'response', re.form = ~0)
   df$predict <- predict(fit, newdata = df, type = 'response')
   df$predict.var <- df$predict * (1 - df$predict)
@@ -20,7 +21,7 @@ calcDataSummary <- function(df, model = NULL, entity = 'entity', y = "y", ctrPer
   entities <- agg$entity
   obs      <- agg$y
   p        <- obs / n
-  p.ci     <- t(apply(cbind(obs, n), 1, function(x) prop.test(x[1], x[2], conf.level = cl)$conf.int))  #p.lwr   <- p.ci[1]
+  p.ci     <- t(apply(cbind(obs, n), 1, function(x) prop.test(x[1], x[2], conf.level = cl)$conf.int))
   p.lwr    <- p.ci[,1]
   p.upr    <- p.ci[,2]
   pred     <- aggregate(predict ~ entity, data = df, sum)$predict

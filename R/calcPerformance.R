@@ -11,8 +11,7 @@
 #' @references None
 #' @examples
 #' # TBD
-#' @importFrom stats aggregate setNames predict
-#' @importFrom lme4 bootMer
+#' @importFrom stats aggregate predict
 #' @export
 
 calcPerformance <- function(df = NULL, model = NULL, entity = "entity", y = "y", ctrPerf = controlPerf()){
@@ -35,49 +34,88 @@ calcPerformance <- function(df = NULL, model = NULL, entity = "entity", y = "y",
   exp <- data.out$exp
   rank <- data.out$rank
 
+  # direct standardization
+  rs.direct = vector(length = length(entities))
+  df.ds <- df
+  for (i in 1:length(entities)){
+    df.ds$sta3n = entities[i]
+    rs.direct[i] = mean(predict(fit, newdata = df.ds, type = 'response'))
+  }
+  
+  # indirect standardization
   oe      <- obs / exp
   pe      <- pred / exp
-  rs      <- oe * marg.p
+  rs.oe   <- oe * marg.p
+  rs.pe   <- pe * marg.p
   rank.oe <- rank(oe, ties.method = "random")
   rank.pe <- rank(pe, ties.method = "random")
-  rank.rs <- rank(rs, ties.method = "random")
-  pred.se <- sqrt(aggregate(predict.var ~ entity, data = df, sum)$predict.var)
-  obs.se  <- sqrt(pred.se * (1 + 1/n))
-  oe.lwr  <- (obs - 1.96*obs.se) / exp
-  oe.upr  <- (obs + 1.96*obs.se) / exp
 
-  # parametric bootstrapping for O/E estimates
-  n.sims = ctrPerf$n.sims
+  # parametric bootstrapping
+  n.boots = ctrPerf$n.boots
   n.cores = ctrPerf$n.cores
-  g <- function(x) {
-    data <- x@frame
-    data$y <- data[[y]]
-    data$entity <- data[[entity]]
-    data$expect <- predict(x, newdata = data, type = 'response', re.form = ~0)
-    data$predict <- predict(x, newdata = data, type = 'response')
-    marg.p <- mean(data$y)
-    obs    <- aggregate(y ~ entity, data = data, sum)$y
-    pred   <- aggregate(predict ~ entity, data = data, sum)$predict
-    exp    <- aggregate(expect ~ entity, data = data, sum)$expect
-    oe     <- obs / exp
-    pe     <- pred / exp
-    rs     <- oe * marg.p
-    out    <- c(oe, pe, rs)
-    return(out)
+  df.pb = df
+  
+  cl <- parallel::makeCluster(n.cores)
+  doParallel::registerDoParallel(cl)
+  
+  out <- foreach::foreach(s = 1:n.boots, .combine = rbind, .packages = c('lme4', 'qmrel')) %dopar% {
+
+    df.pb[[y]] = rbinom(nrow(df.pb), 1, df.pb$predict)
+    est.boot <- estOEPE(df.pb, model, entities, entity, y)
+    list(
+      oe.boot = est.boot$oe,
+      pe.boot = est.boot$pe,
+      rs.oe.boot = est.boot$rs.oe,
+      rs.pe.boot = est.boot$rs.pe,
+      rs.direct.boot = est.boot$rs.direct
+    )
   }
-  b <- lme4::bootMer(fit, FUN = g, nsim = n.sims, use.u = TRUE, parallel = 'multicore', ncpus = n.cores)
-  oe.boot <- as.data.frame(b$t[,1:length(n)])
-  pe.boot <- as.data.frame(b$t[,(length(n) + 1):(2*length(n))])
-  rs.boot <- as.data.frame(b$t[,(2*length(n)+1):ncol(b$t)])
+  parallel::stopCluster(cl)
+  
+  out <- as.data.frame(out)
+  
+  output = list(
+    oe.boot = matrix(unlist(out$oe.boot), nrow = length(entities), ncol = n.boots),
+    pe.boot = matrix(unlist(out$pe.boot), nrow = length(entities), ncol = n.boots),
+    rs.oe.boot = matrix(unlist(out$rs.oe.boot), nrow = length(entities), ncol = n.boots),
+    rs.pe.boot = matrix(unlist(out$rs.pe.boot), nrow = length(entities), ncol = n.boots),
+    rs.direct.boot = matrix(unlist(out$rs.direct.boot), nrow = length(entities), ncol = n.boots)
+  )
+  oe.boot = output$oe.boot
+  pe.boot = output$pe.boot
+  rs.oe.boot = output$rs.oe.boot
+  rs.pe.boot = output$rs.pe.boot
+  rs.direct.boot = output$rs.direct.boot
+  
+  oe.se <- apply(oe.boot, 1, sd)
+  pe.se <- apply(pe.boot, 1, sd)
+  rs.oe.se <- apply(rs.oe.boot, 1, sd)
+  rs.pe.se <- apply(rs.pe.boot, 1, sd)
+  rs.direct.se <- apply(rs.direct.boot, 1, sd)
+  
+  oe.lwr = apply(oe.boot, 1, quantile, 0.025) 
+  oe.upr = apply(oe.boot, 1, quantile, 0.975) 
+  
+  pe.lwr = apply(pe.boot, 1, quantile, 0.025) 
+  pe.upr = apply(pe.boot, 1, quantile, 0.975) 
+  
+  rs.oe.lwr = apply(rs.oe.boot, 1, quantile, 0.025)
+  rs.oe.upr = apply(rs.oe.boot, 1, quantile, 0.975)
 
-  bootmer.res.oe <- t(apply(oe.boot, 2, quantile, c(0.5, 0.025, 0.975)))
-  bootmer.res.pe <- t(apply(pe.boot, 2, quantile, c(0.5, 0.025, 0.975)))
-  bootmer.res.rs <- t(apply(rs.boot, 2, quantile, c(0.5, 0.025, 0.975)))
+  rs.pe.lwr = apply(rs.pe.boot, 1, quantile, 0.025)
+  rs.pe.upr = apply(rs.pe.boot, 1, quantile, 0.975)
+  
+  rs.direct.lwr = apply(rs.direct.boot, 1, quantile, 0.025) 
+  rs.direct.upr = apply(rs.direct.boot, 1, quantile, 0.975) 
+  
+  category.oe = rep('No Different', length(entities))
+  category.oe[rs.oe.upr < marg.p] <- 'Better'
+  category.oe[rs.oe.lwr > marg.p] <- 'Worse'
 
-  bootmer.res.oe <- setNames(as.data.frame(bootmer.res.oe), c('est', 'lwr', 'upr'))
-  bootmer.res.pe <- setNames(as.data.frame(bootmer.res.pe), c('est', 'lwr', 'upr'))
-  bootmer.res.rs <- setNames(as.data.frame(bootmer.res.rs), c('est', 'lwr', 'upr'))
-
+  category.pe = rep('No Different', length(entities))
+  category.pe[rs.pe.upr < marg.p] <- 'Better'
+  category.pe[rs.pe.lwr > marg.p] <- 'Worse'
+  
   perf.results <- data.frame(
     entities = entities,
     n = n,
@@ -88,23 +126,28 @@ calcPerformance <- function(df = NULL, model = NULL, entity = "entity", y = "y",
     p.lwr = p.lwr,
     p.upr = p.upr,
     p.re = p.re,
-    rank = rank,
+    rank.p = rank,
     oe = oe,
     oe.lwr = oe.lwr,
     oe.upr = oe.upr,
-    oe.boot.lwr = bootmer.res.oe$lwr,
-    oe.boot.upr = bootmer.res.oe$upr,
     rank.oe = rank.oe,
     pe = pe,
-    pe.lwr = bootmer.res.pe$lwr,
-    pe.upr = bootmer.res.pe$upr,
+    pe.lwr = pe.lwr,
+    pe.upr = pe.upr,
     rank.pe = rank.pe,
-    rs = rs,
-    rs.lwr = bootmer.res.rs$lwr,
-    rs.upr = bootmer.res.rs$upr,
-    rank.rs = rank.rs
+    rs.oe = rs.oe,
+    rs.oe.lwr = rs.oe.lwr,
+    rs.oe.upr = rs.oe.upr,
+    category.oe,
+    rs.pe = rs.pe,
+    rs.pe.lwr = rs.pe.lwr,
+    rs.pe.upr = rs.pe.upr,
+    category.pe,
+    rs.direct = rs.direct,
+    rs.direct.lwr = rs.direct.lwr,
+    rs.direct.upr = rs.direct.upr
   )
-  output = list(df = df, model = model, fit = fit, marg.p = marg.p, marg.p.model = marg.p.model, perf.results = perf.results)
+  results = list(df = df, model = model, fit = fit, marg.p = marg.p, marg.p.model = marg.p.model, perf.results = perf.results)
 
-  return(output)
+  return(results)
 }
