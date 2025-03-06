@@ -10,9 +10,9 @@ calcMisclassificationRates(
   entity = "entity",
   y = "y",
   ctrPerf = controlPerf(),
-  percentile.misclassification.fig.file,
-  misclassification.oe.fig.file,
-  misclassification.pe.fig.file
+  ctrRel = controlRel(),
+  output.dir,
+  filename.add = NULL
 )
 }
 \arguments{

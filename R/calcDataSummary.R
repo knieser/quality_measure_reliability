@@ -4,14 +4,8 @@ calcDataSummary <- function(df, model = NULL, entity = 'entity', y = "y", ctrPer
   cl <- ctrPerf$cl
 
   df <- cleanData(df, entity, y, ctrPerf)
-  if (is.null(model)){
-    f = paste0(y, ' ~ (1|', entity, ')')
-    fit <- lme4::glmer(f, data = df, family = 'binomial', control = glmerControl(optimizer = "bobyqa"), nAGQ = 1)
-  } else {
-    fit <- lme4::glmer(formula = model, data = df, family = 'binomial', control = glmerControl(optimizer = "bobyqa"), nAGQ = 0)
-  }
-
-  
+  if (is.null(model)){model = paste0(y, ' ~ (1|', entity, ')')}
+  fit <- lme4::glmer(formula = model, data = df, family = 'binomial', control = glmerControl(optimizer = "bobyqa"), nAGQ = 0)
   df$expect  <- predict(fit, newdata = df, type = 'response', re.form = ~0)
   df$predict <- predict(fit, newdata = df, type = 'response')
   df$predict.var <- df$predict * (1 - df$predict)
