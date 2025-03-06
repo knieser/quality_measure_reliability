@@ -9,11 +9,11 @@
 #' @returns Estimated risk-standardized measure performance by accountable entity
 #' @author Kenneth Nieser (nieser@stanford.edu)
 #' @importFrom stats aggregate predict
-#' @importFrom lme4 glmer 
+#' @importFrom lme4 glmer
 #' @export
 
-reliability_analysis <- function(df, model, entity, y, predictor.clean, ctrPerf, ctrRel, model.estimates.file, model.estimates.fig.file, prediction.fig.file, calibration.plot.fig.file, complication.rate.fig.file, rel.out.file, rel.dist.plot.file, SSR.plot.file){
-  
+reliability_analysis <- function(df, model, entity, y, predictor.clean, ctrPerf, ctrRel, model.estimates.file, model.estimates.fig.file, prediction.fig.file, calibration.fig.file, rand.int.plot.file, corr.plot.file, comparison.rate.fig.file, rel.out.file, rel.dist.plot.file, SSR.plot.file){
+
   # clean data
   df = cleanData(df, entity = entity, y = y, ctrPerf = ctrPerf)
 
@@ -25,13 +25,13 @@ reliability_analysis <- function(df, model, entity, y, predictor.clean, ctrPerf,
   perf.results <- perf.out$perf.results
   marg.p = perf.out$marg.p
   message('...done')
-  
+
   # model estimates
   results <- as.data.frame(summary(fit)$coef)
   results$exp.estimate <- exp(results$Estimate)
   results$lb <-  exp(results$Estimate - qnorm(0.975) * results$`Std. Error`)
   results$ub <-  exp(results$Estimate + qnorm(0.975) * results$`Std. Error`)
-  
+
   model.results <- data.frame(
     predictor = row.names(results)[-1],
     est = results$exp.estimate[-1],
@@ -40,8 +40,8 @@ reliability_analysis <- function(df, model, entity, y, predictor.clean, ctrPerf,
     p = results$`Pr(>|z|)`[-1]
   )
   model.results$sig = as.factor(ifelse(model.results$p < 0.05, 1, 0))
-  write.csv(model.results, file = paste0(output.dir, model.estimates.file))
-  
+  write.csv(model.results, file = model.estimates.file)
+
   model.results$rank <- rank(model.results$est, ties.method = 'random')
   model.results$predictor.clean <- model.results$predictor
   predictor.original = model.results$predictor
@@ -51,7 +51,7 @@ reliability_analysis <- function(df, model, entity, y, predictor.clean, ctrPerf,
   }
   model.results$predictor.clean <- as.factor(model.results$predictor.clean)
   model.results$predictor.clean <- factor(model.results$predictor.clean, levels = model.results$predictor.clean[order(model.results$rank, decreasing = T)])
-  
+
   # make plot of model results
   fig.estimates <- ggplot(data = model.results, aes(x = est, y = predictor.clean, group = sig)) +
     geom_point(aes(color = sig), size = 3) +
@@ -61,7 +61,7 @@ reliability_analysis <- function(df, model, entity, y, predictor.clean, ctrPerf,
     scale_color_manual(values = c('black', 'red')) +
     geom_vline(xintercept = 1, lty = 2) +
     scale_x_continuous(trans = 'log10') +
-    scale_y_discrete(limits = rev) + 
+    scale_y_discrete(limits = rev) +
     labs(x = 'Adjusted OR', y = 'Predictor') +
     theme_classic() +
     theme(
@@ -75,8 +75,8 @@ reliability_analysis <- function(df, model, entity, y, predictor.clean, ctrPerf,
       panel.grid.minor.x = element_line(),
       legend.position = 'none'
     )
-  ggsave(filename = paste0(output.dir, model.estimates.fig.file), fig.estimates, width = 10, height = 10, units = 'in')
-  
+  ggsave(filename = model.estimates.fig.file, fig.estimates, width = 10, height = 10, units = 'in')
+
   # discrimination
   prediction_plot <- ggplot(data = df.perf, aes(x=predict, color = as.factor(y), fill = as.factor(y))) +
     geom_density(alpha = .3) +
@@ -92,10 +92,10 @@ reliability_analysis <- function(df, model, entity, y, predictor.clean, ctrPerf,
       legend.position = 'top',
       legend.title = element_text(size = 18, face = 'bold'),
       legend.text = element_text(size = 18)
-    ) 
-  ggsave(filename = paste0(output.dir, prediction.fig.file), prediction_plot, width = 10, height = 10, units = 'in')
-  
-  
+    )
+  ggsave(filename = prediction.fig.file, prediction_plot, width = 10, height = 10, units = 'in')
+
+
   # calibration plot
   deciles = quantile(df.perf$predict, 1:10/10)
   df.perf$decile <- NA
@@ -125,9 +125,56 @@ reliability_analysis <- function(df, model, entity, y, predictor.clean, ctrPerf,
       legend.title = element_blank(),
       legend.position = 'bottom'
     )
-  ggsave(filename = paste0(output.dir, calibration.plot.fig.file), calibration.fig, width = 10, height = 10, units = 'in')
-  
-  
+  ggsave(filename = calibration.fig.file, calibration.fig, width = 10, height = 10, units = 'in')
+
+
+  # plot of ORs comparing each facility with the average facility
+  fig.rand.int <- ggplot(data = perf.results, aes(x = intercept.OR, y = entities)) +
+    geom_point(aes(color = intercept.sig), size = 2) +
+    geom_errorbar(aes(xmin = intercept.OR.lwr, xmax = intercept.OR.upr), width = 0.1, position = position_dodge(width = .7)) +
+    scale_color_manual(values = c('black', 'red')) +
+    scale_x_continuous(trans = 'log10') +
+    geom_vline(xintercept = 1, lty = 2) +
+    xlab('OR') +
+    ylab('Facility') +
+    theme_classic() +
+    theme(
+      plot.title = element_text(size = 16, face ="bold"),
+      axis.text = element_text(size = 16),
+      axis.text.y = element_blank(),
+      axis.ticks.length.y = unit(0,'cm'),
+      axis.ticks.length.x = unit(.25, 'cm'),
+      axis.title = element_text(size = 18, face = "bold"),
+      axis.text.x = element_text(angle = 55, vjust = 0.7),
+      strip.text = element_text(size = 18, face = "bold"),
+      legend.position = 'none'
+      )
+  ggsave(filename = rand.int.plot.file, fig.rand.int, width = 8, height = 8, units = 'in')
+
+  # plot of risk-standardized rates against the entity random intercepts
+  plot.df.corr <- data.frame(
+    Method = rep(c('OE-standardized', 'PE-standardized'), each = nrow(perf.results)),
+    rand.int = rep(m.re.intercept$est.exp, 2),
+    standardized.rates = c(perf.results$rs.oe, perf.results$rs.pe)
+  )
+
+  corrfig <- ggplot2::ggplot(data = plot.df.corr, aes(x = rand.int, y = standardized.rates, group = Method)) +
+    geom_point(aes(color = Method, shape = Method), size = 3) +
+    scale_color_manual(values = c('darkgrey', 'red')) +
+    xlab('Entity-specific random intercepts') +
+    ylab('Risk-standardized rates') +
+    theme_classic() +
+    theme(
+      plot.title = element_text(size = 16, face ="bold"),
+      axis.text = element_text(size = 16),
+      axis.ticks.length = unit(.25,"cm"),
+      axis.title = element_text(size = 18, face = "bold"),
+      legend.position = 'top',
+      legend.text = element_text(size = 16),
+      legend.title = element_text(size = 18, face = 'bold')
+    )
+  ggsave(filename = corr.plot.file, corrfig, width = 8, height = 8, units = 'in')
+
   # risk-adjustment method comparison plot
   plot.df.p <- data.frame(
     method = rep(c('A. Unadjusted', 'B. OE-standardized', 'C. PE-standardized', 'D. Direct standardized'), each = nrow(perf.results)),
@@ -138,7 +185,7 @@ reliability_analysis <- function(df, model, entity, y, predictor.clean, ctrPerf,
     rank.oe = rep(perf.results$rank.oe, 4),
     rank.pe = rep(perf.results$rank.pe, 4)
   )
-  
+
   fig <- ggplot2::ggplot(data = plot.df.p, aes(x = rank, y = p, group = method)) +
     geom_point(size = 2) +
     geom_errorbar(aes(ymin = lwr, ymax = upr), width = 0.1) +
@@ -157,12 +204,11 @@ reliability_analysis <- function(df, model, entity, y, predictor.clean, ctrPerf,
       legend.title = element_blank(),
       legend.position = 'bottom'
     )
-  ggsave(filename = paste0(output.dir, complication.rate.fig.file), 
-         fig, width = 10, height = 8, units = 'in')
+  ggsave(filename = comparison.rate.fig.file, fig, width = 10, height = 8, units = 'in')
 
   # calculate reliability
   rel.results <- calcReliability(df = df, model = model, entity = entity, y = y, ctrPerf = ctrPerf, ctrRel = ctrRel)
-  write.csv(rel.results, paste0(output.dir, rel.out.file), row.names=F)
+  write.csv(rel.results, rel.out.file, row.names=F)
 
   # make plot to show distribution of reliability estimates
   message('calculating HLGM reliability estimates for plot...')
@@ -171,20 +217,20 @@ reliability_analysis <- function(df, model, entity, y, predictor.clean, ctrPerf,
   message('calculating Beta-binomial reliability estimates for plot...')
   BB.out <- calcBetaBin(df = df, model = model, entity = entity, y = y, ctrPerf = ctrPerf)
   message('...done')
-  
+
   rel.plot.df <- data.frame(
-    method = rep(c('MLM, logit scale', 
-                   'MLM, delta approx.', 
-                   'MLM, FE', 
+    method = rep(c('MLM, latent scale',
+                   'MLM, delta approx.',
+                   'MLM, FE',
                    'MLM, RE',
-                   'Beta-binomial', 
-                   'Beta-binomial, FE', 
-                   'Beta-binomial, RE', 
+                   'Beta-binomial',
+                   'Beta-binomial, FE',
+                   'Beta-binomial, RE',
                    'Beta-binomial, Jeffreys'), each = length(HLGM.out$n)),
     est = c(HLGM.out$est.HLGM.logistic, HLGM.out$est.HLGM.model, HLGM.out$est.HLGM.FE.model, HLGM.out$est.HLGM.RE.model,
             BB.out$est.BB, BB.out$est.BB.FE, BB.out$est.BB.RE, BB.out$est.BB.J)
   )
-  
+
   rel.fig <- ggplot(data = rel.plot.df, aes(est, factor(method))) +
     geom_boxplot(outlier.shape = NA) +
     geom_point(alpha = 0.6, position = position_jitter(height = 0.1, width = 0)) +
@@ -199,17 +245,17 @@ reliability_analysis <- function(df, model, entity, y, predictor.clean, ctrPerf,
       axis.title = element_text(size = 18, face = "bold"),
       legend.position = 'bottom'
     )
-  ggsave(filename = paste0(output.dir, rel.dist.plot.file), rel.fig, width = 10, height = 8, units = 'in')
-  
+  ggsave(filename = rel.dist.plot.file, rel.fig, width = 10, height = 8, units = 'in')
+
   # split-sample plot to visualize split-sample reliability
   message('making example plot of split-sample reliability estimates')
 
   data.out <- calcDataSummary(df, model, entity, y, ctrPerf)
   df.SSR <- data.out$df
-  
+
   entities = unique(df.SSR$entity)
   n.entity = length(entities)
-  
+
   # randomly assign each record into either s=1 or s=2 for each entity
   df.SSR$s <- 1
   for (j in 1:n.entity){
@@ -218,11 +264,11 @@ reliability_analysis <- function(df, model, entity, y, predictor.clean, ctrPerf,
     df.SSR$s[df.SSR$entity == entities[j]] <- entity.df$s
   }
   df.SSR$s <- as.factor(df.SSR$s)
-  
+
   # calculate performance by entity and split-half
   entity.means <- aggregate(y ~ entity + s, data = df.SSR, mean)
   entity.means.wide <- reshape(entity.means, idvar = "entity", timevar = "s", direction = "wide")
-  
+
   agg       <- aggregate(y ~ entity + s, data = df.SSR, sum)
   agg$obs   <- agg$y
   agg$pred  <- aggregate(predict ~ entity + s, data = df.SSR, sum)$predict
@@ -230,7 +276,7 @@ reliability_analysis <- function(df, model, entity, y, predictor.clean, ctrPerf,
   agg$oe    <- agg$obs / agg$exp * marg.p
   agg$pe    <- agg$pred / agg$exp * marg.p
   entity.means.wide.adj <- reshape(agg, idvar = "entity", timevar = "s", direction = "wide")
-  
+
   plot.df.SSR <- data.frame(
     Method = rep(c('OE-standardized', 'PE-standardized'), each = nrow(entity.means.wide.adj)),
     t1 = c(entity.means.wide.adj$oe.1, entity.means.wide.adj$pe.1),
@@ -255,18 +301,18 @@ reliability_analysis <- function(df, model, entity, y, predictor.clean, ctrPerf,
       legend.title = element_text(size = 18, face = 'bold')
     )
   SSRfig
-  ggsave(filename = paste0(output.dir, SSR.plot.file), SSRfig, width = 8, height = 8, units = 'in')
+  ggsave(filename = SSR.plot.file, SSRfig, width = 8, height = 8, units = 'in')
   message('...done')
-  
-  results = list(df = df, 
+
+  results = list(df = df,
                  df.perf = df.perf,
                  df.SSR = df.SSR,
                  fit = fit,
-                 marg.p = marg.p, 
-                 perf.out = perf.out, 
+                 marg.p = marg.p,
+                 perf.out = perf.out,
                  rel.results = rel.results,
                  HLGM.out = HLGM.out,
-                 BB.out = BB.out)  
-  
+                 BB.out = BB.out)
+
   return(results)
 }

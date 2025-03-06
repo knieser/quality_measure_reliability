@@ -15,8 +15,10 @@ reliability_analysis(
   model.estimates.file,
   model.estimates.fig.file,
   prediction.fig.file,
-  calibration.plot.fig.file,
-  complication.rate.fig.file,
+  calibration.fig.file,
+  rand.int.plot.file,
+  corr.plot.file,
+  comparison.rate.fig.file,
   rel.out.file,
   rel.dist.plot.file,
   SSR.plot.file

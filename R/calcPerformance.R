@@ -11,7 +11,10 @@
 #' @references None
 #' @examples
 #' # TBD
-#' @importFrom stats aggregate predict
+#' @importFrom stats aggregate predict rbinom
+#' @importFrom parallel makeCluster stopCluster
+#' @importFrom doParallel registerDoParallel
+#' @importFrom foreach foreach
 #' @export
 
 calcPerformance <- function(df = NULL, model = NULL, entity = "entity", y = "y", ctrPerf = controlPerf()){
@@ -41,7 +44,7 @@ calcPerformance <- function(df = NULL, model = NULL, entity = "entity", y = "y",
     df.ds$sta3n = entities[i]
     rs.direct[i] = mean(predict(fit, newdata = df.ds, type = 'response'))
   }
-  
+
   # indirect standardization
   oe      <- obs / exp
   pe      <- pred / exp
@@ -54,11 +57,45 @@ calcPerformance <- function(df = NULL, model = NULL, entity = "entity", y = "y",
   n.boots = ctrPerf$n.boots
   n.cores = ctrPerf$n.cores
   df.pb = df
-  
+
   cl <- parallel::makeCluster(n.cores)
   doParallel::registerDoParallel(cl)
-  
-  out <- foreach::foreach(s = 1:n.boots, .combine = rbind, .packages = c('lme4', 'qmrel')) %dopar% {
+
+  out <- foreach::foreach(s = 1:n.boots, .combine = rbind, .packages = c('lme4')) %dopar% {
+    estOEPE <- function(df, model, entities, entity = "entity", y = "y"){
+      df$y         <- df[[y]]
+      df$entity    <- df[[entity]]
+
+      # refit model
+      fit <- lme4::glmer(model, data = df, family = 'binomial', control = glmerControl(optimizer = 'bobyqa'), nAGQ = 0)
+
+      # calculate predictions w/ and w/o random intercept
+      df$expect    <- predict(fit, newdata = df, type = 'response', re.form = ~0)
+      df$predict   <- predict(fit, newdata = df, type = 'response')
+
+      # calculate oe and pe ratios
+      obs    <- aggregate(y ~ entity, data = df, sum)$y
+      pred   <- aggregate(predict ~ entity, data = df, sum)$predict
+      exp    <- aggregate(expect ~ entity, data = df, sum)$expect
+      oe     <- obs / exp
+      pe     <- pred / exp
+
+      # calculate OE and PE risk-standardized rates
+      marg.p <- mean(df$y)
+      rs.oe  <- oe * marg.p
+      rs.pe  <- pe * marg.p
+
+      # calculate direct standardized rates
+      rs.direct = vector(length = length(entities))
+      df.ds <- df
+      for (j in 1:length(entities)){
+        df.ds$sta3n = entities[j]
+        rs.direct[j] = mean(predict(fit, newdata = df.ds, type = 'response'))
+      }
+
+      out <- list(oe = oe, pe = pe, rs.oe = rs.oe, rs.pe = rs.pe, rs.direct = rs.direct)
+      return(out)
+    }
 
     df.pb[[y]] = rbinom(nrow(df.pb), 1, df.pb$predict)
     est.boot <- estOEPE(df.pb, model, entities, entity, y)
@@ -71,9 +108,9 @@ calcPerformance <- function(df = NULL, model = NULL, entity = "entity", y = "y",
     )
   }
   parallel::stopCluster(cl)
-  
+
   out <- as.data.frame(out)
-  
+
   output = list(
     oe.boot = matrix(unlist(out$oe.boot), nrow = length(entities), ncol = n.boots),
     pe.boot = matrix(unlist(out$pe.boot), nrow = length(entities), ncol = n.boots),
@@ -86,28 +123,28 @@ calcPerformance <- function(df = NULL, model = NULL, entity = "entity", y = "y",
   rs.oe.boot = output$rs.oe.boot
   rs.pe.boot = output$rs.pe.boot
   rs.direct.boot = output$rs.direct.boot
-  
+
   oe.se <- apply(oe.boot, 1, sd)
   pe.se <- apply(pe.boot, 1, sd)
   rs.oe.se <- apply(rs.oe.boot, 1, sd)
   rs.pe.se <- apply(rs.pe.boot, 1, sd)
   rs.direct.se <- apply(rs.direct.boot, 1, sd)
-  
-  oe.lwr = apply(oe.boot, 1, quantile, 0.025) 
-  oe.upr = apply(oe.boot, 1, quantile, 0.975) 
-  
-  pe.lwr = apply(pe.boot, 1, quantile, 0.025) 
-  pe.upr = apply(pe.boot, 1, quantile, 0.975) 
-  
+
+  oe.lwr = apply(oe.boot, 1, quantile, 0.025)
+  oe.upr = apply(oe.boot, 1, quantile, 0.975)
+
+  pe.lwr = apply(pe.boot, 1, quantile, 0.025)
+  pe.upr = apply(pe.boot, 1, quantile, 0.975)
+
   rs.oe.lwr = apply(rs.oe.boot, 1, quantile, 0.025)
   rs.oe.upr = apply(rs.oe.boot, 1, quantile, 0.975)
 
   rs.pe.lwr = apply(rs.pe.boot, 1, quantile, 0.025)
   rs.pe.upr = apply(rs.pe.boot, 1, quantile, 0.975)
-  
-  rs.direct.lwr = apply(rs.direct.boot, 1, quantile, 0.025) 
-  rs.direct.upr = apply(rs.direct.boot, 1, quantile, 0.975) 
-  
+
+  rs.direct.lwr = apply(rs.direct.boot, 1, quantile, 0.025)
+  rs.direct.upr = apply(rs.direct.boot, 1, quantile, 0.975)
+
   category.oe = rep('No Different', length(entities))
   category.oe[rs.oe.upr < marg.p] <- 'Better'
   category.oe[rs.oe.lwr > marg.p] <- 'Worse'
@@ -115,7 +152,12 @@ calcPerformance <- function(df = NULL, model = NULL, entity = "entity", y = "y",
   category.pe = rep('No Different', length(entities))
   category.pe[rs.pe.upr < marg.p] <- 'Better'
   category.pe[rs.pe.lwr > marg.p] <- 'Worse'
-  
+
+  m.re = as.data.frame(ranef(fit))
+  m.re.intercept <- data.frame(est = m.re$condval[m.re$term == '(Intercept)'],
+                               sd = m.re$condsd[m.re$term == '(Intercept)'],
+                               entity = m.re$grp[m.re$term == '(Intercept)'])
+
   perf.results <- data.frame(
     entities = entities,
     n = n,
@@ -145,8 +187,13 @@ calcPerformance <- function(df = NULL, model = NULL, entity = "entity", y = "y",
     category.pe,
     rs.direct = rs.direct,
     rs.direct.lwr = rs.direct.lwr,
-    rs.direct.upr = rs.direct.upr
+    rs.direct.upr = rs.direct.upr,
+    intercept.OR = exp(m.re.intercept$est),
+    intercept.OR.lwr = exp(m.re.intercept$est - 1.96*m.re.intercept$sd),
+    intercept.OR.upr = exp(m.re.intercept$est + 1.96*m.re.intercept$sd)
   )
+  perf.results$intercept.sig = as.factor(ifelse(perf.results$intercept.OR.lwr > 1 | perf.results$intercept.OR.upr < 1, 1, 0))
+
   results = list(df = df, model = model, fit = fit, marg.p = marg.p, marg.p.model = marg.p.model, perf.results = perf.results)
 
   return(results)
