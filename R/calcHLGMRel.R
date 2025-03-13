@@ -23,47 +23,46 @@ calcHLGMRel <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', ctr
   df <- data.out$df
   fit <- data.out$fit
   marg.p <- data.out$marg.p
-  marg.p.model <- data.out$marg.p.model
   n  <- data.out$n
   p <- data.out$p
   p.re <- data.out$p.re
+  var.expected = aggregate(expect ~ entity, data = df, function(x) sum(x * (1-x)))$expect
 
   # calculate between-variance based on model
   var.b.HLGM <- lme4::VarCorr(fit)[[entity]][1,1]
-  var.b.HLGM.pscale.model <- marg.p.model^2 * (1 - marg.p.model)^2 * var.b.HLGM
+  var.b.HLGM.delta <- (var.expected / n)^2 * var.b.HLGM
 
   # within-variance on the latent scale
   var.w.latent = pi^2 / (3 * n)
   est.HLGM.latent <- var.b.HLGM / (var.b.HLGM + var.w.latent)
 
-  # within-variance based on marginal probability
-  var.w.model <- marg.p.model * (1 - marg.p.model) / n
-  est.HLGM.model <- var.b.HLGM.pscale.model / (var.b.HLGM.pscale.model + var.w.model)
+  # within-variance based on delta method approximation
+  var.w.delta <- var.expected / n^2
+  est.HLGM.delta <- var.b.HLGM.delta / (var.b.HLGM.delta + var.w.delta)
 
   # within-variance based on sample proportion estimates
   var.w.FE <- p * (1 - p) / n
-  est.HLGM.FE.model <- var.b.HLGM.pscale.model / (var.b.HLGM.pscale.model + var.w.FE)
+  est.HLGM.FE <- var.b.HLGM.delta / (var.b.HLGM.delta + var.w.FE)
 
   # within-variance from random effects model
   var.w.RE <- p.re * (1 - p.re) / n
-  est.HLGM.RE.model <- var.b.HLGM.pscale.model / (var.b.HLGM.pscale.model + var.w.RE)
+  est.HLGM.RE <- var.b.HLGM.delta / (var.b.HLGM.delta + var.w.RE)
 
   output = list(
     marg.p = marg.p,
-    marg.p.model = marg.p.model,
     n = n,
     p = p,
     p.re = p.re,
     var.b.HLGM = var.b.HLGM,
-    var.b.HLGM.pscale.model = var.b.HLGM.pscale.model,
+    var.b.HLGM.delta = var.b.HLGM.delta,
     var.w.latent = var.w.latent,
-    var.w.model = var.w.model,
+    var.w.delta = var.w.delta,
     var.w.FE = var.w.FE,
     var.w.RE = var.w.RE,
     est.HLGM.latent = est.HLGM.latent,
-    est.HLGM.model = est.HLGM.model,
-    est.HLGM.FE.model = est.HLGM.FE.model,
-    est.HLGM.RE.model = est.HLGM.RE.model
+    est.HLGM.delta = est.HLGM.delta,
+    est.HLGM.FE = est.HLGM.FE,
+    est.HLGM.RE = est.HLGM.RE
   )
 
   return(output)

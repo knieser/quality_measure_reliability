@@ -4,7 +4,7 @@
 \alias{simulateData}
 \title{Simulate data}
 \usage{
-simulateData(n.entity, avg.n, icc, beta0, beta1, type = "binary")
+simulateData(n.entity, avg.n, tau = tau, theta = theta, type = "binary")
 }
 \arguments{
 \item{type}{variable type of the observations (e.g., binary)}

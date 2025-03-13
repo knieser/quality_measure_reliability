@@ -16,7 +16,7 @@ reliability_analysis <- function(df, model, entity, y, ctrPerf, ctrRel, output.d
   rel.out.file = paste0(output.dir, 'table_reliability_results', filename.add, '.csv')
   rel.dist.plot.file = paste0(output.dir, 'fig_reliability_distribution', filename.add, '.png')
   SSR.plot.file = paste0(output.dir, 'fig_SSR_comparison', filename.add, '.png')
-  
+
   # clean data
   df = cleanData(df, entity = entity, y = y, ctrPerf = ctrPerf)
 
@@ -41,7 +41,7 @@ reliability_analysis <- function(df, model, entity, y, ctrPerf, ctrRel, output.d
                    'Beta-binomial, FE',
                    'Beta-binomial, RE',
                    'Beta-binomial, Jeffreys'), each = length(HLGM.out$n)),
-    est = c(HLGM.out$est.HLGM.latent, HLGM.out$est.HLGM.model, HLGM.out$est.HLGM.FE.model, HLGM.out$est.HLGM.RE.model,
+    est = c(HLGM.out$est.HLGM.latent, HLGM.out$est.HLGM.delta, HLGM.out$est.HLGM.FE, HLGM.out$est.HLGM.RE,
             BB.out$est.BB, BB.out$est.BB.FE, BB.out$est.BB.RE, BB.out$est.BB.J)
   )
 
@@ -67,7 +67,7 @@ reliability_analysis <- function(df, model, entity, y, ctrPerf, ctrRel, output.d
   data.out <- calcDataSummary(df, model, entity, y, ctrPerf)
   marg.p <- data.out$marg.p
   df.SSR <- data.out$df
-  
+
   entities = unique(df.SSR$entity)
   n.entity = length(entities)
 

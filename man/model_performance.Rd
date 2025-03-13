@@ -9,7 +9,7 @@ model_performance(
   model,
   entity,
   y,
-  predictor.clean,
+  predictor.clean = NA,
   ctrPerf,
   output.dir,
   filename.add = NULL
