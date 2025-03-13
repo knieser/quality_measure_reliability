@@ -133,7 +133,7 @@ calcReliability <- function(df = NULL, model = NULL, entity = "entity", y = "y",
     ),
     reliability_mean = c(
       NA,
-	  NA,
+	    NA,
       NA,
       NA,
       NA,

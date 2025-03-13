@@ -1,7 +1,7 @@
 calcDataSummary <- function(df, model = NULL, entity = 'entity', y = "y", ctrPerf = controlPerf()){
   if (is.null(df) & is.null(model)) stop ('Please provide either a dataframe or a model object')
 
-  cl <- ctrPerf$cl
+  alpha <- ctrPerf$alpha
 
   df <- cleanData(df, entity, y, ctrPerf)
   if (is.null(model)){model = paste0(y, ' ~ (1|', entity, ')')}
@@ -15,7 +15,7 @@ calcDataSummary <- function(df, model = NULL, entity = 'entity', y = "y", ctrPer
   entities <- agg$entity
   obs      <- agg$y
   p        <- obs / n
-  p.ci     <- t(apply(cbind(obs, n), 1, function(x) prop.test(x[1], x[2], conf.level = cl)$conf.int))
+  p.ci     <- t(apply(cbind(obs, n), 1, function(x) prop.test(x[1], x[2], conf.level = 1-alpha)$conf.int))
   p.lwr    <- p.ci[,1]
   p.upr    <- p.ci[,2]
   pred     <- aggregate(predict ~ entity, data = df, sum)$predict

@@ -1,12 +1,18 @@
-controlRel <- function(n.cores = 4, n.resamples = 10, SSRmethod = 'permutation', fn = NA, rs.method = 'oe', d.steps = 10, classification.quantiles = 4){
+#' Parameters for reliability calculations
+#' @description
+#' This function stores parameters for reliability calculations
+#' @author Kenneth Nieser (nieser@stanford.edu)
+#' @references None
+#' @examples
+#' # TBD
+#' @export
+
+controlRel <- function(n.resamples = 10, SSRmethod = 'permutation', fn = NA, d.steps = 10){
   output = list()
-  output$n.cores <- n.cores
   output$n.resamples <- n.resamples
   output$SSRmethod <- SSRmethod
   output$fn <- fn
-  output$rs.method <- rs.method
   output$d.steps <- d.steps
-  output$classification.quantiles <- classification.quantiles
   return(output)
 }
 

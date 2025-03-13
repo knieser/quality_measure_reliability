@@ -19,6 +19,10 @@
 
 calcPerformance <- function(df = NULL, model = NULL, entity = "entity", y = "y", ctrPerf = controlPerf()){
   if (is.null(df) & is.null(model)) stop ('Please provide either a dataframe or a model object')
+  alpha = ctrPerf$alpha
+  ci.lwr = alpha/2
+  ci.upr = 1 - alpha/2
+  z = qnorm(1 - alpha/2)
 
   data.out <- calcDataSummary(df, model, entity, y, ctrPerf)
   df = data.out$df
@@ -130,20 +134,20 @@ calcPerformance <- function(df = NULL, model = NULL, entity = "entity", y = "y",
   rs.pe.se <- apply(rs.pe.boot, 1, sd)
   rs.direct.se <- apply(rs.direct.boot, 1, sd)
 
-  oe.lwr = apply(oe.boot, 1, quantile, 0.025)
-  oe.upr = apply(oe.boot, 1, quantile, 0.975)
+  oe.lwr = apply(oe.boot, 1, quantile, ci.lwr)
+  oe.upr = apply(oe.boot, 1, quantile, ci.upr)
 
-  pe.lwr = apply(pe.boot, 1, quantile, 0.025)
-  pe.upr = apply(pe.boot, 1, quantile, 0.975)
+  pe.lwr = apply(pe.boot, 1, quantile, ci.lwr)
+  pe.upr = apply(pe.boot, 1, quantile, ci.upr)
 
-  rs.oe.lwr = apply(rs.oe.boot, 1, quantile, 0.025)
-  rs.oe.upr = apply(rs.oe.boot, 1, quantile, 0.975)
+  rs.oe.lwr = apply(rs.oe.boot, 1, quantile, ci.lwr)
+  rs.oe.upr = apply(rs.oe.boot, 1, quantile, ci.upr)
 
-  rs.pe.lwr = apply(rs.pe.boot, 1, quantile, 0.025)
-  rs.pe.upr = apply(rs.pe.boot, 1, quantile, 0.975)
+  rs.pe.lwr = apply(rs.pe.boot, 1, quantile, ci.lwr)
+  rs.pe.upr = apply(rs.pe.boot, 1, quantile, ci.upr)
 
-  rs.direct.lwr = apply(rs.direct.boot, 1, quantile, 0.025)
-  rs.direct.upr = apply(rs.direct.boot, 1, quantile, 0.975)
+  rs.direct.lwr = apply(rs.direct.boot, 1, quantile, ci.lwr)
+  rs.direct.upr = apply(rs.direct.boot, 1, quantile, ci.upr)
 
   category.oe = rep('No Different', length(entities))
   category.oe[rs.oe.upr < marg.p] <- 'Better'
@@ -189,8 +193,8 @@ calcPerformance <- function(df = NULL, model = NULL, entity = "entity", y = "y",
     rs.direct.lwr = rs.direct.lwr,
     rs.direct.upr = rs.direct.upr,
     intercept.OR = exp(m.re.intercept$est),
-    intercept.OR.lwr = exp(m.re.intercept$est - 1.96*m.re.intercept$sd),
-    intercept.OR.upr = exp(m.re.intercept$est + 1.96*m.re.intercept$sd)
+    intercept.OR.lwr = exp(m.re.intercept$est - z*m.re.intercept$sd),
+    intercept.OR.upr = exp(m.re.intercept$est + z*m.re.intercept$sd)
   )
   perf.results$intercept.sig = as.factor(ifelse(perf.results$intercept.OR.lwr > 1 | perf.results$intercept.OR.upr < 1, 1, 0))
 

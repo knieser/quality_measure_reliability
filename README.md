@@ -1,15 +1,13 @@
-# Quality measure reliability
+# Analyzing health care quality measures
 
-qmrel is an R package to help with analyzing health care quality measures. The package includes functions for calculating measure performance, both unadjusted and adjusted, and estimating reliability with several different methods. More detail on each reliability estimation method can be found in 
-[Comparing methods for assessing the reliability of health care quality measures](https://doi.org/10.1002/sim.10197).
+QualityMeasure is an R package to help with analyzing health care quality measures. The package includes functions for calculating measure performance, both unadjusted and adjusted, and estimating reliability with several different methods. More detail on each reliability estimation method can be found in [Comparing methods for assessing the reliability of health care quality measures](https://doi.org/10.1002/sim.10197).
 
+<b> This package is a work-in-progress. Please email me at nieser\@stanford.edu with any questions if you plan to use this code. </b>
 
 The following code can be used to download the latest version of the package to your RStudio from Github.
+
 ``` r
 library(devtools)
 devtools::install_github('knieser/quality_measure_reliability')
-library(qmrel)
+library(QualityMeasure)
 ```
-
-
-

@@ -4,12 +4,12 @@
 \alias{simulateData}
 \title{Simulate data}
 \usage{
-simulateData(n, type = "binary", p = NA, var.w = NA, lambda = NA)
+simulateData(n.entity, avg.n, icc, beta0, beta1, type = "binary")
 }
 \arguments{
-\item{n}{a vector of the number of observations for each accountable entity}
-
 \item{type}{variable type of the observations (e.g., binary)}
+
+\item{n}{a vector of the number of observations for each accountable entity}
 }
 \value{
 A dataframe with the following columns:

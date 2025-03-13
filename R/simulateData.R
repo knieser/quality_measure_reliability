@@ -13,32 +13,40 @@
 #' @importFrom stats aov
 #' @export
 
-simulateData <- function(n, type = 'binary', p = NA, var.w = NA, lambda = NA){
+simulateData <- function(n.entity, avg.n, tau = tau, theta = theta, type = 'binary'){
 
-  n.entity = length(n)
+  #n = rpois(n.entity, avg.n)
+  n = rep(avg.n, n.entity)
+  total.n = sum(n)
   entity = rep(1:n.entity, times = n)
-  y <- vector()
+  x1 = rnorm(total.n, 0, 1)
 
   if (type == 'binary'){
-    for (j in 1:n.entity){
-      entity.y <- rbinom(n[j], 1, p[j])
-      ifelse(length(y)==0, y <- entity.y, y <- c(y, entity.y))
-    }
-  } else if (type == 'normal'){
-    for (j in 1:n.entity){
-      entity.y <- rnorm(n[j], p[j], sqrt(var.w))
-      ifelse(length(y)==0, y <- entity.y, y <- c(y, entity.y))
-    }
-  } else if (type == 'count'){
-    for (j in 1:n.entity){
-      entity.y <- rpois(n[j], lambda[j])
-      ifelse(length(y)==0, y <- entity.y, y <- c(y, entity.y))
-    }
+    z = rep(rnorm(n.entity, tau[1], tau[2]), times = n)
+    lp = z + theta[1] + theta[2] * x1
+    p = exp(lp) / (1 + exp(lp))
+    y = rbinom(total.n, 1, p)
+    df = data.frame(
+      entity = as.factor(entity),
+      z = z,
+      x1 = x1,
+      lp = lp,
+      p = p,
+      y = y
+    )
   }
 
-  df <- data.frame(
-    entity = as.factor(entity),
-    y = y
-  )
+  if (type == 'normal'){
+    z = rep(rnorm(n.entity, 0, tau[1]), times = n)
+    lp = z + theta[1] + theta[2] * x1
+    y = rnorm(total.n, mean = lp, sd = tau[2])
+    df = data.frame(
+      entity = as.factor(entity),
+      z = z,
+      x1 = x1,
+      lp = lp,
+      y = y
+    )
+  }
   return(df)
 }

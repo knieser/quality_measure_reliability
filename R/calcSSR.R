@@ -23,7 +23,7 @@ calcSSR <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', ctrPerf
 
   fn <- ctrRel$fn
   if(is.na(fn)){fn = function(x){mean(x)}}
-  n.cores     <- ctrRel$n.cores
+  n.cores     <- ctrPerf$n.cores
   n.resamples <- ctrRel$n.resamples
   method      <- ctrRel$SSRmethod
 

@@ -1,8 +1,8 @@
 ---
-title: "Example-quality-measure-analysis"
+title: "Example-analysis"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Example-quality-measure-analysis}
+  %\VignetteIndexEntry{Example-analysis}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -22,7 +22,7 @@ library(lme4)
 library(psych)
 
 document()
-library(qmrel)
+library(QualityMeasure)
 ```
 
 

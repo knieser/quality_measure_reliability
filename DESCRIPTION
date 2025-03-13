@@ -1,5 +1,5 @@
-Package: qmrel
-Title: Estimate Reliability of Quality Measures
+Package: QualityMeasure
+Title: A package to assist with the analysis of health care quality measure performance
 Version: 0.0.0.9000
 Authors@R: 
     person("Kenneth", "Nieser", , "nieser@stanford.edu", role = c("aut", "cre"))

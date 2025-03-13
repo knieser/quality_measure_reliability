@@ -38,9 +38,11 @@ parametricBootstrap <- function(df, model, entities, entity, y, ctrPerf){
       df$predict   <- predict(fit, newdata = df, type = 'response')
 
       # calculate oe and pe ratios
+      n      <- aggregate(y ~ entity, data = df, length)$y
       obs    <- aggregate(y ~ entity, data = df, sum)$y
       pred   <- aggregate(predict ~ entity, data = df, sum)$predict
       exp    <- aggregate(expect ~ entity, data = df, sum)$expect
+      p      <- obs / n
       oe     <- obs / exp
       pe     <- pred / exp
 
@@ -57,13 +59,14 @@ parametricBootstrap <- function(df, model, entities, entity, y, ctrPerf){
         rs.direct[j] = mean(predict(fit, newdata = df.ds, type = 'response'))
       }
 
-      out <- list(oe = oe, pe = pe, rs.oe = rs.oe, rs.pe = rs.pe, rs.direct = rs.direct)
+      out <- list(p = p, oe = oe, pe = pe, rs.oe = rs.oe, rs.pe = rs.pe, rs.direct = rs.direct)
       return(out)
     }
 
     df.pb[[y]] = rbinom(nrow(df.pb), 1, df.pb$predict)
     est.boot <- estOEPE(df.pb, model, entities, entity, y)
     list(
+      p.boot = est.boot$p,
       oe.boot = est.boot$oe,
       pe.boot = est.boot$pe,
       rs.oe.boot = est.boot$rs.oe,
@@ -77,6 +80,7 @@ parametricBootstrap <- function(df, model, entities, entity, y, ctrPerf){
 
   output = list(
     entities = entities,
+    p.boot = matrix(unlist(out$p.boot), nrow = length(entities), ncol = n.boots),
     oe.boot = matrix(unlist(out$oe.boot), nrow = length(entities), ncol = n.boots),
     pe.boot = matrix(unlist(out$pe.boot), nrow = length(entities), ncol = n.boots),
     rs.oe.boot = matrix(unlist(out$rs.oe.boot), nrow = length(entities), ncol = n.boots),
