@@ -6,11 +6,11 @@
 \usage{
 profiling_analysis(
   df,
-  model,
-  entity,
-  y,
-  ctrPerf,
-  output.dir,
+  model = NULL,
+  entity = "entity",
+  y = "y",
+  ctrPerf = controlPerf(),
+  output.dir = getwd(),
   filename.add = NULL
 )
 }

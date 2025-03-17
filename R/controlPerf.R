@@ -7,7 +7,7 @@
 #' # TBD
 #' @export
 
-controlPerf <- function(min.n = 2, alpha = 0.05, n.boots = 10, n.cores = 4){
+controlPerf <- function(min.n = 2, alpha = 0.05, n.boots = 200, n.cores = 4){
   output = list()
   output$min.n <- min.n
   output$alpha <- alpha

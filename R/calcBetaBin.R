@@ -20,8 +20,6 @@ calcBetaBin <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', ctr
 
   data.out <- calcDataSummary(df, model, entity, y, ctrPerf)
   df <- data.out$df
-  marg.p <- data.out$marg.p
-  marg.p.model <- data.out$marg.p.model
   n  <- data.out$n
   x <- data.out$obs
   p <- data.out$p

@@ -18,18 +18,18 @@ plotPerformance <- function(df, plot.y = 'p'){
     df$upr = df$p.upr
     ylab = 'Unadjusted rate'
   } else if (plot.y == 'oe') {
-    df$y = df$rs.oe.est
+    df$y = df$rs.oe
     df$rank = df$rank.oe
     df$lwr = df$rs.oe.lwr
     df$upr = df$rs.oe.upr
     ylab = 'OE risk-standardized rate'
   } else if (plot.y == 'pe') {
-    df$y = df$rs.pe.est
+    df$y = df$rs.pe
     df$rank = df$rank.pe
     df$lwr = df$rs.pe.lwr
     df$upr = df$rs.pe.lwr
     ylab = 'PE risk-standardized rate'
-  } 
+  }
 
   fig <- ggplot2::ggplot(data = df, aes(x = rank, y = y)) +
     geom_point(color = 'darkblue') +

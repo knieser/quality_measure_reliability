@@ -4,7 +4,7 @@
 \alias{controlPerf}
 \title{Parameters for performance calculations}
 \usage{
-controlPerf(min.n = 2, alpha = 0.05, n.boots = 10, n.cores = 4)
+controlPerf(min.n = 2, alpha = 0.05, n.boots = 200, n.cores = 4)
 }
 \description{
 This function stores parameters for performance calculations

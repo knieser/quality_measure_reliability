@@ -7,7 +7,7 @@
 #' # TBD
 #' @export
 
-controlRel <- function(n.resamples = 10, SSRmethod = 'permutation', fn = NA, d.steps = 10){
+controlRel <- function(n.resamples = 100, SSRmethod = 'permutation', fn = NA, d.steps = 10){
   output = list()
   output$n.resamples <- n.resamples
   output$SSRmethod <- SSRmethod

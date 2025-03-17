@@ -15,8 +15,7 @@
 
 simulateData <- function(n.entity, avg.n, tau = tau, theta = theta, type = 'binary'){
 
-  #n = rpois(n.entity, avg.n)
-  n = rep(avg.n, n.entity)
+  n = rpois(n.entity, avg.n)
   total.n = sum(n)
   entity = rep(1:n.entity, times = n)
   x1 = rnorm(total.n, 0, 1)

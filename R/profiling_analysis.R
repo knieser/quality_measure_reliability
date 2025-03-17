@@ -12,7 +12,7 @@
 #' @importFrom lme4 glmer
 #' @export
 
-profiling_analysis <- function(df, model, entity, y, ctrPerf, output.dir, filename.add = NULL){
+profiling_analysis <- function(df, model = NULL, entity = 'entity', y = 'y', ctrPerf = controlPerf(), output.dir = getwd(), filename.add = NULL){
   rand.int.plot.file = paste0(output.dir, 'fig_random_intercepts', filename.add, '.png')
   corr.plot.file = paste0(output.dir, 'fig_correlation', filename.add, '.png')
   comparison.plot.file = paste0(output.dir, 'fig_comparison_rates', filename.add, '.png')

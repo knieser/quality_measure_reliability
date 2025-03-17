@@ -15,7 +15,14 @@ calcDataSummary <- function(df, model = NULL, entity = 'entity', y = "y", ctrPer
   entities <- agg$entity
   obs      <- agg$y
   p        <- obs / n
-  p.ci     <- t(apply(cbind(obs, n), 1, function(x) prop.test(x[1], x[2], conf.level = 1-alpha)$conf.int))
+  tryCatch({
+    p.ci     <- t(apply(cbind(obs, n), 1, function(x) prop.test(x[1], x[2], conf.level = 1-alpha)$conf.int))
+    },
+    warning = function(w){
+      message('...using Clopper-Pearson intervals instead of Wilson score intervals for performance CIs...')
+      p.ci     <- t(apply(cbind(obs, n), 1, function(x) binom.test(x[1], x[2], conf.level = 1-alpha)$conf.int))
+    }
+  )
   p.lwr    <- p.ci[,1]
   p.upr    <- p.ci[,2]
   pred     <- aggregate(predict ~ entity, data = df, sum)$predict
