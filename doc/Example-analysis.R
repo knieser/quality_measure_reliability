@@ -1,20 +1,10 @@
----
-title: "Example-analysis"
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{Example-analysis}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
----
-
-```{r, include = FALSE}
+## ----include = FALSE----------------------------------------------------------
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
-```
 
-```{r setup}
+## ----setup--------------------------------------------------------------------
 library(ggplot2)
 library(doParallel)
 library(lme4)
@@ -25,15 +15,8 @@ load_all()
 #devtools::install_github('knieser/quality_measure_reliability')
 #library(QualityMeasure)
 
-```
 
-
-# Introduction
-This vignette shows how to use the functions in QualityMeasure to analyze quality measure performance and reliability.
-
-First we'll simulate some data.
-
-```{r}
+## -----------------------------------------------------------------------------
 # number of accountable entities
 n.entity = 100  
 
@@ -61,12 +44,8 @@ df1 = data.frame(
 )
 head(df1)
 
-```
 
-
-You could also use the built-in function to simulate data from a hierarchical logistic regression model.
-
-```{r}
+## -----------------------------------------------------------------------------
 # number of accountable entities
 n.entity = 100  
 
@@ -88,15 +67,8 @@ theta = c(theta1, theta2)
 
 df2 <- simulateData(n.entity = n.entity, avg.n = avg.n, tau = tau, theta = theta)
 head(df2)
-```
 
-The profiling_analysis() function can be used to obtain some basic provider profiling results. 
-
-This analysis generates confidence intervals for entity-level performance using a parametric bootstrapping method. The number of bootstraps and the number of cores to use for parallel processing can be adjusted with the controlPerf() function within profiling_analysis() as shown below.
-
-The output directory where figures are saved can also be adjusted by the user.
-
-```{r}
+## -----------------------------------------------------------------------------
 
 # adjust number of bootstraps and cores for parallel processing.
 n.boots = 20
@@ -108,37 +80,20 @@ output.dir = paste0(getwd(), '/test_output/')
 # run profiling analysis
 profiling.results <- profiling_analysis(df = df1, ctrPerf = controlPerf(n.boots = n.boots, n.cores = n.cores), output.dir = output.dir)
 
-```
 
-
-# Plot number of observations per provider
-
-```{r}
+## -----------------------------------------------------------------------------
 plotN(profiling.results$perf.results$n)
 
-```
 
-
-# Plot measure performance
-
-```{r}
+## -----------------------------------------------------------------------------
 # unadjusted performance
 plotPerformance(profiling.results$perf.results)
 
 # OE-standardized performance
 plotPerformance(profiling.results$perf.results, 'oe')
 
-```
 
-
-
-
-# Calculate beta-binomial-based reliability estimates
-
-You can calculate the beta-binomial estimates by using the calcBetaBin() function. Note that these estimates do not account for any risk-adjustment.
-
-
-```{r}
+## -----------------------------------------------------------------------------
 BB.results <- calcBetaBin(df = df1)
 message(paste0('Estimated parameters from the Beta-Binomial model are: alpha = ', round(BB.results$alpha, 3), '; beta = ', round(BB.results$beta, 3)))
 
@@ -165,16 +120,8 @@ BB.plot.df <- data.frame(
       legend.position = 'bottom'
     )
 BB.fig
-```
 
-
-# Calculate reliability from all methods
-
-Or you can calculate reliability estimates from all the available methods in this package by using the calcReliability() function.
-
-The number of resamples used to calculate the permutation split-sample reliability estimate can be adjusted using the controlRel() function within calcReliability() as shown below.
-
-```{r}
+## -----------------------------------------------------------------------------
 
 # number of resamples to use for the permutation Ssplit-sample reliability estimate
 n.resamples = 100
@@ -182,5 +129,4 @@ n.cores = 3
 
 rel.results <- calcReliability(df = df1, ctrPerf = controlPerf(n.cores = n.cores), ctrRel = controlRel(n.resamples = n.resamples))
 rel.results
-```
 
