@@ -2,20 +2,17 @@
 #' @description
 #' This function calculates measure performance by accountable entity.
 #' @param df dataframe; if null, will use the dataframe in the model object
-#' @param model model; if null, will use an unadjusted model
-#' @param entities list of accountable entities
-#' @param entity variable to use as the accountable entity; default = "entity"
-#' @param y variable to use as the outcome; default = "y"
+#' @param model model; if null, will use an unadjusted model (NOTE: currently, Beta-Binomial reliability estimates do not take risk-adjustment into account.)
+#' @param entity data column containing the accountable entity identifier
+#' @param y data column containing the outcome variable
+#' @param ctrPerf parameters to control performance measure calculation
 #' @returns Estimated risk-standardized measure performance by accountable entity
 #' @author Kenneth Nieser (nieser@stanford.edu)
 #' @importFrom stats aggregate predict
 #' @importFrom lme4 glmer
 #' @export
 
-profiling_analysis <- function(df, model = NULL, entity = 'entity', y = 'y', ctrPerf = controlPerf(), output.dir = getwd(), filename.add = NULL){
-  rand.int.plot.file = paste0(output.dir, 'fig_random_intercepts', filename.add, '.png')
-  corr.plot.file = paste0(output.dir, 'fig_correlation', filename.add, '.png')
-  comparison.plot.file = paste0(output.dir, 'fig_comparison_rates', filename.add, '.png')
+profiling_analysis <- function(df, model = NULL, entity = 'entity', y = 'y', ctrPerf = controlPerf()){
 
   # clean data
   df = cleanData(df, entity = entity, y = y, ctrPerf = ctrPerf)
@@ -64,7 +61,6 @@ profiling_analysis <- function(df, model = NULL, entity = 'entity', y = 'y', ctr
       strip.text = element_text(size = 18, face = "bold"),
       legend.position = 'none'
     )
-  ggsave(filename = rand.int.plot.file, fig.rand.int, width = 8, height = 8, units = 'in')
 
   # plot of standardization ratios against the entity random intercepts
   plot.df.corr <- data.frame(
@@ -73,7 +69,7 @@ profiling_analysis <- function(df, model = NULL, entity = 'entity', y = 'y', ctr
     std.ratio = c(perf.results$oe, perf.results$pe)
   )
 
-  corr.fig <- ggplot2::ggplot(data = plot.df.corr, aes(x = rand.int, y = std.ratio, group = Method)) +
+  fig.corr <- ggplot2::ggplot(data = plot.df.corr, aes(x = rand.int, y = std.ratio, group = Method)) +
     geom_point(aes(color = Method, shape = Method), size = 3) +
     stat_smooth(method = 'lm', formula = y ~ x, geom = 'smooth', se = F, aes(color = Method), lty = 'dashed') +
     scale_color_manual(values = c('darkgrey', 'red')) +
@@ -89,7 +85,6 @@ profiling_analysis <- function(df, model = NULL, entity = 'entity', y = 'y', ctr
       legend.text = element_text(size = 16),
       legend.title = element_text(size = 18, face = 'bold')
     )
-  ggsave(filename = corr.plot.file, corr.fig, width = 8, height = 8, units = 'in')
 
   # plot of measure performance across different risk-adjustment methods
   plot.df.p <- data.frame(
@@ -102,7 +97,7 @@ profiling_analysis <- function(df, model = NULL, entity = 'entity', y = 'y', ctr
     rank.pe = rep(perf.results$rank.pe, 3)
   )
 
-  fig <- ggplot2::ggplot(data = plot.df.p, aes(x = rank, y = p, group = method)) +
+  fig.perf <- ggplot2::ggplot(data = plot.df.p, aes(x = rank, y = p, group = method)) +
     geom_point(size = 2) +
     geom_errorbar(aes(ymin = lwr, ymax = upr), width = 0.1) +
     geom_hline(yintercept = marg.p, col = 'red', lty = 'dashed', size = 1.2, alpha = 0.7) +
@@ -120,7 +115,6 @@ profiling_analysis <- function(df, model = NULL, entity = 'entity', y = 'y', ctr
       legend.title = element_blank(),
       legend.position = 'bottom'
     )
-  ggsave(filename = comparison.plot.file, fig, width = 24, height = 8, units = 'in')
   message('...done')
 
   results = list(df = df.perf,
@@ -133,7 +127,10 @@ profiling_analysis <- function(df, model = NULL, entity = 'entity', y = 'y', ctr
                  corr.oe.randint = corr.oe.randint,
                  corr.pe.randint = corr.pe.randint,
                  icc.oe.randint = icc.oe.randint,
-                 icc.pe.randint = icc.pe.randint
+                 icc.pe.randint = icc.pe.randint,
+                 fig.rand.int = fig.rand.int,
+                 fig.corr = fig.corr,
+                 fig.perf = fig.perf
                 )
 
   return(results)

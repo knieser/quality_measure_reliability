@@ -9,21 +9,19 @@ profiling_analysis(
   model = NULL,
   entity = "entity",
   y = "y",
-  ctrPerf = controlPerf(),
-  output.dir = getwd(),
-  filename.add = NULL
+  ctrPerf = controlPerf()
 )
 }
 \arguments{
 \item{df}{dataframe; if null, will use the dataframe in the model object}
 
-\item{model}{model; if null, will use an unadjusted model}
+\item{model}{model; if null, will use an unadjusted model (NOTE: currently, Beta-Binomial reliability estimates do not take risk-adjustment into account.)}
 
-\item{entity}{variable to use as the accountable entity; default = "entity"}
+\item{entity}{data column containing the accountable entity identifier}
 
-\item{y}{variable to use as the outcome; default = "y"}
+\item{y}{data column containing the outcome variable}
 
-\item{entities}{list of accountable entities}
+\item{ctrPerf}{parameters to control performance measure calculation}
 }
 \value{
 Estimated risk-standardized measure performance by accountable entity
