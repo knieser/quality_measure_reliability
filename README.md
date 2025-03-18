@@ -14,10 +14,4 @@ library(QualityMeasure)
 
 ## Tutorial
 
-This package contains a vignette describing how this package can be used to estimate reliability:
-[Example analysis](https://knieser.github.io/QualityMeasure/Example-analysis.html)
-
-
-
-
-
+This package contains a vignette describing how this package can be used to estimate reliability: [Example analysis](https://knieser.github.io/QualityMeasure/Example-analysis.html)
