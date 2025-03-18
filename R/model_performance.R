@@ -1,23 +1,19 @@
 #' Calculate model performance
 #' @description
 #' This function calculates risk model performance.
-#' @param df dataframe; if null, will use the dataframe in the model object
+#' @param df observation-level data; if null, will use the dataframe from the model object
 #' @param model model; if null, will use an unadjusted model
-#' @param entities list of accountable entities
-#' @param entity variable to use as the accountable entity; default = "entity"
-#' @param y variable to use as the outcome; default = "y"
+#' @param entity data column containing the accountable entity identifier
+#' @param y data column containing the outcome variable
+#' @param predictor.clean optional list of formatted names of predictors in the model
+#' @param ctrPerf parameters to control performance measure calculation
 #' @returns Estimated risk-standardized measure performance by accountable entity
 #' @author Kenneth Nieser (nieser@stanford.edu)
 #' @importFrom stats aggregate predict
 #' @importFrom lme4 glmer
 #' @export
 
-model_performance <- function(df, model, entity, y, predictor.clean = NA, ctrPerf, output.dir, filename.add = NULL){
-  model.estimates.file = paste0(output.dir, 'parameter_estimates', filename.add, '.csv')
-  model.estimates.fig.file = paste0(output.dir, 'fig_parameter_estimates', filename.add, '.png')
-  prediction.fig.file = paste0(output.dir, 'fig_prediction', filename.add, '.png')
-  calibration.fig.file = paste0(output.dir, 'fig_calibration', filename.add, '.png')
-
+model_performance <- function(df, model, entity, y, predictor.clean = NA, ctrPerf = controlPerf()){
   alpha = ctrPerf$alpha
   z = qnorm(1 - alpha/2)
 
@@ -53,7 +49,6 @@ model_performance <- function(df, model, entity, y, predictor.clean = NA, ctrPer
   }
   model.results$predictor.clean <- as.factor(model.results$predictor.clean)
   model.results$predictor.clean <- factor(model.results$predictor.clean, levels = model.results$predictor.clean[order(model.results$rank, decreasing = T)])
-  write.csv(model.results, file = model.estimates.file)
 
   # make plot of model results
   fig.estimates <- ggplot(data = model.results, aes(x = est, y = predictor.clean, group = sig)) +
@@ -78,10 +73,9 @@ model_performance <- function(df, model, entity, y, predictor.clean = NA, ctrPer
       panel.grid.minor.x = element_line(),
       legend.position = 'none'
     )
-  ggsave(filename = model.estimates.fig.file, fig.estimates, width = 10, height = 10, units = 'in')
 
   # discrimination
-  prediction_plot <- ggplot(data = df, aes(x=predict, color = as.factor(y), fill = as.factor(y))) +
+  fig.prediction <- ggplot(data = df, aes(x=predict, color = as.factor(y), fill = as.factor(y))) +
     geom_density(alpha = .3) +
     scale_color_manual('Observed outcome', values = c('black', 'red')) +
     scale_fill_manual('Observed outcome', values = c('black', 'red')) +
@@ -96,7 +90,6 @@ model_performance <- function(df, model, entity, y, predictor.clean = NA, ctrPer
       legend.title = element_text(size = 18, face = 'bold'),
       legend.text = element_text(size = 18)
     )
-  ggsave(filename = prediction.fig.file, prediction_plot, width = 10, height = 10, units = 'in')
 
   # calibration plot
   deciles = quantile(df$predict, 1:10/10)
@@ -110,7 +103,7 @@ model_performance <- function(df, model, entity, y, predictor.clean = NA, ctrPer
     observed = aggregate(y ~ decile, data = df, mean)$y,
     predicted = aggregate(predict ~ decile, data = df, mean)$predict
   )
-  calibration.fig <- ggplot(data = calibration.df, aes(x = predicted, y = observed)) +
+  fig.calibration <- ggplot(data = calibration.df, aes(x = predicted, y = observed)) +
     geom_point(size = 3) +
     geom_line(lwd = 1) +
     geom_abline(slope = 1, intercept = 0, lty = 'dashed', lwd = 1) +
@@ -127,7 +120,6 @@ model_performance <- function(df, model, entity, y, predictor.clean = NA, ctrPer
       legend.title = element_blank(),
       legend.position = 'bottom'
     )
-  ggsave(filename = calibration.fig.file, calibration.fig, width = 10, height = 10, units = 'in')
 
   # calculate c statistic using wilcox
   p1 = df$predict[df$y==1]
@@ -144,7 +136,10 @@ model_performance <- function(df, model, entity, y, predictor.clean = NA, ctrPer
                  marg.p = marg.p,
                  c.statistic = c.statistic,
                  model.results = model.results,
-                 calibration.df = calibration.df)
+                 calibration.df = calibration.df,
+                 fig.estimates = fig.estimates,
+                 fig.prediction = fig.prediction,
+                 fig.calibration = fig.calibration)
 
   return(results)
 }

@@ -1,22 +1,3 @@
-#' Parametric bootstrap function
-#' @description
-#' This function creates bootstrap samples from the fitted model
-#' @param df dataframe; if null, will use the dataframe in the model object
-#' @param model model; if null, will use an unadjusted model
-#' @param entity variable to use as the accountable entity; default = "entity"
-#' @param y variable to use as the outcome; default = "y"
-#' @param ctrPerf parameters to control performance measure calculation
-#' @returns Estimated measure performance by accountable entity
-#' @author Kenneth Nieser (nieser@stanford.edu)
-#' @references None
-#' @examples
-#' # TBD
-#' @importFrom stats aggregate predict rbinom
-#' @importFrom parallel makeCluster stopCluster
-#' @importFrom doParallel registerDoParallel
-#' @importFrom foreach foreach
-#' @export
-
 parametricBootstrap <- function(df, model, entities, entity, y, ctrPerf){
   n.boots = ctrPerf$n.boots
   n.cores = ctrPerf$n.cores

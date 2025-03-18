@@ -6,16 +6,6 @@
 \usage{
 simulateData(n.entity, avg.n, tau = tau, theta = theta, type = "binary")
 }
-\arguments{
-\item{type}{variable type of the observations (e.g., binary)}
-
-\item{n}{a vector of the number of observations for each accountable entity}
-}
-\value{
-A dataframe with the following columns:
-\item{entity}{the accountable entity}
-\item{y}{outcome}
-}
 \description{
 This function simulates some data.
 }

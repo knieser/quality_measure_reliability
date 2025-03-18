@@ -1,8 +1,8 @@
 #' Calculate measure performance
 #' @description
 #' This function calculates measure performance by accountable entity.
-#' @param df dataframe; if null, will use the dataframe in the model object
-#' @param model model; if null, will use an unadjusted model (NOTE: currently, Beta-Binomial reliability estimates do not take risk-adjustment into account.)
+#' @param df observation-level data; if null, will use the dataframe from the model object
+#' @param model model; if null, will use an unadjusted model
 #' @param entity data column containing the accountable entity identifier
 #' @param y data column containing the outcome variable
 #' @param ctrPerf parameters to control performance measure calculation

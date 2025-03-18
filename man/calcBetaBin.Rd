@@ -16,7 +16,7 @@ calcBetaBin(
 )
 }
 \arguments{
-\item{df}{dataframe; if null, will use the dataframe in the model object}
+\item{df}{observation-level data; if null, will use the dataframe from the model object}
 
 \item{model}{model; if null, will use an unadjusted model (NOTE: currently, Beta-Binomial reliability estimates do not take risk-adjustment into account.)}
 

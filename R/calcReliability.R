@@ -1,10 +1,10 @@
 #' Calculate reliability of quality measure performance
 #' @description
 #' This function calculates several estimates of quality measure performance.
-#' @param df dataframe; if null, will use the dataframe in the model object
+#' @param df observation-level data; if null, will use the dataframe from the model object
 #' @param model model; if null, will use an unadjusted model
-#' @param entity variable to use as the accountable entity; default = "entity"
-#' @param y variable to use as the outcome; default = "y"
+#' @param entity data column containing the accountable entity identifier
+#' @param y data column containing the outcome variable
 #' @param ctrPerf parameters to control performance measure calculation
 #' @param ctrRel parameters to control reliability estimation
 #' @returns A list with the following components:

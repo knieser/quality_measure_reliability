@@ -1,25 +1,22 @@
 #' Calculate misclassification probabilities
 #' @description
 #' This function runs the misclassification functions
-#' @param df dataframe; if null, will use the dataframe in the model object
+#' @param df observation-level data; if null, will use the dataframe from the model object
 #' @param model model; if null, will use an unadjusted model
-#' @param entity variable to use as the accountable entity; default = "entity"
-#' @param y variable to use as the outcome; default = "y"
+#' @param entity data column containing the accountable entity identifier
+#' @param y data column containing the outcome variable
 #' @param ctrPerf parameters to control performance measure calculation
-#' @returns Estimated measure performance by accountable entity
+#' @param ctrRel parameters to control reliability estimation
+#' @returns Estimated misclassification probabilities
 #' @author Kenneth Nieser (nieser@stanford.edu)
 #' @references None
 #' @examples
 #' # TBD
 #' @export
 
-misclassification_analysis <- function(df = NULL, model = NULL, entity = "entity", y = "y", ctrPerf = controlPerf(), ctrRel = controlRel(), output.dir, filename.add = NULL){
+misclassification_analysis <- function(df = NULL, model = NULL, entity = "entity", y = "y", ctrPerf = controlPerf(), ctrRel = controlRel()){
   if (is.null(df) & is.null(model)) stop ('Please provide either a dataframe or a model object')
   d.steps <- ctrRel$d.steps
-  plot.file.type = '.png'
-  unadjusted.percentile.misclassification.fig.file = paste0(output.dir, 'fig_unadj_percentile_misclassification', filename.add, plot.file.type)
-  oe.percentile.misclassification.fig.file = paste0(output.dir, 'fig_oe_percentile_misclassification', filename.add, plot.file.type)
-  pe.percentile.misclassification.fig.file = paste0(output.dir, 'fig_pe_percentile_misclassification', filename.add, plot.file.type)
 
   # fit model and get estimates
   data.out <- calcDataSummary(df, model, entity, y, ctrPerf)
@@ -57,7 +54,8 @@ misclassification_analysis <- function(df = NULL, model = NULL, entity = "entity
     pe = c(t(pe.diffs))
   )
 
-  p.percentile.fig <- ggplot2::ggplot(data = percentile.df, aes(x = d, y = p, group = entities)) +
+  # make figures
+  fig.p.percentile <- ggplot2::ggplot(data = percentile.df, aes(x = d, y = p, group = entities)) +
     geom_point(aes(color = entities), size = 2) +
     geom_line(aes(color = entities)) +
     xlab('d (differences in percentiles)') +
@@ -67,9 +65,8 @@ misclassification_analysis <- function(df = NULL, model = NULL, entity = "entity
       axis.title = element_text(size = 16, face = 'bold'),
       axis.text = element_text(size = 14, face = 'bold'),
       legend.position = 'none')
-  ggsave(filename = unadjusted.percentile.misclassification.fig.file, plot = p.percentile.fig, width = 8, height = 8)
 
-  oe.percentile.fig <- ggplot2::ggplot(data = percentile.df, aes(x = d, y = oe, group = entities)) +
+  fig.oe.percentile <- ggplot2::ggplot(data = percentile.df, aes(x = d, y = oe, group = entities)) +
     geom_point(aes(color = entities), size = 2) +
     geom_line(aes(color = entities)) +
     xlab('d (differences in percentiles)') +
@@ -79,9 +76,8 @@ misclassification_analysis <- function(df = NULL, model = NULL, entity = "entity
       axis.title = element_text(size = 16, face = 'bold'),
       axis.text = element_text(size = 14, face = 'bold'),
       legend.position = 'none')
-  ggsave(filename = oe.percentile.misclassification.fig.file, plot = oe.percentile.fig, width = 8, height = 8)
 
-  pe.percentile.fig <- ggplot2::ggplot(data = percentile.df, aes(x = d, y = pe, group = entities)) +
+  fig.pe.percentile <- ggplot2::ggplot(data = percentile.df, aes(x = d, y = pe, group = entities)) +
     geom_point(aes(color = entities), size = 2) +
     geom_line(aes(color = entities)) +
     xlab('d (differences in percentiles)') +
@@ -91,11 +87,13 @@ misclassification_analysis <- function(df = NULL, model = NULL, entity = "entity
       axis.title = element_text(size = 16, face = 'bold'),
       axis.text = element_text(size = 14, face = 'bold'),
       legend.position = 'none')
-  ggsave(filename = pe.percentile.misclassification.fig.file, plot = pe.percentile.fig, width = 8, height = 8)
 
   results = list(entities = entities,
                  p.diffs = p.diffs,
                  oe.diffs = oe.diffs,
                  pe.diffs = pe.diffs,
-                 percentile.df = percentile.df)
+                 percentile.df = percentile.df,
+                 fig.p.percentile = fig.p.percentile,
+                 fig.oe.percentile = fig.oe.percentile,
+                 fig.pe.percentile = fig.pe.percentile)
 }

@@ -1,11 +1,6 @@
 #' Simulate data
 #' @description
 #' This function simulates some data.
-#' @param n a vector of the number of observations for each accountable entity
-#' @param type variable type of the observations (e.g., binary)
-#' @returns A dataframe with the following columns:
-#'  \item{entity}{the accountable entity}
-#'  \item{y}{outcome}
 #' @author Kenneth Nieser (nieser@stanford.edu)
 #' @references None
 #' @examples

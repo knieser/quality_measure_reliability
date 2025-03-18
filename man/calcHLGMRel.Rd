@@ -13,13 +13,13 @@ calcHLGMRel(
 )
 }
 \arguments{
-\item{df}{dataframe; if null, will use the dataframe in the model object}
+\item{df}{observation-level data; if null, will use the dataframe from the model object}
 
 \item{model}{model; if null, will use an unadjusted model}
 
-\item{entity}{variable to use as the accountable entity}
+\item{entity}{data column containing the accountable entity identifier}
 
-\item{y}{variable to use as the outcome}
+\item{y}{data column containing the outcome variable}
 
 \item{ctrPerf}{parameters to control performance measure calculation}
 }

@@ -1,32 +1,17 @@
-#' Calculate misclassification probabilities
-#' @description
-#' This function runs the misclassification functions
-#' @param df dataframe; if null, will use the dataframe in the model object
-#' @param model model; if null, will use an unadjusted model
-#' @param entity variable to use as the accountable entity; default = "entity"
-#' @param y variable to use as the outcome; default = "y"
-#' @param ctrPerf parameters to control performance measure calculation
-#' @returns Estimated measure performance by accountable entity
-#' @author Kenneth Nieser (nieser@stanford.edu)
-#' @references None
-#' @examples
-#' # TBD
-#' @export
-
 calcMisclassificationRates <- function(rs, rs.boot, d.steps){
-    
+
   # calculate percentile misclassification rates
   orig.ranks = rank(rs, ties.method = 'random')
   orig.percentile.breaks <- quantile(orig.ranks, probs = seq(0, 1, 1/100))
   orig.percentiles = as.numeric(cut(orig.ranks, breaks = orig.percentile.breaks, labels = 1:100, include.lowest = T))
-  
+
   boot.ranks <- apply(rs.boot, 2, rank, ties.method = 'random')
   boot.percentile.breaks <- apply(boot.ranks, 2, quantile, probs = seq(0, 1, 1/100))
   boot.percentiles = matrix(data = NA, nrow = nrow(boot.ranks), ncol = ncol(boot.ranks))
   for (k in 1:ncol(boot.percentiles)){
     boot.percentiles[,k] <- cut(boot.ranks[,k], breaks = boot.percentile.breaks[,k], labels = 1:100, include.lowest = T)
   }
-  
+
   percentile.diff = apply(boot.percentiles, 2, function(x) abs(x - orig.percentiles))
   diffs = seq(0, 100, d.steps)
   prob.diffs = matrix(data = NA, nrow = nrow(boot.ranks), ncol = length(diffs))

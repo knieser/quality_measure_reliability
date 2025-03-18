@@ -1,10 +1,10 @@
 #' Calculate reliability using a multilevel logistic regression model
 #' @description
 #' This function estimates reliability using a multilevel logistic regression model.
-#' @param df dataframe; if null, will use the dataframe in the model object
+#' @param df observation-level data; if null, will use the dataframe from the model object
 #' @param model model; if null, will use an unadjusted model
-#' @param entity variable to use as the accountable entity
-#' @param y variable to use as the outcome
+#' @param entity data column containing the accountable entity identifier
+#' @param y data column containing the outcome variable
 #' @param ctrPerf parameters to control performance measure calculation
 #' @returns Estimated parameters and reliability
 #'  \item{var.b.aov}{between-entity variance}
