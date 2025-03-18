@@ -2,9 +2,12 @@
 #' @description
 #' This function estimates reliability using a Beta-Binomial model.
 #' @param df dataframe; if null, will use the dataframe in the model object
-#' @param model model; if null, will use an unadjusted model
-#' @param entity variable to use as the accountable entity
-#' @param y variable to use as the outcome
+#' @param model model; if null, will use an unadjusted model (NOTE: currently, Beta-Binomial reliability estimates do not take risk-adjustment into account.)
+#' @param entity data column containing the accountable entity identifier
+#' @param y data column containing the outcome variable
+#' @param df.aggregate set this to TRUE if the data have already been aggregated to include only summary data (n, x) for each entity; default is FALSE.
+#' @param n if using aggregated data, data column containing the sample size by entity
+#' @param x if using aggregated data, data column containing the number of observations that met measure criteria by entity
 #' @param ctrPerf parameters to control performance measure calculation
 #' @returns Estimated parameters from the Beta-Binomial model, estimates of between and within-entity variance, and estimates of entity-specific reliability
 #' @author Kenneth Nieser (nieser@stanford.edu)
@@ -14,16 +17,24 @@
 #' @importFrom stats optim median
 #' @export
 
-calcBetaBin <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', ctrPerf = controlPerf()){
+calcBetaBin <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', df.aggregate = FALSE, n = 'n', x = 'x', ctrPerf = controlPerf()){
   if (is.null(df) & is.null(model)) stop ('Please provide either a dataframe or a model object')
   if (is.null(df)){df <- model@frame}
 
+  if (isFALSE(df.aggregate)){
   data.out <- calcDataSummary(df, model, entity, y, ctrPerf)
   df <- data.out$df
   n  <- data.out$n
   x <- data.out$obs
   p <- data.out$p
   p.re <- data.out$p.re
+  } else{
+    message('Note that aggregated data are being used, so Beta-Binomial reliability estimates with random effects predictions cannot be calculated.')
+    n <- df[[n]]
+    x <- df[[x]]
+    p <- x / n
+    p.re <- NA
+}
 
   # negative log-likelihood
   neg.loglik <- function(v){

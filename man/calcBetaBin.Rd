@@ -9,17 +9,26 @@ calcBetaBin(
   model = NULL,
   entity = "entity",
   y = "y",
+  df.aggregate = FALSE,
+  n = "n",
+  x = "x",
   ctrPerf = controlPerf()
 )
 }
 \arguments{
 \item{df}{dataframe; if null, will use the dataframe in the model object}
 
-\item{model}{model; if null, will use an unadjusted model}
+\item{model}{model; if null, will use an unadjusted model (NOTE: currently, Beta-Binomial reliability estimates do not take risk-adjustment into account.)}
 
-\item{entity}{variable to use as the accountable entity}
+\item{entity}{data column containing the accountable entity identifier}
 
-\item{y}{variable to use as the outcome}
+\item{y}{data column containing the outcome variable}
+
+\item{df.aggregate}{set this to TRUE if the data have already been aggregated to include only summary data (n, x) for each entity; default is FALSE.}
+
+\item{n}{if using aggregated data, data column containing the sample size by entity}
+
+\item{x}{if using aggregated data, data column containing the number of observations that met measure criteria by entity}
 
 \item{ctrPerf}{parameters to control performance measure calculation}
 }

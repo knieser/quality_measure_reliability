@@ -48,7 +48,7 @@ calcReliability <- function(df = NULL, model = NULL, entity = "entity", y = "y",
 
   # Beta-Binomial method
   message('calculating reliability based on Beta-Binomial method...')
-  betabin.out <- calcBetaBin(df, model, entity, y, ctrPerf)
+  betabin.out <- calcBetaBin(df, model, entity, y, df.aggregate = FALSE, ctrPerf = ctrPerf)
   est.BB <- betabin.out$est.BB
   est.BB.FE <- betabin.out$est.BB.FE
   est.BB.RE <- betabin.out$est.BB.RE
