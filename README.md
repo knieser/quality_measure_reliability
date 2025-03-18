@@ -11,3 +11,13 @@ library(devtools)
 devtools::install_github('knieser/quality_measure_reliability')
 library(QualityMeasure)
 ```
+
+## Tutorial
+
+This package contains a vignette describing how this package can be used to estimate reliability:
+[Example analysis](https://knieser.github.io/QualityMeasure/Example-analysis.html)
+
+
+
+
+
