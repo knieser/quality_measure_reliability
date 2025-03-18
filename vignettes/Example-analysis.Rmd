@@ -1,7 +1,6 @@
 ---
 title: "Example reliability estimation analysis"
 author: "Kenneth Nieser, PhD"
-date: "March 18, 2025"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Example reliability estimation analysis}
@@ -44,7 +43,7 @@ We'll simulate some data to use for the example analyses.
 n.entity = 100  
 
 # average number of patients/cases per accountable entity
-n.pts = 50
+n.pts = 100
 
 # parameters of the Beta distribution
 alpha = 1
@@ -77,7 +76,7 @@ You could also use the built-in function `simulateData()` to simulate data from 
 n.entity = 100  
 
 # average number of patients/cases per accountable entity
-avg.n = 50
+avg.n = 100
 
 # marginal probability of the outcome
 marg.p = .2 
@@ -135,6 +134,7 @@ profiling.results$fig.perf
 
 ## Plot of ORs comparing each entity with the "average" entity
 
+Entities highlighted in red have estimated ORs that are statistically different from 1.0 at alpha = 0.05.
 ```{r}
 profiling.results$fig.rand.int
 ```

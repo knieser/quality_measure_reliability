@@ -23,7 +23,7 @@ library(QualityMeasure)
 n.entity = 100  
 
 # average number of patients/cases per accountable entity
-n.pts = 50
+n.pts = 100
 
 # parameters of the Beta distribution
 alpha = 1
@@ -52,7 +52,7 @@ kable(head(df1, 10), caption = 'Simulated data 1')
 n.entity = 100  
 
 # average number of patients/cases per accountable entity
-avg.n = 50
+avg.n = 100
 
 # marginal probability of the outcome
 marg.p = .2 
