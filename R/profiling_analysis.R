@@ -29,8 +29,8 @@ profiling_analysis <- function(df, model = NULL, entity = 'entity', y = 'y', ctr
                        summary(perf.results$rs.pe),
                        summary(perf.results$rs.direct)
                        )
-  perf.summary = cbind(method = c('Unadjusted', 'OE_standardized', 'PE_standardized', 'Direct_standardized'),
-                       rate.summary)
+  perf.summary = cbind(Method = c('Unadjusted', 'OE standardized', 'PE standardized', 'Direct standardized'),
+                       round(rate.summary, 3))
   perf.summary = as.data.frame(perf.summary)
   category.table = table(perf.results$category.oe, perf.results$category.pe)
   corr.oe.randint = cor(perf.results$intercept.OR, perf.results$oe)
