@@ -1,0 +1,13 @@
+bibentry(
+  bibtype = "Article",
+  textVersion = "Nieser KJ, Harris AHS. Comparing methods for assessing the reliability of health care quality measures. Statistics in Medicine. 2024 Oct 15;43(23):4575-94.",
+  header = "To cite QualityMeasure in publications, please use",
+  author="Kenneth J. Nieser and Alex H. S. Harris",
+  title = "Comparing methods for assessing the reliability of health care quality measures",
+  journal = "Statistics in Medicine",
+  volume = "43",
+  number = "23",
+  year = "2024",
+  publisher="Wiley Online Library",
+  doi = "10.1002/sim.10197"
+  )
