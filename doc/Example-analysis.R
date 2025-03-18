@@ -1,20 +1,22 @@
 ## ----include = FALSE----------------------------------------------------------
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  fig.width=6, 
+  fig.height=4
 )
+library(knitr)
+
 
 ## ----setup--------------------------------------------------------------------
-library(ggplot2)
-library(doParallel)
-library(lme4)
-library(psych)
+library(ggplot2) # for plots
+library(doParallel) # for parallel processing
+library(lme4) # for fitting GLMMs
+library(psych) # for calculating ICCs
+library(devtools) # R package development
 
-library(devtools)
 load_all()
-#devtools::install_github('knieser/quality_measure_reliability')
-#library(QualityMeasure)
-
+library(QualityMeasure)
 
 ## -----------------------------------------------------------------------------
 # number of accountable entities
@@ -38,12 +40,12 @@ p = rbeta(n.entity, alpha, beta)
 entity = rep(1:n.entity, times = n)
 y = rbinom(total.n, 1, rep(p, times = n))
 df1 = data.frame(
-  id = 1:total.n,
   entity = entity,
   y = y
 )
-head(df1)
 
+## ----echo = FALSE, results = 'asis'-------------------------------------------
+kable(head(df1, 10), caption = 'Simulated data 1')
 
 ## -----------------------------------------------------------------------------
 # number of accountable entities
@@ -66,37 +68,41 @@ theta2 = log(1.5)
 theta = c(theta1, theta2)
 
 df2 <- simulateData(n.entity = n.entity, avg.n = avg.n, tau = tau, theta = theta)
-head(df2)
+
+
+## ----echo = FALSE, results = 'asis'-------------------------------------------
+kable(head(df2, 10), caption = 'Simulated data 2')
 
 ## -----------------------------------------------------------------------------
-
 # adjust number of bootstraps and cores for parallel processing.
 n.boots = 20
 n.cores = 3
 
-# change this to the directory that you want plots saved to:
-output.dir = paste0(getwd(), '/test_output/')
-
 # run profiling analysis
-profiling.results <- profiling_analysis(df = df1, ctrPerf = controlPerf(n.boots = n.boots, n.cores = n.cores), output.dir = output.dir)
+profiling.results <- profiling_analysis(df = df1, ctrPerf = controlPerf(n.boots = n.boots, n.cores = n.cores))
 
+## ----echo = FALSE, results = 'asis'-------------------------------------------
+kable(profiling.results$perf.summary, caption = 'Performance summary statistics across entities')
 
 ## -----------------------------------------------------------------------------
 plotN(profiling.results$perf.results$n)
 
+## -----------------------------------------------------------------------------
+profiling.results$fig.perf
 
 ## -----------------------------------------------------------------------------
-# unadjusted performance
-plotPerformance(profiling.results$perf.results)
+profiling.results$fig.rand.int
 
-# OE-standardized performance
-plotPerformance(profiling.results$perf.results, 'oe')
-
+## -----------------------------------------------------------------------------
+profiling.results$fig.corr
 
 ## -----------------------------------------------------------------------------
 BB.results <- calcBetaBin(df = df1)
-message(paste0('Estimated parameters from the Beta-Binomial model are: alpha = ', round(BB.results$alpha, 3), '; beta = ', round(BB.results$beta, 3)))
 
+## ----echo = FALSE-------------------------------------------------------------
+summary(BB.results$est.BB)
+
+## ----echo = FALSE-------------------------------------------------------------
 BB.plot.df <- data.frame(
     method = rep(c('Beta-binomial',
                    'Beta-binomial, FE',
@@ -122,11 +128,29 @@ BB.plot.df <- data.frame(
 BB.fig
 
 ## -----------------------------------------------------------------------------
+# Aggregated data
+df.agg <- data.frame(n = aggregate(y ~ entity, data = df1, length)$y,
+                     x = aggregate(y ~ entity, data = df1, sum)$y)
 
+
+BB.agg.results <- calcBetaBin(df = df.agg, df.aggregate = T, n = 'n', x = 'x')
+
+## ----echo = FALSE-------------------------------------------------------------
+summary(BB.agg.results$est.BB)
+
+## -----------------------------------------------------------------------------
 # number of resamples to use for the permutation Ssplit-sample reliability estimate
 n.resamples = 100
 n.cores = 3
 
 rel.results <- calcReliability(df = df1, ctrPerf = controlPerf(n.cores = n.cores), ctrRel = controlRel(n.resamples = n.resamples))
-rel.results
+
+## ----echo = FALSE, results = 'asis'-------------------------------------------
+rel.results.sub <- rel.results[,c('method', 'reliability', 'reliability_min', 'reliability_max')]
+rel.results.sub$reliability <- round(rel.results.sub$reliability, 3)
+rel.results.sub$reliability_min <- round(rel.results.sub$reliability_min, 3)
+rel.results.sub$reliability_max <- round(rel.results.sub$reliability_max, 3)
+names(rel.results.sub) <- c('Method', 'Reliability', 'Min Reliability', 'Max Reliability')
+
+kable(rel.results.sub, caption = 'Reliability estimates')
 

@@ -1,8 +1,10 @@
 ---
-title: "Example-analysis"
+title: "Example reliability estimation analysis"
+author: "Kenneth Nieser, PhD"
+date: "March 18, 2025"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Example-analysis}
+  %\VignetteIndexEntry{Example reliability estimation analysis}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -10,28 +12,32 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  fig.width=6, 
+  fig.height=4
 )
+library(knitr)
+
 ```
+
+This vignette shows how to use the functions in `QualityMeasure` to analyze quality measure performance and reliability.
+
+Start by loading the required packages:
 
 ```{r setup}
-library(ggplot2)
-library(doParallel)
-library(lme4)
-library(psych)
+library(ggplot2) # for plots
+library(doParallel) # for parallel processing
+library(lme4) # for fitting GLMMs
+library(psych) # for calculating ICCs
+library(devtools) # R package development
 
-library(devtools)
 load_all()
-#devtools::install_github('knieser/quality_measure_reliability')
-#library(QualityMeasure)
-
+library(QualityMeasure)
 ```
 
+# Simulate data
 
-# Introduction
-This vignette shows how to use the functions in QualityMeasure to analyze quality measure performance and reliability.
-
-First we'll simulate some data.
+We'll simulate some data to use for the example analyses.
 
 ```{r}
 # number of accountable entities
@@ -55,16 +61,16 @@ p = rbeta(n.entity, alpha, beta)
 entity = rep(1:n.entity, times = n)
 y = rbinom(total.n, 1, rep(p, times = n))
 df1 = data.frame(
-  id = 1:total.n,
   entity = entity,
   y = y
 )
-head(df1)
-
 ```
 
+```{r, echo = FALSE, results = 'asis'}
+kable(head(df1, 10), caption = 'Simulated data 1')
+```
 
-You could also use the built-in function to simulate data from a hierarchical logistic regression model.
+You could also use the built-in function `simulateData()` to simulate data from a hierarchical logistic regression model.
 
 ```{r}
 # number of accountable entities
@@ -87,61 +93,74 @@ theta2 = log(1.5)
 theta = c(theta1, theta2)
 
 df2 <- simulateData(n.entity = n.entity, avg.n = avg.n, tau = tau, theta = theta)
-head(df2)
+
 ```
 
-The profiling_analysis() function can be used to obtain some basic provider profiling results. 
+```{r, echo = FALSE, results = 'asis'}
+kable(head(df2, 10), caption = 'Simulated data 2')
+```
 
-This analysis generates confidence intervals for entity-level performance using a parametric bootstrapping method. The number of bootstraps and the number of cores to use for parallel processing can be adjusted with the controlPerf() function within profiling_analysis() as shown below.
+# Provider profiling analyses
 
-The output directory where figures are saved can also be adjusted by the user.
+The `profiling_analysis()` function can be used to obtain some basic provider profiling results.
+
+This analysis generates confidence intervals for entity-level performance using a parametric bootstrapping method. The number of bootstraps and the number of cores to use for parallel processing can be adjusted with the `controlPerf()` function within `profiling_analysis()` as shown below.
 
 ```{r}
-
 # adjust number of bootstraps and cores for parallel processing.
 n.boots = 20
 n.cores = 3
 
-# change this to the directory that you want plots saved to:
-output.dir = paste0(getwd(), '/test_output/')
-
 # run profiling analysis
-profiling.results <- profiling_analysis(df = df1, ctrPerf = controlPerf(n.boots = n.boots, n.cores = n.cores), output.dir = output.dir)
-
+profiling.results <- profiling_analysis(df = df1, ctrPerf = controlPerf(n.boots = n.boots, n.cores = n.cores))
 ```
 
+The estimated marginal probability of the outcome is `r round(profiling.results$marg.p, 3)`.
 
-# Plot number of observations per provider
+```{r, echo = FALSE, results = 'asis'}
+kable(profiling.results$perf.summary, caption = 'Performance summary statistics across entities')
+```
+
+## Number of observations per provider
 
 ```{r}
 plotN(profiling.results$perf.results$n)
-
 ```
 
-
-# Plot measure performance
+## Plot of estimated rates across entities
 
 ```{r}
-# unadjusted performance
-plotPerformance(profiling.results$perf.results)
-
-# OE-standardized performance
-plotPerformance(profiling.results$perf.results, 'oe')
-
+profiling.results$fig.perf
 ```
 
+## Plot of ORs comparing each entity with the "average" entity
 
+```{r}
+profiling.results$fig.rand.int
+```
 
+## Plot of correlation between entity-specific random intercepts and risk-standardization ratios
 
-# Calculate beta-binomial-based reliability estimates
+```{r}
+profiling.results$fig.corr
+```
 
-You can calculate the beta-binomial estimates by using the calcBetaBin() function. Note that these estimates do not account for any risk-adjustment.
+# Beta-binomial-based reliability estimates
 
+You can calculate the Beta-Binomial estimates by using the `calcBetaBin()` function. Note that these estimates do not account for any risk-adjustment.
 
 ```{r}
 BB.results <- calcBetaBin(df = df1)
-message(paste0('Estimated parameters from the Beta-Binomial model are: alpha = ', round(BB.results$alpha, 3), '; beta = ', round(BB.results$beta, 3)))
+```
 
+The estimated alpha is `r round(BB.results$alpha, 3)` and beta is `r round(BB.results$beta, 3)`.
+
+Reliability summary statistics:
+```{r, echo = FALSE}
+summary(BB.results$est.BB)
+```
+
+```{r, echo = FALSE}
 BB.plot.df <- data.frame(
     method = rep(c('Beta-binomial',
                    'Beta-binomial, FE',
@@ -167,20 +186,44 @@ BB.plot.df <- data.frame(
 BB.fig
 ```
 
+If you have data that is already aggregated by entity, you can calculate Beta-Binomial estimates as follows:
+
+```{r}
+# Aggregated data
+df.agg <- data.frame(n = aggregate(y ~ entity, data = df1, length)$y,
+                     x = aggregate(y ~ entity, data = df1, sum)$y)
+
+
+BB.agg.results <- calcBetaBin(df = df.agg, df.aggregate = T, n = 'n', x = 'x')
+```
+
+The estimated alpha is `r round(BB.agg.results$alpha, 3)` and beta is `r round(BB.agg.results$beta, 3)`.
+
+Reliability summary statistics:
+```{r, echo = FALSE}
+summary(BB.agg.results$est.BB)
+```
 
 # Calculate reliability from all methods
 
-Or you can calculate reliability estimates from all the available methods in this package by using the calcReliability() function.
+If you would like to calculate reliability estimates from all the available methods in this package, you can use the `calcReliability()` function.
 
-The number of resamples used to calculate the permutation split-sample reliability estimate can be adjusted using the controlRel() function within calcReliability() as shown below.
+The number of resamples used to calculate the permutation split-sample reliability estimate can be adjusted using the `controlRel()` function within `calcReliability()` as shown below.
 
 ```{r}
-
 # number of resamples to use for the permutation Ssplit-sample reliability estimate
 n.resamples = 100
 n.cores = 3
 
 rel.results <- calcReliability(df = df1, ctrPerf = controlPerf(n.cores = n.cores), ctrRel = controlRel(n.resamples = n.resamples))
-rel.results
 ```
 
+```{r, echo = FALSE, results = 'asis'}
+rel.results.sub <- rel.results[,c('method', 'reliability', 'reliability_min', 'reliability_max')]
+rel.results.sub$reliability <- round(rel.results.sub$reliability, 3)
+rel.results.sub$reliability_min <- round(rel.results.sub$reliability_min, 3)
+rel.results.sub$reliability_max <- round(rel.results.sub$reliability_max, 3)
+names(rel.results.sub) <- c('Method', 'Reliability', 'Min Reliability', 'Max Reliability')
+
+kable(rel.results.sub, caption = 'Reliability estimates')
+```
