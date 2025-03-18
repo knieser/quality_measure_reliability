@@ -48,7 +48,7 @@ profiling_analysis <- function(df, model = NULL, entity = 'entity', y = 'y', ctr
     scale_x_continuous(trans = 'log10') +
     geom_vline(xintercept = 1, lty = 2) +
     xlab('OR') +
-    ylab('Facility') +
+    ylab('Entity') +
     theme_classic() +
     theme(
       plot.title = element_text(size = 16, face ="bold"),
@@ -101,8 +101,8 @@ profiling_analysis <- function(df, model = NULL, entity = 'entity', y = 'y', ctr
     geom_point(size = 2) +
     geom_errorbar(aes(ymin = lwr, ymax = upr), width = 0.1) +
     geom_hline(yintercept = marg.p, col = 'red', lty = 'dashed', size = 1.2, alpha = 0.7) +
-    xlab('Facility rank') +
-    ylab('Complication rate') +
+    xlab('Entity rank') +
+    ylab('Measure performance') +
     facet_wrap( ~ method, nrow = 1) +
     theme_classic() +
     theme(
