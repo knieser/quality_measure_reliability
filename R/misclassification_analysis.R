@@ -1,4 +1,4 @@
-#' Calculate misclassification probabilities
+#' Calculate misclassification probabilities (in progress)
 #' @description
 #' This function runs the misclassification functions
 #' @param df observation-level data; if null, will use the dataframe from the model object
@@ -12,7 +12,6 @@
 #' @references None
 #' @examples
 #' # TBD
-#' @export
 
 misclassification_analysis <- function(df = NULL, model = NULL, entity = "entity", y = "y", ctrPerf = controlPerf(), ctrRel = controlRel()){
   if (is.null(df) & is.null(model)) stop ('Please provide either a dataframe or a model object')

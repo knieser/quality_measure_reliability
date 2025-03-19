@@ -4,18 +4,10 @@
 \alias{calcAOV}
 \title{Calculate reliability using ANOVA method}
 \usage{
-calcAOV(
-  df = NULL,
-  model = NULL,
-  entity = "entity",
-  y = "y",
-  ctrPerf = controlPerf()
-)
+calcAOV(df, entity = "entity", y = "y", ctrPerf = controlPerf())
 }
 \arguments{
 \item{df}{observation-level data; if null, will use the dataframe from the model object}
-
-\item{model}{model; if null, will use an unadjusted model}
 
 \item{entity}{data column containing the accountable entity identifier}
 

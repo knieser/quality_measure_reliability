@@ -1,17 +1,3 @@
-#' Calculate reliability
-#' @description
-#' This function calculates reliability using several methods.
-#' @param df observation-level data; if null, will use the dataframe from the model object
-#' @param model model; if null, will use an unadjusted model
-#' @param entity data column containing the accountable entity identifier
-#' @param y data column containing the outcome variable
-#' @param ctrPerf parameters to control performance measure calculation
-#' @param ctrRel parameters to control reliability estimation
-#' @returns Estimated risk-standardized measure performance by accountable entity
-#' @author Kenneth Nieser (nieser@stanford.edu)
-#' @importFrom stats aggregate predict
-#' @importFrom lme4 glmer
-#' @export
 
 reliability_analysis <- function(df, model, entity = 'entity', y = 'y', ctrPerf = controlPerf(), ctrRel = controlRel()){
 
@@ -20,43 +6,8 @@ reliability_analysis <- function(df, model, entity = 'entity', y = 'y', ctrPerf 
 
   # calculate reliability
   rel.results <- calcReliability(df = df, model = model, entity = entity, y = y, ctrPerf = ctrPerf, ctrRel = ctrRel)
-
-  # make plot to show distribution of reliability estimates
-  message('calculating HLGM reliability estimates for plot...')
-  HLGM.out <- calcHLGMRel(df = df, model = model, entity = entity, y = y, ctrPerf = ctrPerf)
-  message('...done')
-  message('calculating Beta-binomial reliability estimates for plot...')
-  BB.out <- calcBetaBin(df = df, model = model, entity = entity, y = y, ctrPerf = ctrPerf)
-  message('...done')
-
-  rel.plot.df <- data.frame(
-    method = rep(c('MLM, latent scale',
-                   'MLM, delta approx.',
-                   'MLM, FE',
-                   'MLM, RE',
-                   'Beta-binomial',
-                   'Beta-binomial, FE',
-                   'Beta-binomial, RE',
-                   'Beta-binomial, Jeffreys'), each = length(HLGM.out$n)),
-    est = c(HLGM.out$est.HLGM.latent, HLGM.out$est.HLGM.delta, HLGM.out$est.HLGM.FE, HLGM.out$est.HLGM.RE,
-            BB.out$est.BB, BB.out$est.BB.FE, BB.out$est.BB.RE, BB.out$est.BB.J)
-  )
-
-  fig.rel <- ggplot(data = rel.plot.df, aes(est, factor(method))) +
-    geom_boxplot(outlier.shape = NA) +
-    geom_point(alpha = 0.6, position = position_jitter(height = 0.1, width = 0)) +
-    xlab('Entity-specific reliability estimate') +
-    ylab('Method') +
-    theme_classic() +
-    theme(
-      panel.grid.major = element_line(linewidth = 1),
-      plot.title = element_text(size = 16, face ="bold"),
-      axis.text = element_text(size = 16),
-      axis.ticks.length = unit(.25,"cm"),
-      axis.title = element_text(size = 18, face = "bold"),
-      legend.position = 'bottom'
-    )
-
+  HLGM.out <- rel.results$HLGM.out
+  BB.out <- rel.results$BB.out
 
   # split-sample plot to visualize split-sample reliability
   message('making example plot of split-sample reliability estimates')
@@ -116,7 +67,6 @@ reliability_analysis <- function(df, model, entity = 'entity', y = 'y', ctrPerf 
                  rel.results = rel.results,
                  HLGM.out = HLGM.out,
                  BB.out = BB.out,
-                 fig.rel = fig.rel,
                  fig.SSR = fig.SSR)
 
   return(results)

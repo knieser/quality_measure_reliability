@@ -2,7 +2,6 @@
 #' @description
 #' This function estimates reliability using the ANOVA method.
 #' @param df observation-level data; if null, will use the dataframe from the model object
-#' @param model model; if null, will use an unadjusted model
 #' @param entity data column containing the accountable entity identifier
 #' @param y data column containing the outcome variable
 #' @param ctrPerf parameters to control performance measure calculation
@@ -17,13 +16,10 @@
 #' @importFrom stats aov
 #' @export
 
-calcAOV <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', ctrPerf = controlPerf()){
-  if (is.null(df) & is.null(model)) stop ('Please provide either a dataframe or a model object')
-  if (is.null(df)){df <- model@frame}
+calcAOV <- function(df, entity = 'entity', y = 'y', ctrPerf = controlPerf()){
 
-  data.out <- calcDataSummary(df, model, entity, y, ctrPerf = ctrPerf)
-  df <- data.out$df
-  n  <- data.out$n
+  df <- cleanData(df, entity, y, ctrPerf)
+  n  <- aggregate(y ~ entity, data = df, length)$y
   n0 <- 1 / (length(n) - 1) * (sum(n) - sum(n^2) / sum(n))
 
   aov.out <- aov(y ~ entity, data = df)

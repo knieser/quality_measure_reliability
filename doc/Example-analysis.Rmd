@@ -12,8 +12,8 @@ vignette: >
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  fig.width=6, 
-  fig.height=4
+  fig.width=8, 
+  fig.height=6
 )
 library(knitr)
 
@@ -215,10 +215,11 @@ The number of resamples used to calculate the permutation split-sample reliabili
 n.resamples = 100
 n.cores = 3
 
-rel.results <- calcReliability(df = df1, ctrPerf = controlPerf(n.cores = n.cores), ctrRel = controlRel(n.resamples = n.resamples))
+rel.out <- calcReliability(df = df1, ctrPerf = controlPerf(n.cores = n.cores), ctrRel = controlRel(n.resamples = n.resamples))
 ```
 
 ```{r, echo = FALSE, results = 'asis'}
+rel.results <- rel.out$rel.results
 rel.results.sub <- rel.results[,c('method', 'reliability', 'reliability_min', 'reliability_max')]
 rel.results.sub$reliability <- round(rel.results.sub$reliability, 3)
 rel.results.sub$reliability_min <- round(rel.results.sub$reliability_min, 3)
@@ -226,4 +227,38 @@ rel.results.sub$reliability_max <- round(rel.results.sub$reliability_max, 3)
 names(rel.results.sub) <- c('Method', 'Reliability', 'Min Reliability', 'Max Reliability')
 
 kable(rel.results.sub, caption = 'Reliability estimates')
+```
+
+
+```{r, echo = FALSE}
+HLGM.out <- rel.out$HLGM.out
+BB.out <- rel.out$BB.out
+rel.plot.df <- data.frame(
+    method = rep(c('HLGM, latent scale',
+                   'HLGM, delta approx.',
+                   'HLGM, FE',
+                   'HLGM, RE',
+                   'Beta-binomial',
+                   'Beta-binomial, FE',
+                   'Beta-binomial, RE',
+                   'Beta-binomial, Jeffreys'), each = length(HLGM.out$n)),
+    est = c(HLGM.out$est.HLGM.latent, HLGM.out$est.HLGM.delta, HLGM.out$est.HLGM.FE, HLGM.out$est.HLGM.RE,
+            BB.out$est.BB, BB.out$est.BB.FE, BB.out$est.BB.RE, BB.out$est.BB.J)
+  )
+
+fig.rel <- ggplot(data = rel.plot.df, aes(est, factor(method))) +
+    geom_boxplot(outlier.shape = NA) +
+    geom_point(alpha = 0.6, position = position_jitter(height = 0.1, width = 0)) +
+    xlab('Entity-specific reliability estimate') +
+    ylab('Method') +
+    theme_classic() +
+    theme(
+      panel.grid.major = element_line(linewidth = 1),
+      plot.title = element_text(size = 16, face ="bold"),
+      axis.text = element_text(size = 16),
+      axis.ticks.length = unit(.25,"cm"),
+      axis.title = element_text(size = 18, face = "bold"),
+      legend.position = 'bottom'
+    )
+fig.rel
 ```

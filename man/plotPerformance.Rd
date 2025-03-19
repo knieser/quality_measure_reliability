@@ -4,10 +4,16 @@
 \alias{plotPerformance}
 \title{Plot measure performance across accountable entities}
 \usage{
-plotPerformance(df, plot.y = "p")
+plotPerformance(df = perf.results, plot.type = "single", plot.y = "p")
 }
 \arguments{
 \item{df}{perf.results dataframe from calcPerformance() output}
+
+\item{plot.type}{select which plot to return:
+\item{single}{a plot of the performance across entities}
+\item{OR}{plot of ORs comparing each facility with the average facility}
+\item{correlation}{plot of standardization ratios against the entity random intercepts}
+\item{multiple}{plot of measure performance across different risk-adjustment methods}}
 
 \item{plot.y}{'p' plots the unadjusted performance, 'oe' plots the observed-to-expected ratio, 'rs' plots the risk-standardized rate, and 'pe' plots the predicted-to-expected ratio'}
 }

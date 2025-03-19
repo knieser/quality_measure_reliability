@@ -2,7 +2,7 @@
 % Please edit documentation in R/misclassification_analysis.R
 \name{misclassification_analysis}
 \alias{misclassification_analysis}
-\title{Calculate misclassification probabilities}
+\title{Calculate misclassification probabilities (in progress)}
 \usage{
 misclassification_analysis(
   df = NULL,

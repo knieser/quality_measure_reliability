@@ -33,7 +33,7 @@ calcReliability <- function(df = NULL, model = NULL, entity = "entity", y = "y",
   #### SNR methods ####
   # anova
   message('calculating reliability based on anova method...')
-  AOV.out <- calcAOV(df, model, entity, y, ctrPerf)
+  AOV.out <- calcAOV(df, entity, y, ctrPerf)
   est.aov <- AOV.out$est.aov
   message('...done')
 
@@ -48,11 +48,11 @@ calcReliability <- function(df = NULL, model = NULL, entity = "entity", y = "y",
 
   # Beta-Binomial method
   message('calculating reliability based on Beta-Binomial method...')
-  betabin.out <- calcBetaBin(df, model, entity, y, df.aggregate = FALSE, ctrPerf = ctrPerf)
-  est.BB <- betabin.out$est.BB
-  est.BB.FE <- betabin.out$est.BB.FE
-  est.BB.RE <- betabin.out$est.BB.RE
-  est.BB.J <- betabin.out$est.BB.J
+  BB.out <- calcBetaBin(df, model, entity, y, df.aggregate = FALSE, ctrPerf = ctrPerf)
+  est.BB <- BB.out$est.BB
+  est.BB.FE <- BB.out$est.BB.FE
+  est.BB.RE <- BB.out$est.BB.RE
+  est.BB.J <- BB.out$est.BB.J
   message('...done')
 
   # resampling IUR method from He et al 2019
@@ -63,7 +63,7 @@ calcReliability <- function(df = NULL, model = NULL, entity = "entity", y = "y",
   message('...done')
 
   ##### compile output ####
-  results <- data.frame(
+  rel.results <- data.frame(
     method = c('SSR', 'PSSR', 'SSR.OE', 'SSR.PE', 'PSSR.OE', 'PSSR.PE', 'ANOVA', 'Logit on latent scale', 'Logit w/ delta approx', 'Logit w/ FE', 'Logit w/ RE', 'BetaBinomial', 'BetaBinomial w/ FE', 'BetaBinomial w/ RE', 'BetaBinomial w/ Jeffreys', 'Resampling IUR'),
     between_var = c(NA, NA, NA, NA, NA, NA,
                     AOV.out$var.b.aov,
@@ -71,10 +71,10 @@ calcReliability <- function(df = NULL, model = NULL, entity = "entity", y = "y",
                     median(HLGM.out$var.b.HLGM.delta),
                     median(HLGM.out$var.b.HLGM.delta),
                     median(HLGM.out$var.b.HLGM.delta),
-                    betabin.out$var.b.BB,
-                    betabin.out$var.b.BB,
-                    betabin.out$var.b.BB,
-                    betabin.out$var.b.BB,
+                    BB.out$var.b.BB,
+                    BB.out$var.b.BB,
+                    BB.out$var.b.BB,
+                    BB.out$var.b.BB,
                     NA
                     ),
     within_var = c(NA, NA, NA, NA, NA, NA,
@@ -83,10 +83,10 @@ calcReliability <- function(df = NULL, model = NULL, entity = "entity", y = "y",
                    median(HLGM.out$var.w.delta),
                    median(HLGM.out$var.w.FE),
                    median(HLGM.out$var.w.RE),
-                   median(betabin.out$var.w.BB),
-                   median(betabin.out$var.w.FE),
-                   median(betabin.out$var.w.RE),
-                   median(betabin.out$var.w.J),
+                   median(BB.out$var.w.BB),
+                   median(BB.out$var.w.FE),
+                   median(BB.out$var.w.RE),
+                   median(BB.out$var.w.J),
                    NA
                    ),
     within_var_min = c(NA, NA, NA, NA, NA, NA,
@@ -95,10 +95,10 @@ calcReliability <- function(df = NULL, model = NULL, entity = "entity", y = "y",
                               min(HLGM.out$var.w.delta),
                               min(HLGM.out$var.w.FE),
                               min(HLGM.out$var.w.RE),
-                              min(betabin.out$var.w.BB),
-                       min(betabin.out$var.w.FE),
-                       min(betabin.out$var.w.RE),
-                       min(betabin.out$var.w.J),
+                              min(BB.out$var.w.BB),
+                       min(BB.out$var.w.FE),
+                       min(BB.out$var.w.RE),
+                       min(BB.out$var.w.J),
                               NA
     ),
     within_var_max = c(NA, NA, NA, NA, NA, NA,
@@ -107,10 +107,10 @@ calcReliability <- function(df = NULL, model = NULL, entity = "entity", y = "y",
                        max(HLGM.out$var.w.delta),
                        max(HLGM.out$var.w.FE),
                        max(HLGM.out$var.w.RE),
-                       max(betabin.out$var.w.BB),
-                       max(betabin.out$var.w.FE),
-                       max(betabin.out$var.w.RE),
-                       max(betabin.out$var.w.J),
+                       max(BB.out$var.w.BB),
+                       max(BB.out$var.w.FE),
+                       max(BB.out$var.w.RE),
+                       max(BB.out$var.w.J),
                               NA
     ),
     reliability = c(
@@ -222,5 +222,13 @@ calcReliability <- function(df = NULL, model = NULL, entity = "entity", y = "y",
       est.RIUR = NA
     )
   )
-  return(results)
+
+  output <- list(
+    rel.results = rel.results,
+    SSR.out = SSR.out,
+    AOV.out = AOV.out,
+    HLGM.out = HLGM.out,
+    BB.out = BB.out
+  )
+  return(output)
 }
