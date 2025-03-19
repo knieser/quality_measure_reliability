@@ -1,6 +1,6 @@
 ---
 title: "Example reliability estimation analysis"
-author: "Kenneth Nieser, PhD"
+author: "Kenneth Nieser"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Example reliability estimation analysis}
@@ -39,15 +39,17 @@ library(QualityMeasure)
 We'll simulate some data to use for the example analyses.
 
 ```{r}
+set.seed(123)
+
 # number of accountable entities
 n.entity = 100  
 
 # average number of patients/cases per accountable entity
-n.pts = 100
+n.pts = 50
 
 # parameters of the Beta distribution
 alpha = 1
-beta = 50
+beta = 30
 
 # sample the number of patients/cases per accountable entity
 n = rpois(n.entity, n.pts) 
@@ -79,7 +81,7 @@ n.entity = 100
 avg.n = 100
 
 # marginal probability of the outcome
-marg.p = .2 
+marg.p = .3 
 mu = log(marg.p / (1 - marg.p))
 
 # between-entity variance
@@ -109,8 +111,8 @@ This analysis generates confidence intervals for entity-level performance using 
 
 ```{r}
 # adjust number of bootstraps and cores for parallel processing.
-n.boots = 20
-n.cores = 3
+n.boots = 25
+n.cores = 5
 
 # run profiling analysis
 profiling.results <- profiling_analysis(df = df1, ctrPerf = controlPerf(n.boots = n.boots, n.cores = n.cores))
@@ -226,7 +228,7 @@ The number of resamples used to calculate the permutation split-sample reliabili
 ```{r}
 # number of resamples to use for the permutation Ssplit-sample reliability estimate
 n.resamples = 100
-n.cores = 3
+n.cores = 5
 
 rel.out <- calcReliability(df = df1, ctrPerf = controlPerf(n.cores = n.cores), ctrRel = controlRel(n.resamples = n.resamples))
 ```

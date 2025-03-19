@@ -8,7 +8,7 @@ knitr::opts_chunk$set(
 library(knitr)
 
 
-## ----setup--------------------------------------------------------------------
+## ----setup, include = FALSE---------------------------------------------------
 library(ggplot2) # for plots
 library(doParallel) # for parallel processing
 library(lme4) # for fitting GLMMs
@@ -19,15 +19,17 @@ load_all()
 library(QualityMeasure)
 
 ## -----------------------------------------------------------------------------
+set.seed(123)
+
 # number of accountable entities
 n.entity = 100  
 
 # average number of patients/cases per accountable entity
-n.pts = 100
+n.pts = 50
 
 # parameters of the Beta distribution
 alpha = 1
-beta = 50
+beta = 30
 
 # sample the number of patients/cases per accountable entity
 n = rpois(n.entity, n.pts) 
@@ -55,7 +57,7 @@ n.entity = 100
 avg.n = 100
 
 # marginal probability of the outcome
-marg.p = .2 
+marg.p = .3 
 mu = log(marg.p / (1 - marg.p))
 
 # between-entity variance
@@ -75,26 +77,28 @@ kable(head(df2, 10), caption = 'Simulated data 2')
 
 ## -----------------------------------------------------------------------------
 # adjust number of bootstraps and cores for parallel processing.
-n.boots = 20
-n.cores = 3
+n.boots = 25
+n.cores = 5
 
 # run profiling analysis
 profiling.results <- profiling_analysis(df = df1, ctrPerf = controlPerf(n.boots = n.boots, n.cores = n.cores))
+perf.results <- profiling.results$perf.results
 
 ## ----echo = FALSE, results = 'asis'-------------------------------------------
 kable(profiling.results$perf.summary, caption = 'Performance summary statistics across entities')
 
 ## -----------------------------------------------------------------------------
-plotN(profiling.results$perf.results$n)
+plotN(perf.results$n)
 
 ## -----------------------------------------------------------------------------
-profiling.results$fig.perf
+# Unadjusted performance
+plotPerformance()
 
 ## -----------------------------------------------------------------------------
-profiling.results$fig.rand.int
+plotPerformance(plot.type = 'OR')
 
 ## -----------------------------------------------------------------------------
-profiling.results$fig.corr
+plotPerformance(plot.type = 'correlation')
 
 ## -----------------------------------------------------------------------------
 BB.results <- calcBetaBin(df = df1)
@@ -141,7 +145,7 @@ summary(BB.agg.results$est.BB)
 ## -----------------------------------------------------------------------------
 # number of resamples to use for the permutation Ssplit-sample reliability estimate
 n.resamples = 100
-n.cores = 3
+n.cores = 5
 
 rel.out <- calcReliability(df = df1, ctrPerf = controlPerf(n.cores = n.cores), ctrRel = controlRel(n.resamples = n.resamples))
 
