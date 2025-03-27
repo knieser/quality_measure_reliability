@@ -7,7 +7,7 @@
 #' \item{OR}{plot of ORs comparing each facility with the average facility}
 #' \item{correlation}{plot of standardization ratios against the entity random intercepts}
 #' \item{multiple}{plot of measure performance across different risk-adjustment methods}
-#' @param plot.y 'p' plots the unadjusted performance, 'oe' plots the observed-to-expected ratio, 'rs' plots the risk-standardized rate, and 'pe' plots the predicted-to-expected ratio'
+#' @param plot.y 'p' plots the unadjusted performance, 'oe' plots the observed-to-expected ratio, 'pe' plots the predicted-to-expected ratio'
 #' @author Kenneth Nieser (nieser@stanford.edu)
 #' @references None
 #' @examples
@@ -16,6 +16,8 @@
 #' @export
 
 plotPerformance <- function(df = perf.results, plot.type = 'single', plot.y = 'p'){
+
+  marg.p = sum(df$observed) / sum(df$n)
 
   if (plot.type == 'single'){
     if (plot.y == 'p') {
@@ -34,13 +36,14 @@ plotPerformance <- function(df = perf.results, plot.type = 'single', plot.y = 'p
       df$y = df$rs.pe
       df$rank = df$rank.pe
       df$lwr = df$rs.pe.lwr
-      df$upr = df$rs.pe.lwr
+      df$upr = df$rs.pe.upr
       ylab = 'PE risk-standardized rate'
     }
 
     fig <- ggplot2::ggplot(data = df, aes(x = rank, y = y)) +
-      geom_point(color = 'darkblue') +
+      geom_point(color = 'black') +
       geom_errorbar(aes(ymin = lwr, ymax = upr), width = 0.1) +
+      geom_hline(yintercept = marg.p, col = 'red', lty = 'dashed', size = 1.2, alpha = 0.7) +
       xlab('Rank') +
       ylab(ylab) +
       theme_classic() +
@@ -56,7 +59,7 @@ plotPerformance <- function(df = perf.results, plot.type = 'single', plot.y = 'p
 
   if(plot.type == 'OR'){
     # plot of ORs comparing each facility with the average facility
-    fig <- ggplot(data = perf.results, aes(x = intercept.OR, y = entities)) +
+    fig <- ggplot2::ggplot(data = df, aes(x = intercept.OR, y = entities)) +
       geom_point(aes(color = intercept.sig), size = 2) +
       geom_errorbar(aes(xmin = intercept.OR.lwr, xmax = intercept.OR.upr), width = 0.1, position = position_dodge(width = .7)) +
       scale_color_manual(values = c('black', 'red')) +
@@ -81,9 +84,9 @@ plotPerformance <- function(df = perf.results, plot.type = 'single', plot.y = 'p
   # plot of standardization ratios against the entity random intercepts
   if (plot.type == 'correlation'){
     plot.df.corr <- data.frame(
-      Method = rep(c('OE', 'PE'), each = nrow(perf.results)),
-      rand.int = rep(perf.results$intercept.OR, 2),
-      std.ratio = c(perf.results$oe, perf.results$pe)
+      Method = rep(c('OE', 'PE'), each = nrow(df)),
+      rand.int = rep(df$intercept.OR, 2),
+      std.ratio = c(df$oe, df$pe)
     )
 
     fig <- ggplot2::ggplot(data = plot.df.corr, aes(x = rand.int, y = std.ratio, group = Method)) +
@@ -107,13 +110,13 @@ plotPerformance <- function(df = perf.results, plot.type = 'single', plot.y = 'p
   # plot of measure performance across different risk-adjustment methods
   if (plot.type == 'multiple'){
   plot.df.p <- data.frame(
-    method = rep(c('A. Unadjusted', 'B. OE-standardized', 'C. PE-standardized'), each = nrow(perf.results)),
-    p = c(perf.results$p, perf.results$rs.oe, perf.results$rs.pe),
-    lwr = c(perf.results$p.lwr, perf.results$rs.oe.lwr, perf.results$rs.pe.lwr),
-    upr = c(perf.results$p.upr, perf.results$rs.oe.upr, perf.results$rs.pe.upr),
-    rank = rep(perf.results$rank.p, 3),
-    rank.oe = rep(perf.results$rank.oe, 3),
-    rank.pe = rep(perf.results$rank.pe, 3)
+    method = rep(c('A. Unadjusted', 'B. OE-standardized', 'C. PE-standardized'), each = nrow(df)),
+    p = c(df$p, df$rs.oe, df$rs.pe),
+    lwr = c(df$p.lwr, df$rs.oe.lwr, df$rs.pe.lwr),
+    upr = c(df$p.upr, df$rs.oe.upr, df$rs.pe.upr),
+    rank = rep(df$rank.p, 3),
+    rank.oe = rep(df$rank.oe, 3),
+    rank.pe = rep(df$rank.pe, 3)
   )
 
   fig <- ggplot2::ggplot(data = plot.df.p, aes(x = rank, y = p, group = method)) +

@@ -15,7 +15,7 @@ plotPerformance(df = perf.results, plot.type = "single", plot.y = "p")
 \item{correlation}{plot of standardization ratios against the entity random intercepts}
 \item{multiple}{plot of measure performance across different risk-adjustment methods}}
 
-\item{plot.y}{'p' plots the unadjusted performance, 'oe' plots the observed-to-expected ratio, 'rs' plots the risk-standardized rate, and 'pe' plots the predicted-to-expected ratio'}
+\item{plot.y}{'p' plots the unadjusted performance, 'oe' plots the observed-to-expected ratio, 'pe' plots the predicted-to-expected ratio'}
 }
 \description{
 This function creates a plot of measure performance across accountable entities, using the perf.results dataframe from calcPerformance() output.

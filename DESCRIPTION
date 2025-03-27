@@ -7,6 +7,7 @@ Authors@R:
 Description: This package contains functions useful for analyzing quality
     measures and estimating reliability of quality measures.
 License: GPL (>= 3)
+Depends: R (>= 4.0), ggplot2, doParallel, lme4, psych
 Imports: 
     doParallel,
     foreach,

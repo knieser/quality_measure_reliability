@@ -149,13 +149,13 @@ calcPerformance <- function(df = NULL, model = NULL, entity = "entity", y = "y",
   rs.direct.lwr = apply(rs.direct.boot, 1, quantile, ci.lwr)
   rs.direct.upr = apply(rs.direct.boot, 1, quantile, ci.upr)
 
-  category.oe = rep('No Different', length(entities))
-  category.oe[rs.oe.upr < marg.p] <- 'Better'
-  category.oe[rs.oe.lwr > marg.p] <- 'Worse'
+  category.oe = rep('No different than average', length(entities))
+  category.oe[rs.oe.upr < marg.p] <- 'Lower than average'
+  category.oe[rs.oe.lwr > marg.p] <- 'Higher than average'
 
-  category.pe = rep('No Different', length(entities))
-  category.pe[rs.pe.upr < marg.p] <- 'Better'
-  category.pe[rs.pe.lwr > marg.p] <- 'Worse'
+  category.pe = rep('No different than average', length(entities))
+  category.pe[rs.pe.upr < marg.p] <- 'Lower than average'
+  category.pe[rs.pe.lwr > marg.p] <- 'Higher than average'
 
   m.re = as.data.frame(ranef(fit))
   m.re.intercept <- data.frame(est = m.re$condval[m.re$term == '(Intercept)'],

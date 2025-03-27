@@ -13,9 +13,9 @@
 plotN <- function(n){
   df <- data.frame(n)
   fig <- ggplot2::ggplot(data = df, aes(n)) +
-    geom_histogram(color = 'white', fill = 'black') +
+    geom_histogram(color = 'white', fill = 'black', binwidth = 5) +
     scale_y_continuous(expand = c(0,0)) +
-    xlab('Number of cases') +
+    xlab('Number of observations') +
     ylab('Entities') +
     ggtitle('Sample size distribution') +
     theme_classic() +

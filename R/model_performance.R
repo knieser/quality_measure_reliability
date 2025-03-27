@@ -13,7 +13,7 @@
 #' @importFrom lme4 glmer
 #' @export
 
-model_performance <- function(df, model, entity, y, predictor.clean = NA, ctrPerf = controlPerf()){
+model_performance <- function(df, model, entity = 'entity', y = 'y', predictor.clean = NA, ctrPerf = controlPerf()){
   alpha = ctrPerf$alpha
   z = qnorm(1 - alpha/2)
 
@@ -50,77 +50,6 @@ model_performance <- function(df, model, entity, y, predictor.clean = NA, ctrPer
   model.results$predictor.clean <- as.factor(model.results$predictor.clean)
   model.results$predictor.clean <- factor(model.results$predictor.clean, levels = model.results$predictor.clean[order(model.results$rank, decreasing = T)])
 
-  # make plot of model results
-  fig.estimates <- ggplot(data = model.results, aes(x = est, y = predictor.clean, group = sig)) +
-    geom_point(aes(color = sig), size = 3) +
-    geom_errorbar(aes(xmin = lb, xmax = ub, color = sig),
-                  width = 0.5,
-                  linetype = 1) +
-    scale_color_manual(values = c('black', 'red')) +
-    geom_vline(xintercept = 1, lty = 2) +
-    scale_x_continuous(trans = 'log10') +
-    scale_y_discrete(limits = rev) +
-    labs(x = 'Adjusted OR', y = 'Predictor') +
-    theme_classic() +
-    theme(
-      plot.title = element_text(size = 16, face ="bold"),
-      axis.text = element_text(size = 16, color = 1),
-      axis.text.y = element_text(hjust = 1),
-      axis.ticks.length = unit(.25,"cm"),
-      axis.title = element_text(size = 18, face = "bold"),
-      strip.text = element_text(size = 18, face = "bold"),
-      panel.grid.major.x = element_line(),
-      panel.grid.minor.x = element_line(),
-      legend.position = 'none'
-    )
-
-  # discrimination
-  fig.prediction <- ggplot(data = df, aes(x=predict, color = as.factor(y), fill = as.factor(y))) +
-    geom_density(alpha = .3) +
-    scale_color_manual('Observed outcome', values = c('black', 'red')) +
-    scale_fill_manual('Observed outcome', values = c('black', 'red')) +
-    xlab('Predicted probability') +
-    ylab('Density') +
-    theme_classic() +
-    theme(
-      axis.text = element_text(size = 16),
-      axis.ticks.length = unit(.25, 'cm'),
-      axis.title = element_text(size = 18, face = 'bold'),
-      legend.position = 'top',
-      legend.title = element_text(size = 18, face = 'bold'),
-      legend.text = element_text(size = 18)
-    )
-
-  # calibration plot
-  deciles = quantile(df$predict, 1:10/10)
-  df$decile <- NA
-  for (i in 10:1){
-    df$decile[df$predict <= deciles[i]] <- i
-  }
-
-  calibration.df <- data.frame(
-    decile = 1:10,
-    observed = aggregate(y ~ decile, data = df, mean)$y,
-    predicted = aggregate(predict ~ decile, data = df, mean)$predict
-  )
-  fig.calibration <- ggplot(data = calibration.df, aes(x = predicted, y = observed)) +
-    geom_point(size = 3) +
-    geom_line(lwd = 1) +
-    geom_abline(slope = 1, intercept = 0, lty = 'dashed', lwd = 1) +
-    xlab('Predicted probability') +
-    ylab('Observed complication rate') +
-    theme_classic() +
-    theme(
-      panel.grid.major = element_line(linewidth = 1),
-      axis.text = element_text(size = 16),
-      axis.ticks.length = unit(.25,"cm"),
-      axis.title = element_text(size = 18, face = "bold"),
-      strip.text = element_text(size = 18, face = "bold"),
-      legend.text = element_text(size = 16),
-      legend.title = element_blank(),
-      legend.position = 'bottom'
-    )
-
   # calculate c statistic using wilcox
   p1 = df$predict[df$y==1]
   p0 = df$predict[df$y==0]
@@ -135,11 +64,7 @@ model_performance <- function(df, model, entity, y, predictor.clean = NA, ctrPer
                  fit = fit,
                  marg.p = marg.p,
                  c.statistic = c.statistic,
-                 model.results = model.results,
-                 calibration.df = calibration.df,
-                 fig.estimates = fig.estimates,
-                 fig.prediction = fig.prediction,
-                 fig.calibration = fig.calibration)
+                 model.results = model.results)
 
   return(results)
 }

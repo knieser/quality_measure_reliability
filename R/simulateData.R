@@ -17,7 +17,7 @@ simulateData <- function(n.entity, avg.n, tau = tau, theta = theta, type = 'bina
 
   if (type == 'binary'){
     z = rep(rnorm(n.entity, tau[1], tau[2]), times = n)
-    lp = z + theta[1] + theta[2] * x1
+    lp = z + theta * x1
     p = exp(lp) / (1 + exp(lp))
     y = rbinom(total.n, 1, p)
     df = data.frame(
@@ -32,7 +32,7 @@ simulateData <- function(n.entity, avg.n, tau = tau, theta = theta, type = 'bina
 
   if (type == 'normal'){
     z = rep(rnorm(n.entity, 0, tau[1]), times = n)
-    lp = z + theta[1] + theta[2] * x1
+    lp = z + theta * x1
     y = rnorm(total.n, mean = lp, sd = tau[2])
     df = data.frame(
       entity = as.factor(entity),

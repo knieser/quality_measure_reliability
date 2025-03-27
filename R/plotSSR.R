@@ -1,13 +1,23 @@
+#' Example plot of values used to calcualte split-sample reliability.
+#' @description
+#' This function creates a plot of the measure performance for each entity split across two exclusive random samples of observations within each entity.
+#' @param df observation-level data; if null, will use the dataframe from the model object
+#' @param model model; if null, will use an unadjusted model
+#' @param entity data column containing the accountable entity identifier
+#' @param y data column containing the outcome variable
+#' @param ctrPerf parameters to control performance measure calculation
+#' @author Kenneth Nieser (nieser@stanford.edu)
+#' @references None
+#' @examples
+#' # TBD
+#' @importFrom ggplot2 ggplot
+#' @export
 
-reliability_analysis <- function(df, model, entity = 'entity', y = 'y', ctrPerf = controlPerf(), ctrRel = controlRel()){
+
+plotSSR <- function(df, model = NULL, entity = 'entity', y = 'y', ctrPerf = controlPerf()){
 
   # clean data
   df = cleanData(df = df, entity = entity, y = y, ctrPerf = ctrPerf)
-
-  # calculate reliability
-  rel.results <- calcReliability(df = df, model = model, entity = entity, y = y, ctrPerf = ctrPerf, ctrRel = ctrRel)
-  HLGM.out <- rel.results$HLGM.out
-  BB.out <- rel.results$BB.out
 
   # split-sample plot to visualize split-sample reliability
   message('making example plot of split-sample reliability estimates')
@@ -44,6 +54,7 @@ reliability_analysis <- function(df, model, entity = 'entity', y = 'y', ctrPerf 
     t2 = c(entity.means.wide.adj$oe.2, entity.means.wide.adj$pe.2)
   )
   max = max(c(plot.df.SSR$t1, plot.df.SSR$t2))
+
   fig.SSR <- ggplot2::ggplot(data = plot.df.SSR, aes(x = t1, y = t2, group = Method)) +
     geom_point(aes(color = Method, shape = Method), size = 3) +
     geom_abline(slope = 1, lty = 'dashed') +
@@ -61,13 +72,6 @@ reliability_analysis <- function(df, model, entity = 'entity', y = 'y', ctrPerf 
       legend.text = element_text(size = 16),
       legend.title = element_text(size = 18, face = 'bold')
     )
+fig.SSR
 
-  results = list(df = df,
-                 df.SSR = df.SSR,
-                 rel.results = rel.results,
-                 HLGM.out = HLGM.out,
-                 BB.out = BB.out,
-                 fig.SSR = fig.SSR)
-
-  return(results)
 }
