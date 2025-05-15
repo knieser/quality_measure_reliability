@@ -12,6 +12,7 @@ calcBetaBin(
   df.aggregate = FALSE,
   n = "n",
   x = "x",
+  show.all = FALSE,
   ctrPerf = controlPerf()
 )
 }

@@ -9,6 +9,7 @@ calcReliability(
   model = NULL,
   entity = "entity",
   y = "y",
+  show.all = FALSE,
   ctrPerf = controlPerf(),
   ctrRel = controlRel()
 )

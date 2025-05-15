@@ -17,10 +17,11 @@
 #' @importFrom stats optim median
 #' @export
 
-calcBetaBin <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', df.aggregate = FALSE, n = 'n', x = 'x', ctrPerf = controlPerf()){
-  message('Currently, Beta-Binomial reliability estimates do not account for risk-adjustment (even if you specified a model). Updates to this function to account for risk-adjustment are in progress.')
+calcBetaBin <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', df.aggregate = FALSE, n = 'n', x = 'x', show.all=FALSE, ctrPerf = controlPerf()){
+  message('\tCurrently, Beta-Binomial reliability estimates do not account for risk-adjustment (even if you specified a model). Updates to this function to account for risk-adjustment are in progress.')
   if (is.null(df) & is.null(model)) stop ('Please provide either a dataframe or a model object')
   if (is.null(df)){df <- model@frame}
+  if(!is.logical(show.all)) stop('show.all needs to be TRUE or FALSE')
 
   if (isFALSE(df.aggregate)){
   data.out <- calcDataSummary(df, model, entity, y, ctrPerf)
@@ -63,27 +64,36 @@ calcBetaBin <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', df.
   var.w.BB = a * b / ((a + b + 1) * (a + b) * n)
   est.BB = n / (a + b + n)
 
-  var.w.FE <- p * (1 - p) / n
-  est.BB.FE = var.b.BB / (var.b.BB + var.w.FE)
-
-  var.w.RE <- p.re * (1 - p.re) / n
-  est.BB.RE = var.b.BB / (var.b.BB + var.w.RE)
-
-  # within variance using Jeffreys prior
-  p.J = (0.5 + x) / (1 + n)
-  var.w.J = p.J * (1 - p.J) / n
-  est.BB.J = var.b.BB / (var.b.BB + var.w.J)
-
   results <- list(alpha = a,
                   beta = b,
-                  var.b.BB = var.b.BB,
-                  var.w.BB = var.w.BB,
-                  var.w.FE = var.w.FE,
-                  var.w.RE = var.w.RE,
-                  var.w.J = var.w.J,
-                  est.BB = est.BB,
-                  est.BB.FE = est.BB.FE,
-                  est.BB.RE = est.BB.RE,
-                  est.BB.J = est.BB.J)
+                  var.between = var.b.BB,
+                  var.within = var.w.BB,
+                  est.BB = est.BB)
+
+  if(show.all==TRUE){
+    var.w.FE <- p * (1 - p) / n
+    est.BB.FE = var.b.BB / (var.b.BB + var.w.FE)
+
+    var.w.RE <- p.re * (1 - p.re) / n
+    est.BB.RE = var.b.BB / (var.b.BB + var.w.RE)
+
+    # within variance using Jeffreys prior
+    p.J = (0.5 + x) / (1 + n)
+    var.w.J = p.J * (1 - p.J) / n
+    est.BB.J = var.b.BB / (var.b.BB + var.w.J)
+
+    results <- list(alpha = a,
+                    beta = b,
+                    var.b.BB = var.b.BB,
+                    var.w.BB = var.w.BB,
+                    var.w.FE = var.w.FE,
+                    var.w.RE = var.w.RE,
+                    var.w.J = var.w.J,
+                    est.BB = est.BB,
+                    est.BB.FE = est.BB.FE,
+                    est.BB.RE = est.BB.RE,
+                    est.BB.J = est.BB.J)
+  }
+
   return(results)
 }

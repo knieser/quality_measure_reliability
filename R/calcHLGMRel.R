@@ -15,9 +15,10 @@
 #' @importFrom lme4 VarCorr
 #' @export
 
-calcHLGMRel <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', ctrPerf = controlPerf()){
+calcHLGMRel <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', show.all=FALSE, ctrPerf = controlPerf()){
   if (is.null(df) & is.null(model)) stop ('Please provide either a dataframe or a model object')
   if (is.null(df)){df <- model@frame}
+  if(!is.logical(show.all)) stop('show.all needs to be TRUE or FALSE')
 
   data.out <- calcDataSummary(df, model, entity, y, ctrPerf)
   df <- data.out$df
@@ -32,38 +33,49 @@ calcHLGMRel <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', ctr
   var.b.HLGM <- lme4::VarCorr(fit)[[entity]][1,1]
   var.b.HLGM.delta <- (var.expected / n)^2 * var.b.HLGM
 
-  # within-variance on the latent scale
-  var.w.latent = pi^2 / (3 * n)
-  est.HLGM.latent <- var.b.HLGM / (var.b.HLGM + var.w.latent)
-
   # within-variance based on delta method approximation
   var.w.delta <- var.expected / n^2
   est.HLGM.delta <- var.b.HLGM.delta / (var.b.HLGM.delta + var.w.delta)
 
-  # within-variance based on sample proportion estimates
-  var.w.FE <- p * (1 - p) / n
-  est.HLGM.FE <- var.b.HLGM.delta / (var.b.HLGM.delta + var.w.FE)
-
-  # within-variance from random effects model
-  var.w.RE <- p.re * (1 - p.re) / n
-  est.HLGM.RE <- var.b.HLGM.delta / (var.b.HLGM.delta + var.w.RE)
-
   output = list(
-    marg.p = marg.p,
+    fit = fit,
     n = n,
-    p = p,
-    p.re = p.re,
-    var.b.HLGM = var.b.HLGM,
-    var.b.HLGM.delta = var.b.HLGM.delta,
-    var.w.latent = var.w.latent,
-    var.w.delta = var.w.delta,
-    var.w.FE = var.w.FE,
-    var.w.RE = var.w.RE,
-    est.HLGM.latent = est.HLGM.latent,
-    est.HLGM.delta = est.HLGM.delta,
-    est.HLGM.FE = est.HLGM.FE,
-    est.HLGM.RE = est.HLGM.RE
+    var.between = var.b.HLGM.delta,
+    var.within = var.w.delta,
+    est.HLGM.delta = est.HLGM.delta
   )
+
+  if (show.all==TRUE){
+    # within-variance on the latent scale
+    var.w.latent = pi^2 / (3 * n)
+    est.HLGM.latent <- var.b.HLGM / (var.b.HLGM + var.w.latent)
+
+    # within-variance based on sample proportion estimates
+    var.w.FE <- p * (1 - p) / n
+    est.HLGM.FE <- var.b.HLGM.delta / (var.b.HLGM.delta + var.w.FE)
+
+    # within-variance from random effects model
+    var.w.RE <- p.re * (1 - p.re) / n
+    est.HLGM.RE <- var.b.HLGM.delta / (var.b.HLGM.delta + var.w.RE)
+
+    output = list(
+      fit = fit,
+      marg.p = marg.p,
+      n = n,
+      p = p,
+      p.re = p.re,
+      var.b.HLGM = var.b.HLGM,
+      var.b.HLGM.delta = var.b.HLGM.delta,
+      var.w.latent = var.w.latent,
+      var.w.delta = var.w.delta,
+      var.w.FE = var.w.FE,
+      var.w.RE = var.w.RE,
+      est.HLGM.latent = est.HLGM.latent,
+      est.HLGM.delta = est.HLGM.delta,
+      est.HLGM.FE = est.HLGM.FE,
+      est.HLGM.RE = est.HLGM.RE
+    )
+  }
 
   return(output)
 }
