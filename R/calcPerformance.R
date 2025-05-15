@@ -17,14 +17,16 @@
 #' @importFrom foreach foreach
 #' @export
 
-calcPerformance <- function(df = NULL, model = NULL, entity = "entity", y = "y", ctrPerf = controlPerf()){
+calcPerformance <- function(df = NULL, model = NULL, entity = "entity", y = "y", data.type = 'binary', ctrPerf = controlPerf()){
   if (is.null(df) & is.null(model)) stop ('Please provide either a dataframe or a model object')
   alpha = ctrPerf$alpha
   ci.lwr = alpha/2
   ci.upr = 1 - alpha/2
   z = qnorm(1 - alpha/2)
 
-  data.out <- calcDataSummary(df, model, entity, y, ctrPerf)
+  if(data.type !='binary') stop('This function currently works with binary outcome data only.')
+
+  data.out <- calcDataSummary(df, model, entity, y, data.type, ctrPerf)
   df = data.out$df
   model = data.out$model
   fit = data.out$fit

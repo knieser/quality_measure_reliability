@@ -9,6 +9,7 @@ calcSSR(
   model = NULL,
   entity = "entity",
   y = "y",
+  data.type = "binary",
   ctrPerf = controlPerf(),
   ctrRel = controlRel()
 )

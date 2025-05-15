@@ -17,7 +17,7 @@
 #' @importFrom foreach foreach
 #' @importFrom psych ICC
 #' @export
-calcSSR <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', ctrPerf = controlPerf(), ctrRel = controlRel()){
+calcSSR <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', data.type = 'binary', ctrPerf = controlPerf(), ctrRel = controlRel()){
   if (is.null(df) & is.null(model)) stop ('Please provide either a dataframe or a model object')
   if (is.null(df)){df <- model@frame}
 
@@ -27,7 +27,7 @@ calcSSR <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', ctrPerf
   n.resamples <- ctrRel$n.resamples
   method      <- ctrRel$SSRmethod
 
-  data.out <- calcDataSummary(df, model, entity, y, ctrPerf)
+  data.out <- calcDataSummary(df, model, entity, y, data.type, ctrPerf)
   df <- data.out$df
 
   entities = unique(df$entity)
@@ -54,10 +54,13 @@ calcSSR <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', ctrPerf
 
     agg   <- aggregate(y ~ entity + s, data = df, sum)
     agg$obs   <- agg$y
-    agg$pred  <- aggregate(predict ~ entity + s, data = df, sum)$predict
-    agg$exp   <- aggregate(expect ~ entity + s, data = df, sum)$expect
-    agg$oe    <- agg$obs / agg$exp
-    agg$pe    <- agg$pred / agg$exp
+
+    if (data.type == 'binary'){
+      agg$pred  <- aggregate(predict ~ entity + s, data = df, sum)$predict
+      agg$exp   <- aggregate(expect ~ entity + s, data = df, sum)$expect
+      agg$oe    <- agg$obs / agg$exp
+      agg$pe    <- agg$pred / agg$exp
+    }
     entity.means.wide.adj <- reshape(agg, idvar = "entity", timevar = "s", direction = "wide")
 
     # calculate ICCs using psych package
@@ -69,21 +72,23 @@ calcSSR <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', ctrPerf
     aov.var.w = (aov.summary[2,2] + aov.summary[2,3])/(aov.summary[1,2] + aov.summary[1,3])
     aov.var.b = (aov.summary[3,1] - aov.var.w) / 2
 
-    aov.out.oe  <- psych::ICC(entity.means.wide.adj[,c('oe.1', 'oe.2')], lmer = F)
-    aov.ICC.oe = aov.out.oe$results$ICC
-    aov.ICC.oe.lb = aov.out.oe$results$`lower bound`
-    aov.ICC.oe.ub = aov.out.oe$results$`upper bound`
-    aov.oe.summary = matrix(unlist(aov.out.oe$summary), ncol = 3, byrow = T)
-    aov.oe.var.w = (aov.oe.summary[2,2] + aov.oe.summary[2,3])/(aov.oe.summary[1,2] + aov.oe.summary[1,3])
-    aov.oe.var.b = (aov.oe.summary[3,1] - aov.oe.var.w) / 2
+    if (data.type == 'binary'){
+      aov.out.oe  <- psych::ICC(entity.means.wide.adj[,c('oe.1', 'oe.2')], lmer = F)
+      aov.ICC.oe = aov.out.oe$results$ICC
+      aov.ICC.oe.lb = aov.out.oe$results$`lower bound`
+      aov.ICC.oe.ub = aov.out.oe$results$`upper bound`
+      aov.oe.summary = matrix(unlist(aov.out.oe$summary), ncol = 3, byrow = T)
+      aov.oe.var.w = (aov.oe.summary[2,2] + aov.oe.summary[2,3])/(aov.oe.summary[1,2] + aov.oe.summary[1,3])
+      aov.oe.var.b = (aov.oe.summary[3,1] - aov.oe.var.w) / 2
 
-    aov.out.pe  <- psych::ICC(entity.means.wide.adj[,c('pe.1', 'pe.2')], lmer = F)
-    aov.ICC.pe = aov.out.pe$results$ICC
-    aov.ICC.pe.lb = aov.out.pe$results$`lower bound`
-    aov.ICC.pe.ub = aov.out.pe$results$`upper bound`
-    aov.pe.summary = matrix(unlist(aov.out.pe$summary), ncol = 3, byrow = T)
-    aov.pe.var.w = (aov.pe.summary[2,2] + aov.pe.summary[2,3])/(aov.pe.summary[1,2] + aov.pe.summary[1,3])
-    aov.pe.var.b = (aov.pe.summary[3,1] - aov.pe.var.w) / 2
+      aov.out.pe  <- psych::ICC(entity.means.wide.adj[,c('pe.1', 'pe.2')], lmer = F)
+      aov.ICC.pe = aov.out.pe$results$ICC
+      aov.ICC.pe.lb = aov.out.pe$results$`lower bound`
+      aov.ICC.pe.ub = aov.out.pe$results$`upper bound`
+      aov.pe.summary = matrix(unlist(aov.out.pe$summary), ncol = 3, byrow = T)
+      aov.pe.var.w = (aov.pe.summary[2,2] + aov.pe.summary[2,3])/(aov.pe.summary[1,2] + aov.pe.summary[1,3])
+      aov.pe.var.b = (aov.pe.summary[3,1] - aov.pe.var.w) / 2
+    }
   }
 
   if(method == 'bootstrap'){
@@ -110,12 +115,26 @@ calcSSR <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', ctrPerf
     icc.aov       = c(aov.ICC[4]) # Spearman-Brown correction
     icc.aov.lb    = c(aov.ICC.lb[4])
     icc.aov.ub    = c(aov.ICC.ub[4])
-    icc.aov.oe    = c(aov.ICC.oe[4])
-    icc.aov.oe.lb = c(aov.ICC.oe.lb[4])
-    icc.aov.oe.ub = c(aov.ICC.oe.ub[4])
-    icc.aov.pe    = c(aov.ICC.pe[4])
-    icc.aov.pe.lb = c(aov.ICC.pe.lb[4])
-    icc.aov.pe.ub = c(aov.ICC.pe.ub[4])
+
+    icc.aov.oe = NA
+    icc.aov.oe.lb = NA
+    icc.aov.oe.ub = NA
+    aov.oe.var.b = NA
+    aov.oe.var.w = NA
+    icc.aov.pe = NA
+    icc.aov.pe.lb = NA
+    icc.aov.pe.ub = NA
+    aov.pe.var.b = NA
+    aov.pe.var.w = NA
+
+    if (data.type == 'binary'){
+      icc.aov.oe    = c(aov.ICC.oe[4])
+      icc.aov.oe.lb = c(aov.ICC.oe.lb[4])
+      icc.aov.oe.ub = c(aov.ICC.oe.ub[4])
+      icc.aov.pe    = c(aov.ICC.pe[4])
+      icc.aov.pe.lb = c(aov.ICC.pe.lb[4])
+      icc.aov.pe.ub = c(aov.ICC.pe.ub[4])
+    }
 
     list(icc.aov       = icc.aov,
          icc.aov.lb    = icc.aov.lb,
@@ -143,7 +162,8 @@ calcSSR <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', ctrPerf
 
   out <- as.data.frame(out)
 
-  output = list(
+  if (data.type == 'binary'){
+    output = list(
       icc = as.vector(unlist(out$icc.aov)),
       icc.lb = as.vector(unlist(out$icc.aov.lb)),
       icc.ub = as.vector(unlist(out$icc.aov.ub)),
@@ -166,6 +186,20 @@ calcSSR <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', ctrPerf
     output$est.PSSR.oe = mean(output$icc.oe)
     output$est.SSR.pe  <- output$icc.pe[1]
     output$est.PSSR.pe <- mean(output$icc.pe)
+  }
+
+  if (data.type == 'continuous'){
+    output = list(
+      icc = as.vector(unlist(out$icc.aov)),
+      icc.lb = as.vector(unlist(out$icc.aov.lb)),
+      icc.ub = as.vector(unlist(out$icc.aov.ub)),
+      var.b.aov = as.vector(unlist(out$var.b.aov)),
+      var.w.aov = as.vector(unlist(out$var.w.aov))
+    )
+    output$est.SSR = output$icc[1]
+    output$est.PSSR = mean(output$icc)
+  }
+
 
   return(output)
 }

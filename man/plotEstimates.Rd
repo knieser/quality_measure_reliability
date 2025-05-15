@@ -4,7 +4,7 @@
 \alias{plotEstimates}
 \title{Plot estimates from regression model used for risk-adjustment}
 \usage{
-plotEstimates(model.results = model.results)
+plotEstimates(model.performance = model.performance)
 }
 \description{
 This function creates a plot of model results

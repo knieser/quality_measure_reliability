@@ -4,7 +4,7 @@
 \alias{plotCalibration}
 \title{Plot calibration curve for risk-adjustment model}
 \usage{
-plotCalibration(df = df, quantiles = 10)
+plotCalibration(model.performance = model.performance, quantiles = 10)
 }
 \description{
 This function creates a plot of the model calibration curve

@@ -3,6 +3,7 @@
 export(calcAOV)
 export(calcBetaBin)
 export(calcHLGMRel)
+export(calcHLMRel)
 export(calcPerformance)
 export(calcReliability)
 export(calcResamplingIUR)

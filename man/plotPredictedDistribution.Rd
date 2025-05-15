@@ -4,7 +4,7 @@
 \alias{plotPredictedDistribution}
 \title{Plot densities of predicted values by outcome group}
 \usage{
-plotPredictedDistribution(df = df)
+plotPredictedDistribution(model.performance = model.performance)
 }
 \description{
 This function creates a plot of the distributions of predicted values by outcome group

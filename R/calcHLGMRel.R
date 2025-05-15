@@ -1,6 +1,6 @@
-#' Calculate reliability using a multilevel logistic regression model
+#' Calculate reliability using a hierarchical logistic regression model
 #' @description
-#' This function estimates reliability using a multilevel logistic regression model.
+#' This function estimates reliability using a hierarchical logistic regression model.
 #' @param df observation-level data; if null, will use the dataframe from the model object
 #' @param model model; if null, will use an unadjusted model
 #' @param entity data column containing the accountable entity identifier
@@ -16,11 +16,9 @@
 #' @export
 
 calcHLGMRel <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', show.all=FALSE, ctrPerf = controlPerf()){
-  if (is.null(df) & is.null(model)) stop ('Please provide either a dataframe or a model object')
-  if (is.null(df)){df <- model@frame}
   if(!is.logical(show.all)) stop('show.all needs to be TRUE or FALSE')
 
-  data.out <- calcDataSummary(df, model, entity, y, ctrPerf)
+  data.out <- calcDataSummary(df, model, entity, y, data.type = 'binary', ctrPerf)
   df <- data.out$df
   fit <- data.out$fit
   marg.p <- data.out$marg.p

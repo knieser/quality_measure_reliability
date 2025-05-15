@@ -97,7 +97,7 @@ names(rel.results.sub) <- c('Method', 'Reliability', 'Min Reliability', 'Max Rel
 knitr::kable(rel.results.sub, caption = 'Reliability estimates')
 
 ## -----------------------------------------------------------------------------
-plotSNRReliability(rel.out)
+plotReliability(rel.out)
 
 ## -----------------------------------------------------------------------------
 # number of accountable entities
@@ -183,5 +183,5 @@ names(rel.results.sub2) <- c('Method', 'Reliability', 'Min Reliability', 'Max Re
 knitr::kable(rel.results.sub2, caption = 'Reliability estimates')
 
 ## -----------------------------------------------------------------------------
-plotSNRReliability(rel.out2)
+plotReliability(rel.out2)
 

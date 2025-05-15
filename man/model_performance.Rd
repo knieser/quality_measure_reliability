@@ -9,6 +9,7 @@ model_performance(
   model,
   entity = "entity",
   y = "y",
+  data.type = "binary",
   predictor.clean = NA,
   ctrPerf = controlPerf()
 )

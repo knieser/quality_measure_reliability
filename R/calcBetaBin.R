@@ -24,7 +24,7 @@ calcBetaBin <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', df.
   if(!is.logical(show.all)) stop('show.all needs to be TRUE or FALSE')
 
   if (isFALSE(df.aggregate)){
-  data.out <- calcDataSummary(df, model, entity, y, ctrPerf)
+  data.out <- calcDataSummary(df, model, entity, y, data.type = 'binary', ctrPerf)
   df <- data.out$df
   n  <- data.out$n
   x <- data.out$obs

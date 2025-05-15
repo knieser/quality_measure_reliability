@@ -12,13 +12,15 @@
 #' @importFrom lme4 glmer
 #' @export
 
-profiling_analysis <- function(df, model = NULL, entity = 'entity', y = 'y', ctrPerf = controlPerf()){
+profiling_analysis <- function(df, model = NULL, entity = 'entity', y = 'y', data.type = 'binary', ctrPerf = controlPerf()){
+
+  if(data.type !='binary') stop('This function currently works with binary outcome data only.')
 
   # clean data
   df = cleanData(df, entity = entity, y = y, ctrPerf = ctrPerf)
 
   # calculate measure performance
-  perf.out <- calcPerformance(df = df, model = model, entity = entity, y = y, ctrPerf = ctrPerf)
+  perf.out <- calcPerformance(df = df, model = model, entity = entity, y = y, data.type = data.type, ctrPerf = ctrPerf)
   df.perf <- perf.out$df
   fit <- perf.out$fit
   perf.results <- perf.out$perf.results

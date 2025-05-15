@@ -9,6 +9,7 @@ calcReliability(
   model = NULL,
   entity = "entity",
   y = "y",
+  data.type = "binary",
   show.all = FALSE,
   ctrPerf = controlPerf(),
   ctrRel = controlRel()
@@ -23,14 +24,13 @@ calcReliability(
 
 \item{y}{data column containing the outcome variable}
 
+\item{data.type}{acceptable values are "binary" for 0/1 data and "continuous" for continuous data (default: 'binary')}
+
+\item{show.all}{logical indicator for whether full list of reliability method estimates should be calculated (default: FALSE)}
+
 \item{ctrPerf}{parameters to control performance measure calculation}
 
 \item{ctrRel}{parameters to control reliability estimation}
-}
-\value{
-A list with the following components:
-\item{perf.res}{list of measure performance results}
-\item{rel.results}{table of reliability estimates by method}
 }
 \description{
 This function calculates several estimates of quality measure performance.
