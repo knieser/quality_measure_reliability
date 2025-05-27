@@ -17,7 +17,11 @@
 
 calcReliability <- function(df = NULL, model = NULL, entity = "entity", y = "y", data.type = 'binary', show.all = FALSE, ctrPerf = controlPerf(), ctrRel = controlRel()){
 
+  if (is.null(df) & is.null(model)) stop ('Please provide either a dataframe or a model object')
+  if (is.null(df)){df <- model@frame}
   if(!is.logical(show.all)) stop('show.all needs to be TRUE or FALSE')
+
+  df <- cleanData(df, entity, y, ctrPerf)
 
   #### resampling methods ####
   # split-sample reliability
@@ -120,6 +124,7 @@ calcReliability <- function(df = NULL, model = NULL, entity = "entity", y = "y",
       )
 
       output <- list(
+        data.type = data.type,
         rel.results = rel.results,
         SSR.out = SSR.out,
         HLGM.out = HLGM.out,
@@ -289,6 +294,7 @@ calcReliability <- function(df = NULL, model = NULL, entity = "entity", y = "y",
       )
 
       output <- list(
+        data.type = data.type,
         rel.results = rel.results,
         SSR.out = SSR.out,
         AOV.out = AOV.out,
