@@ -11,7 +11,6 @@ calcDataSummary <- function(df, model = NULL, entity = 'entity', y = "y", data.t
   agg      <- aggregate(y ~ entity, data = df, sum)
   entities <- agg$entity
 
-
   if(data.type=='continuous'){
     fit <- lmer(formula = model, data = df)
     df$expect  <- predict(fit, newdata = df, type = 'response', re.form = ~0)
@@ -34,20 +33,20 @@ calcDataSummary <- function(df, model = NULL, entity = 'entity', y = "y", data.t
 
     obs      <- agg$y
     p        <- obs / n
-    tryCatch({
-      p.ci     <- t(apply(cbind(obs, n), 1, function(x) prop.test(x[1], x[2], conf.level = 1-alpha)$conf.int))
+    p.ci <- tryCatch({
+      t(apply(cbind(obs, n), 1, function(x) prop.test(x[1], x[2], conf.level = 1-alpha)$conf.int))
     },
     warning = function(w){
       message('...using Clopper-Pearson intervals instead of Wilson score intervals for performance CIs...')
-      p.ci     <- t(apply(cbind(obs, n), 1, function(x) binom.test(x[1], x[2], conf.level = 1-alpha)$conf.int))
+      t(apply(cbind(obs, n), 1, function(x) binom.test(x[1], x[2], conf.level = 1-alpha)$conf.int))
     }
     )
-    p.lwr    <- p.ci[,1]
-    p.upr    <- p.ci[,2]
-    pred     <- aggregate(predict ~ entity, data = df, sum)$predict
-    p.re     <- pred / n
-    exp      <- aggregate(expect ~ entity, data = df, sum)$expect
-    rank     <- rank(p, ties.method = "random")
+    p.lwr <- p.ci[,1]
+    p.upr <- p.ci[,2]
+    pred  <- aggregate(predict ~ entity, data = df, sum)$predict
+    p.re  <- pred / n
+    exp   <- aggregate(expect ~ entity, data = df, sum)$expect
+    rank  <- rank(p, ties.method = "random")
 
     marg.p = mean(df$y)
     marg.p.model = mean(df$predict)
@@ -55,6 +54,5 @@ calcDataSummary <- function(df, model = NULL, entity = 'entity', y = "y", data.t
     output = list(df = df, model = model, fit = fit, marg.p = marg.p, marg.p.model = marg.p.model, entities = entities, n = n, obs = obs, p = p, p.lwr = p.lwr,
                   p.upr = p.upr, pred = pred, p.re = p.re, exp = exp, rank = rank)
   }
-
   return(output)
 }

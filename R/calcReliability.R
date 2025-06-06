@@ -26,7 +26,7 @@ calcReliability <- function(df = NULL, model = NULL, entity = "entity", y = "y",
   #### resampling methods ####
   # split-sample reliability
   message('calculating reliability based on split-sample method...')
-  SSR.out <- calcSSR(df, model, entity, y, data.type, ctrPerf, ctrRel)
+  SSR.out <- suppressMessages(calcSSR(df, model, entity, y, data.type, ctrPerf, ctrRel))
   est.SSR  <- SSR.out$est.SSR
   est.PSSR <- SSR.out$est.PSSR
   if (data.type == 'binary'){
@@ -40,13 +40,13 @@ calcReliability <- function(df = NULL, model = NULL, entity = "entity", y = "y",
   if (data.type == 'binary'){
     # hierarchical logistic regression model methods
     message('calculating reliability based on hierarchial logistic regression model...')
-    HLGM.out <- calcHLGMRel(df, model, entity, y, show.all, ctrPerf)
+    HLGM.out <- suppressMessages(calcHLGMRel(df, model, entity, y, show.all, ctrPerf))
     est.HLGM.delta <- HLGM.out$est.HLGM.delta
     message('...done')
 
     # Beta-Binomial method
     message('calculating reliability based on Beta-Binomial method...')
-    BB.out <- calcBetaBin(df, model, entity, y, df.aggregate = FALSE, show.all=show.all, ctrPerf = ctrPerf)
+    BB.out <- suppressMessages(calcBetaBin(df, model, entity, y, df.aggregate = FALSE, show.all=show.all, ctrPerf = ctrPerf))
     est.BB <- BB.out$est.BB
     message('...done')
 
@@ -60,7 +60,7 @@ calcReliability <- function(df = NULL, model = NULL, entity = "entity", y = "y",
 
       # anova
       message('calculating reliability based on anova method...')
-      AOV.out <- calcAOV(df, entity, y, ctrPerf)
+      AOV.out <- suppressMessages(calcAOV(df, entity, y, ctrPerf))
       est.aov <- AOV.out$est.aov
       message('...done')
 
