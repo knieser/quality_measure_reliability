@@ -4,16 +4,48 @@
 \alias{simulateData}
 \title{Simulate data}
 \usage{
-simulateData(n.entity, avg.n, tau = tau, theta = theta, type = "binary")
+simulateData(n.entity, avg.n, tau, theta = 0, type = "binary")
+}
+\arguments{
+\item{n.entity}{total number of entities to simulate}
+
+\item{avg.n}{average number of observations per entity; entity sample sizes are simulated from a Poisson distribution with mean avg.n}
+
+\item{tau}{parameters for distribution of random intercepts. For binary observations, input a vector of length 2 where the 1st entry is the overall probability of the outcome on the log-odds scale and the 2nd entry is the between-entity standard deviation.
+For continuous observations, input a vector of length 2 where the 1st entry is the between-entity standard deviation and the 2nd entry is the within-entity (or residual) standard deviation.}
+
+\item{theta}{regression coefficient for covariate added to the linear predictor; default is 0.}
+
+\item{type}{type of data to simulate. Valid options include: 'binary' (default) and 'normal'.}
 }
 \description{
 This function simulates some data.
 }
 \examples{
-# TBD
-}
-\references{
-None
+# number of accountable entities
+n.entity = 100
+
+# average number of patients or cases per accountable entity
+avg.n = 50
+
+# marginal probability of the outcome
+p = 0.1
+
+# approximate reliability for entity with an average number of patients
+r = 0.6
+
+# implied between-entity variance
+var.btwn = r / (1 - r) * (1/(avg.n * p * (1 - p)))
+
+mu = log(p / (1-p))
+tau = c(mu, sqrt(var.btwn))
+
+# parameter for risk-adjustment model (i.e., coefficient for x1)
+theta = log(1.5)
+
+df <- simulateData(n.entity = n.entity, avg.n = avg.n, tau = tau, theta = theta)
+head(df)
+
 }
 \author{
 Kenneth Nieser (nieser@stanford.edu)
