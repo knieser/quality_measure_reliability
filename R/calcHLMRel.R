@@ -16,7 +16,6 @@
 #' @export
 
 calcHLMRel <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', ctrPerf = controlPerf()){
-  if(!is.logical(show.all)) stop('show.all needs to be TRUE or FALSE')
 
   data.out <- calcDataSummary(df, model, entity, y, data.type = 'continuous', ctrPerf)
   df <- data.out$df
