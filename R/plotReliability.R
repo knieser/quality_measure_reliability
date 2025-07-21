@@ -11,27 +11,56 @@
 plotReliability <- function(rel.out = rel.out){
 
 data.type = rel.out$data.type
+show.all = rel.out$show.all
 method = rel.out$rel.results$method
 SSR.out <- rel.out$SSR.out
+
 if (data.type == 'binary'){
   HLGM.out <- rel.out$HLGM.out
   BB.out <- rel.out$BB.out
+  n = length(HLGM.out$n)
 
-  rel.plot.df <- data.frame(
-    method = rep(method, each = length(HLGM.out$n)),
-    est = c(rep(SSR.out$est.PSSR.oe, length(HLGM.out$n)),
-            HLGM.out$est.HLGM.delta,
-            BB.out$est.BB)
-  )
+  if (show.all == TRUE){
+    AOV.out <- rel.out$AOV.out
+    rel.plot.df <- data.frame(
+      method = rep(method, each = n),
+      est = c(
+        rep(SSR.out$est.SSR, n),
+        rep(SSR.out$est.PSSR, n),
+        rep(SSR.out$est.SSR.oe, n),
+        rep(SSR.out$est.SSR.pe, n),
+        rep(SSR.out$est.PSSR.oe, n),
+        rep(SSR.out$est.PSSR.pe, n),
+        AOV.out$est.aov,
+        HLGM.out$est.HLGM.latent,
+        HLGM.out$est.HLGM.delta,
+        HLGM.out$est.HLGM.MC,
+        HLGM.out$est.HLGM.FE,
+        HLGM.out$est.HLGM.RE,
+        BB.out$est.BB,
+        BB.out$est.BB.FE,
+        BB.out$est.BB.RE,
+        BB.out$est.BB.J)
+    )
+  } else{
+    rel.plot.df <- data.frame(
+      method = rep(method, each = n),
+      est = c(
+        rep(SSR.out$est.PSSR.pe, n),
+        HLGM.out$est.HLGM.delta,
+        BB.out$est.BB)
+    )
+  }
 }
 
 if (data.type == 'continuous'){
   AOV.out <- rel.out$AOV.out
   HLM.out <- rel.out$HLM.out
+  n = length(HLM.out$n)
 
   rel.plot.df <- data.frame(
-    method = rep(method, each = length(HLM.out$n)),
-    est = c(rep(SSR.out$est.PSSR, length(HLM.out$n)),
+    method = rep(method, each = n),
+    est = c(rep(SSR.out$est.PSSR, n),
             AOV.out$est.aov,
             HLM.out$est.HLM)
   )

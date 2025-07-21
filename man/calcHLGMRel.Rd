@@ -10,7 +10,8 @@ calcHLGMRel(
   entity = "entity",
   y = "y",
   show.all = FALSE,
-  ctrPerf = controlPerf()
+  ctrPerf = controlPerf(),
+  ctrRel = controlRel()
 )
 }
 \arguments{
@@ -24,18 +25,8 @@ calcHLGMRel(
 
 \item{ctrPerf}{parameters to control performance measure calculation}
 }
-\value{
-Estimated parameters and reliability
-\item{var.b.aov}{between-entity variance}
-}
 \description{
 This function estimates reliability using a hierarchical logistic regression model.
-}
-\examples{
-# TBD
-}
-\references{
-None
 }
 \author{
 Kenneth Nieser (nieser@stanford.edu)

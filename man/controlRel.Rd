@@ -4,7 +4,13 @@
 \alias{controlRel}
 \title{Parameters for reliability calculations}
 \usage{
-controlRel(n.resamples = 100, SSRmethod = "permutation", fn = NA, d.steps = 10)
+controlRel(
+  n.resamples = 100,
+  SSRmethod = "permutation",
+  fn = NA,
+  MC.reps = 1000,
+  d.steps = 10
+)
 }
 \description{
 This function stores parameters for reliability calculations
