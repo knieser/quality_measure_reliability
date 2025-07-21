@@ -19,6 +19,7 @@
 
 calcPerformance <- function(df = NULL, model = NULL, entity = "entity", y = "y", data.type = 'binary', ctrPerf = controlPerf()){
   if (is.null(df) & is.null(model)) stop ('Please provide either a dataframe or a model object')
+  cl <- match.call()
   alpha = ctrPerf$alpha
   ci.lwr = alpha/2
   ci.upr = 1 - alpha/2
@@ -200,7 +201,7 @@ calcPerformance <- function(df = NULL, model = NULL, entity = "entity", y = "y",
   )
   perf.results$intercept.sig = as.factor(ifelse(perf.results$intercept.OR.lwr > 1 | perf.results$intercept.OR.upr < 1, 1, 0))
 
-  results = list(df = df, model = model, fit = fit, marg.p = marg.p, marg.p.model = marg.p.model, perf.results = perf.results)
+  results = list(call = cl, df = df, model = model, fit = fit, marg.p = marg.p, marg.p.model = marg.p.model, perf.results = perf.results)
 
   return(results)
 }
