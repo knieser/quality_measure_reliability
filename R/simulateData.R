@@ -3,6 +3,7 @@
 #' This function simulates some data.
 #' @param n.entity total number of entities to simulate
 #' @param avg.n average number of observations per entity; entity sample sizes are simulated from a Poisson distribution with mean avg.n
+#' @param n vector of entity sample sizes; this parameter cannot be used if n.entity and avg.n are used.
 #' @param tau parameters for distribution of random intercepts. For binary observations, input a vector of length 2 where the 1st entry is the overall probability of the outcome on the log-odds scale and the 2nd entry is the between-entity standard deviation.
 #' For continuous observations, input a vector of length 2 where the 1st entry is the between-entity standard deviation and the 2nd entry is the within-entity (or residual) standard deviation.
 #' @param theta regression coefficient for covariate added to the linear predictor; default is 0.
@@ -36,18 +37,16 @@
 #' @importFrom stats aov
 #' @export
 
-simulateData <- function(n.entity, avg.n, tau, theta = 0, type = 'binary'){
+simulateData <- function(n.entity = NULL, avg.n = NULL, n = NULL, tau, theta = 0, type = 'binary'){
 
-  if (!is.numeric(n.entity)){stop('n.entity must be a positive integer.')}
-  if (floor(n.entity) != n.entity){stop('n.entity must be a positive integer.')}
-  if (n.entity <= 0){stop('n.entity must be a positive integer.')}
-  if (!is.numeric(avg.n)){stop('avg.n must be a positive integer.')}
-  if (floor(avg.n) != avg.n){stop('avg.n must be a positive integer.')}
-  if (avg.n <= 0){stop('avg.n must be a positive integer.')}
+  if (is.null(n.entity) & is.null(avg.n) & is.null(n)){stop('Please specify either n or both n.entity and avg.n.')}
+  if (!is.null(n.entity) & !is.null(n)){stop('The parameter n cannot be used if n.entity and avg.n are used.')}
+  if (!is.null(avg.n) & !is.null(n)){stop('The parameter n cannot be used if n.entity and avg.n are used.')}
   if (length(tau) != 2){stop('tau must be a vector of length 2.')}
   if (type != 'binary' &  type != 'normal'){stop('Valid options for data type include binary and normal.')}
 
-  n = rpois(n.entity, avg.n)
+  if (is.null(n)){n = rpois(n.entity, avg.n)}
+  if (is.null(n.entity)){n.entity = length(n)}
   total.n = sum(n)
   entity = rep(1:n.entity, times = n)
   x1 = rnorm(total.n, 0, 1)

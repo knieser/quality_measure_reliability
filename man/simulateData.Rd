@@ -4,12 +4,21 @@
 \alias{simulateData}
 \title{Simulate data}
 \usage{
-simulateData(n.entity, avg.n, tau, theta = 0, type = "binary")
+simulateData(
+  n.entity = NULL,
+  avg.n = NULL,
+  n = NULL,
+  tau,
+  theta = 0,
+  type = "binary"
+)
 }
 \arguments{
 \item{n.entity}{total number of entities to simulate}
 
 \item{avg.n}{average number of observations per entity; entity sample sizes are simulated from a Poisson distribution with mean avg.n}
+
+\item{n}{vector of entity sample sizes; this parameter cannot be used if n.entity and avg.n are used.}
 
 \item{tau}{parameters for distribution of random intercepts. For binary observations, input a vector of length 2 where the 1st entry is the overall probability of the outcome on the log-odds scale and the 2nd entry is the between-entity standard deviation.
 For continuous observations, input a vector of length 2 where the 1st entry is the between-entity standard deviation and the 2nd entry is the within-entity (or residual) standard deviation.}
