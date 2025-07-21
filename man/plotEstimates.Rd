@@ -6,14 +6,11 @@
 \usage{
 plotEstimates(model.performance = model.performance)
 }
+\arguments{
+\item{model.performance}{results from model_performance()}
+}
 \description{
 This function creates a plot of model results
-}
-\examples{
-# TBD
-}
-\references{
-None
 }
 \author{
 Kenneth Nieser (nieser@stanford.edu)

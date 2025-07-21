@@ -15,12 +15,6 @@ controlRel(
 \description{
 This function stores parameters for reliability calculations
 }
-\examples{
-# TBD
-}
-\references{
-None
-}
 \author{
 Kenneth Nieser (nieser@stanford.edu)
 }

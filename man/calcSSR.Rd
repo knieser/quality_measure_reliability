@@ -23,6 +23,8 @@ calcSSR(
 
 \item{y}{data column containing the outcome variable}
 
+\item{data.type}{acceptable values are "binary" for 0/1 data and "continuous" for continuous data (default: 'binary')}
+
 \item{ctrPerf}{parameters to control performance measure calculation}
 
 \item{ctrRel}{parameters to control reliability estimation}

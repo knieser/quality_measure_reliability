@@ -9,12 +9,6 @@ controlPerf(min.n = 2, alpha = 0.05, n.boots = 200, n.cores = 4)
 \description{
 This function stores parameters for performance calculations
 }
-\examples{
-# TBD
-}
-\references{
-None
-}
 \author{
 Kenneth Nieser (nieser@stanford.edu)
 }

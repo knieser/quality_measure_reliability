@@ -5,12 +5,9 @@
 #' @param model model; if null, will use an unadjusted model
 #' @param entity data column containing the accountable entity identifier
 #' @param y data column containing the outcome variable
+#' @param data.type acceptable values are "binary" for 0/1 data (default: 'binary')
 #' @param ctrPerf parameters to control performance measure calculation
-#' @returns Estimated measure performance by accountable entity
 #' @author Kenneth Nieser (nieser@stanford.edu)
-#' @references None
-#' @examples
-#' # TBD
 #' @importFrom stats aggregate predict rbinom
 #' @importFrom parallel makeCluster stopCluster
 #' @importFrom doParallel registerDoParallel

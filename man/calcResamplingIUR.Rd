@@ -26,13 +26,6 @@ calcResamplingIUR(
 
 \item{ctrRel}{parameters to control reliability estimation}
 }
-\value{
-A list with the following components:
-\item{var.b}{between-entity variance}
-\item{var.w}{within-entity variance}
-\item{var.total}{total variance}
-\item{IUR}{estimate of IUR}
-}
 \description{
 This function estimates reliability using the resampling inter-unit reliability method.
 }

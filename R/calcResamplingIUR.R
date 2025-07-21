@@ -7,11 +7,6 @@
 #' @param y data column containing the outcome variable
 #' @param ctrPerf parameters to control performance measure calculation
 #' @param ctrRel parameters to control reliability estimation
-#' @returns A list with the following components:
-#'  \item{var.b}{between-entity variance}
-#'  \item{var.w}{within-entity variance}
-#'  \item{var.total}{total variance}
-#'  \item{IUR}{estimate of IUR}
 #' @author Kenneth Nieser (nieser@stanford.edu)
 #' @references He K, Kalbfleisch JD, Yang Y, Fei Z. Inter‐unit reliability for nonlinear models. Statistics in Medicine. 2019 Feb 28;38(5):844-54.
 #' @references Nieser KJ, Harris AH. Comparing methods for assessing the reliability of health care quality measures. Statistics in Medicine. 2024 Oct 15;43(23):4575-94.
@@ -22,6 +17,7 @@ calcResamplingIUR <- function(df = NULL, model = NULL,  entity = 'entity', y = '
   if (is.null(df) & is.null(model)) stop ('Please provide either a dataframe or a model object')
   if (is.null(df)){df <- model@frame}
 
+  cl <- match.call()
   n.cores     <- ctrRel$n.cores
   n.resamples <- ctrRel$n.resamples
 
@@ -59,7 +55,8 @@ calcResamplingIUR <- function(df = NULL, model = NULL,  entity = 'entity', y = '
 
   IUR = (var.total - var.w) / var.total
 
-  results = list(var.b = var.total - var.w,
+  results = list(call = cl,
+                 var.b = var.total - var.w,
                  var.w = var.w,
                  var.total = var.total,
                  IUR = IUR)

@@ -1,10 +1,8 @@
 #' Plot distributions of reliability estimates across entities
 #' @description
 #' This function creates boxplots of reliability estimates across entities and different methods
+#' @param rel.out results from calcReliability()
 #' @author Kenneth Nieser (nieser@stanford.edu)
-#' @references None
-#' @examples
-#' # TBD
 #' @importFrom ggplot2 ggplot
 #' @export
 

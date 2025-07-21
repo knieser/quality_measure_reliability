@@ -15,12 +15,6 @@ calcAOV(df, entity = "entity", y = "y", ctrPerf = controlPerf())
 
 \item{ctrPerf}{parameters to control performance measure calculation}
 }
-\value{
-A list with the following components:
-\item{var.b.aov}{between-entity variance}
-\item{var.w.aov}{within-entity variance}
-\item{est.aov}{reliability estimate}
-}
 \description{
 This function estimates reliability using the one-way ANOVA method.
 }

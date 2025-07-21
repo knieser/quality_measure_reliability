@@ -22,19 +22,12 @@ calcPerformance(
 
 \item{y}{data column containing the outcome variable}
 
+\item{data.type}{acceptable values are "binary" for 0/1 data (default: 'binary')}
+
 \item{ctrPerf}{parameters to control performance measure calculation}
-}
-\value{
-Estimated measure performance by accountable entity
 }
 \description{
 This function calculates measure performance by accountable entity.
-}
-\examples{
-# TBD
-}
-\references{
-None
 }
 \author{
 Kenneth Nieser (nieser@stanford.edu)

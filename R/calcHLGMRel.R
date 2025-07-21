@@ -19,6 +19,8 @@
 calcHLGMRel <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', show.all=FALSE, ctrPerf = controlPerf(), ctrRel = controlRel()){
   if(!is.logical(show.all)) stop('show.all needs to be TRUE or FALSE')
 
+  cl <- match.call()
+
   data.out <- calcDataSummary(df, model, entity, y, data.type = 'binary', ctrPerf)
   df <- data.out$df
   fit <- data.out$fit
@@ -35,14 +37,6 @@ calcHLGMRel <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', sho
   # within-variance based on delta method approximation
   var.w.delta <- var.expected / n^2
   est.HLGM.delta <- var.b.HLGM.delta / (var.b.HLGM.delta + var.w.delta)
-
-  output = list(
-    fit = fit,
-    n = n,
-    var.between = var.b.HLGM.delta,
-    var.within = var.w.delta,
-    est.HLGM.delta = est.HLGM.delta
-  )
 
   if (show.all==TRUE){
     # Monte Carlo method
@@ -65,6 +59,7 @@ calcHLGMRel <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', sho
     est.HLGM.RE <- var.b.HLGM.delta / (var.b.HLGM.delta + var.w.RE)
 
     output = list(
+      call = cl,
       fit = fit,
       marg.p = marg.p,
       n = n,
@@ -83,6 +78,15 @@ calcHLGMRel <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', sho
       est.HLGM.delta = est.HLGM.delta,
       est.HLGM.FE = est.HLGM.FE,
       est.HLGM.RE = est.HLGM.RE
+    )
+  } else{
+    output = list(
+      call = cl,
+      fit = fit,
+      n = n,
+      var.between = var.b.HLGM.delta,
+      var.within = var.w.delta,
+      est.HLGM.delta = est.HLGM.delta
     )
   }
 

@@ -5,6 +5,7 @@
 #' @param model model; if null, will use an unadjusted model
 #' @param entity data column containing the accountable entity identifier
 #' @param y data column containing the outcome variable
+#' @param data.type acceptable values are "binary" for 0/1 data and "continuous" for continuous data (default: 'binary')
 #' @param predictor.clean optional list of formatted names of predictors in the model
 #' @param ctrPerf parameters to control performance measure calculation
 #' @returns Estimated risk-standardized measure performance by accountable entity
@@ -13,6 +14,7 @@
 #' @export
 
 model_performance <- function(df, model, entity = 'entity', y = 'y', data.type = 'binary', predictor.clean = NA, ctrPerf = controlPerf()){
+  cl <- match.call()
   alpha = ctrPerf$alpha
   z = qnorm(1 - alpha/2)
 
@@ -77,7 +79,8 @@ model_performance <- function(df, model, entity = 'entity', y = 'y', data.type =
     wilcox.out <- wilcox.test(predict ~ y, data = df)
     c.statistic = max(wilcox.out$statistic / pairs, 1 - wilcox.out$statistic / pairs)
 
-    results = list(data.type = data.type,
+    results = list(call = cl,
+                   data.type = data.type,
                    df = df,
                    model = model,
                    fit = fit,
@@ -87,7 +90,8 @@ model_performance <- function(df, model, entity = 'entity', y = 'y', data.type =
   }
 
   if (data.type == 'continuous'){
-    results = list(data.type = data.type,
+    results = list(call = cl,
+                   data.type = data.type,
                    df = df,
                    model = model,
                    fit = fit,

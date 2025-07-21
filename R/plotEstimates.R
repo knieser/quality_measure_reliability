@@ -1,10 +1,8 @@
 #' Plot estimates from regression model used for risk-adjustment
 #' @description
 #' This function creates a plot of model results
+#' @param model.performance results from model_performance()
 #' @author Kenneth Nieser (nieser@stanford.edu)
-#' @references None
-#' @examples
-#' # TBD
 #' @importFrom ggplot2 ggplot
 #' @export
 

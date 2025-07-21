@@ -1,10 +1,8 @@
 #' Plot densities of predicted values by outcome group
 #' @description
 #' This function creates a plot of the distributions of predicted values by outcome group
+#' @param model.performance results from model_performance()
 #' @author Kenneth Nieser (nieser@stanford.edu)
-#' @references None
-#' @examples
-#' # TBD
 #' @importFrom ggplot2 ggplot
 #' @export
 

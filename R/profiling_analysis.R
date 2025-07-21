@@ -5,6 +5,7 @@
 #' @param model model; if null, will use an unadjusted model
 #' @param entity data column containing the accountable entity identifier
 #' @param y data column containing the outcome variable
+#' @param data.type acceptable values are "binary" for 0/1 data and "continuous" for continuous data (default: 'binary')
 #' @param ctrPerf parameters to control performance measure calculation
 #' @returns Estimated risk-standardized measure performance by accountable entity
 #' @author Kenneth Nieser (nieser@stanford.edu)
@@ -15,6 +16,8 @@
 profiling_analysis <- function(df, model = NULL, entity = 'entity', y = 'y', data.type = 'binary', ctrPerf = controlPerf()){
 
   if(data.type !='binary') stop('This function currently works with binary outcome data only.')
+
+  cl <- match.call()
 
   # clean data
   df = cleanData(df, entity = entity, y = y, ctrPerf = ctrPerf)
@@ -39,7 +42,8 @@ profiling_analysis <- function(df, model = NULL, entity = 'entity', y = 'y', dat
   icc.oe.randint = psych::ICC(perf.results[,c('intercept.OR', 'oe')])
   icc.pe.randint = psych::ICC(perf.results[,c('intercept.OR', 'pe')])
 
-  results = list(df = df.perf,
+  results = list(call = cl,
+                 df = df.perf,
                  model = model,
                  fit = fit,
                  marg.p = marg.p,

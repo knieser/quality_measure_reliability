@@ -14,6 +14,8 @@
 
 calcHLMRel <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', ctrPerf = controlPerf()){
 
+  cl <- match.call()
+
   data.out <- calcDataSummary(df, model, entity, y, data.type = 'continuous', ctrPerf)
   df <- data.out$df
   fit <- data.out$fit
@@ -25,6 +27,7 @@ calcHLMRel <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', ctrP
   est.HLM <- var.b / (var.b + var.w / n)
 
   output = list(
+    call = cl,
     fit = fit,
     n = n,
     var.between = var.b,

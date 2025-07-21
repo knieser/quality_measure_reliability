@@ -9,9 +9,6 @@
 #' \item{multiple}{plot of measure performance across different risk-adjustment methods}
 #' @param plot.y 'p' plots the unadjusted performance, 'oe' plots the observed-to-expected ratio, 'pe' plots the predicted-to-expected ratio'
 #' @author Kenneth Nieser (nieser@stanford.edu)
-#' @references None
-#' @examples
-#' # TBD
 #' @importFrom ggplot2 ggplot
 #' @export
 

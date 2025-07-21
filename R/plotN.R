@@ -2,11 +2,7 @@
 #' @description
 #' This function creates a histogram of entity sample sizes.
 #' @param n vector of sample sizes
-#' @returns A ggplot figure
 #' @author Kenneth Nieser (nieser@stanford.edu)
-#' @references None
-#' @examples
-#' # TBD
 #' @importFrom ggplot2 ggplot
 #' @export
 

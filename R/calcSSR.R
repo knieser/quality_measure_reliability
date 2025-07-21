@@ -5,6 +5,7 @@
 #' @param model model; if null, will use an unadjusted model
 #' @param entity data column containing the accountable entity identifier
 #' @param y data column containing the outcome variable
+#' @param data.type acceptable values are "binary" for 0/1 data and "continuous" for continuous data (default: 'binary')
 #' @param ctrPerf parameters to control performance measure calculation
 #' @param ctrRel parameters to control reliability estimation
 #' @returns SSR reliability estimates
@@ -23,6 +24,7 @@ calcSSR <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', data.ty
 
   fn <- ctrRel$fn
   if(is.na(fn)){fn = function(x){mean(x)}}
+  cl <- match.call()
   n.cores     <- ctrPerf$n.cores
   n.resamples <- ctrRel$n.resamples
   method      <- ctrRel$SSRmethod
@@ -164,6 +166,7 @@ calcSSR <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', data.ty
 
   if (data.type == 'binary'){
     output = list(
+      call = cl,
       icc = as.vector(unlist(out$icc.aov)),
       icc.lb = as.vector(unlist(out$icc.aov.lb)),
       icc.ub = as.vector(unlist(out$icc.aov.ub)),
@@ -190,6 +193,7 @@ calcSSR <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', data.ty
 
   if (data.type == 'continuous'){
     output = list(
+      call = cl,
       icc = as.vector(unlist(out$icc.aov)),
       icc.lb = as.vector(unlist(out$icc.aov.lb)),
       icc.ub = as.vector(unlist(out$icc.aov.ub)),

@@ -6,14 +6,11 @@
 \usage{
 plotReliability(rel.out = rel.out)
 }
+\arguments{
+\item{rel.out}{results from calcReliability()}
+}
 \description{
 This function creates boxplots of reliability estimates across entities and different methods
-}
-\examples{
-# TBD
-}
-\references{
-None
 }
 \author{
 Kenneth Nieser (nieser@stanford.edu)

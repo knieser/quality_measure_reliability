@@ -2,9 +2,6 @@
 #' @description
 #' This function stores parameters for reliability calculations
 #' @author Kenneth Nieser (nieser@stanford.edu)
-#' @references None
-#' @examples
-#' # TBD
 #' @export
 
 controlRel <- function(n.resamples = 100, SSRmethod = 'permutation', fn = NA, MC.reps = 1000, d.steps = 10){

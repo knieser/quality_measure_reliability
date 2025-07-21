@@ -9,17 +9,8 @@ plotN(n)
 \arguments{
 \item{n}{vector of sample sizes}
 }
-\value{
-A ggplot figure
-}
 \description{
 This function creates a histogram of entity sample sizes.
-}
-\examples{
-# TBD
-}
-\references{
-None
 }
 \author{
 Kenneth Nieser (nieser@stanford.edu)

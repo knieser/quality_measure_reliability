@@ -6,14 +6,11 @@
 \usage{
 plotPredictedDistribution(model.performance = model.performance)
 }
+\arguments{
+\item{model.performance}{results from model_performance()}
+}
 \description{
 This function creates a plot of the distributions of predicted values by outcome group
-}
-\examples{
-# TBD
-}
-\references{
-None
 }
 \author{
 Kenneth Nieser (nieser@stanford.edu)

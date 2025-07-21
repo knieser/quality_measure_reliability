@@ -24,13 +24,15 @@ calcBetaBin <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', df.
   if (is.null(df)){df <- model@frame}
   if(!is.logical(show.all)) stop('show.all needs to be TRUE or FALSE')
 
+  cl <- match.call()
+
   if (isFALSE(df.aggregate)){
-  data.out <- calcDataSummary(df, model, entity, y, data.type = 'binary', ctrPerf)
-  df <- data.out$df
-  n  <- data.out$n
-  x <- data.out$obs
-  p <- data.out$p
-  p.re <- data.out$p.re
+    data.out <- calcDataSummary(df, model, entity, y, data.type = 'binary', ctrPerf)
+    df <- data.out$df
+    n  <- data.out$n
+    x <- data.out$obs
+    p <- data.out$p
+    p.re <- data.out$p.re
   } else{
     message('Note that aggregated data are being used, so Beta-Binomial reliability estimates with random effects predictions cannot be calculated.')
     n <- df[[n]]
@@ -65,12 +67,6 @@ calcBetaBin <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', df.
   var.w.BB = a * b / ((a + b + 1) * (a + b) * n)
   est.BB = n / (a + b + n)
 
-  results <- list(alpha = a,
-                  beta = b,
-                  var.between = var.b.BB,
-                  var.within = var.w.BB,
-                  est.BB = est.BB)
-
   if(show.all==TRUE){
     var.w.FE <- p * (1 - p) / n
     est.BB.FE = var.b.BB / (var.b.BB + var.w.FE)
@@ -83,7 +79,8 @@ calcBetaBin <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', df.
     var.w.J = p.J * (1 - p.J) / n
     est.BB.J = var.b.BB / (var.b.BB + var.w.J)
 
-    results <- list(alpha = a,
+    results <- list(call = cl,
+                    alpha = a,
                     beta = b,
                     var.b.BB = var.b.BB,
                     var.w.BB = var.w.BB,
@@ -94,6 +91,13 @@ calcBetaBin <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', df.
                     est.BB.FE = est.BB.FE,
                     est.BB.RE = est.BB.RE,
                     est.BB.J = est.BB.J)
+  } else{
+    results <- list(call = cl,
+                    alpha = a,
+                    beta = b,
+                    var.between = var.b.BB,
+                    var.within = var.w.BB,
+                    est.BB = est.BB)
   }
 
   return(results)

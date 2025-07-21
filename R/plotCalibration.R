@@ -1,10 +1,9 @@
 #' Plot calibration curve for risk-adjustment model
 #' @description
 #' This function creates a plot of the model calibration curve
+#' @param model.performance results from model_performance()
+#' @param quantiles number of quantiles to bin data; default is 10.
 #' @author Kenneth Nieser (nieser@stanford.edu)
-#' @references None
-#' @examples
-#' # TBD
 #' @importFrom ggplot2 ggplot
 #' @export
 

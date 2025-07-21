@@ -2,9 +2,6 @@
 #' @description
 #' This function stores parameters for performance calculations
 #' @author Kenneth Nieser (nieser@stanford.edu)
-#' @references None
-#' @examples
-#' # TBD
 #' @export
 
 controlPerf <- function(min.n = 2, alpha = 0.05, n.boots = 200, n.cores = 4){

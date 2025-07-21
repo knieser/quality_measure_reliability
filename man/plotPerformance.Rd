@@ -20,12 +20,6 @@ plotPerformance(df = perf.results, plot.type = "single", plot.y = "p")
 \description{
 This function creates a plot of measure performance across accountable entities, using the perf.results dataframe from calcPerformance() output.
 }
-\examples{
-# TBD
-}
-\references{
-None
-}
 \author{
 Kenneth Nieser (nieser@stanford.edu)
 }
