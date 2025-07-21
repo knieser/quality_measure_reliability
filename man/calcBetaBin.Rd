@@ -31,6 +31,8 @@ calcBetaBin(
 
 \item{x}{if using aggregated data, data column containing the number of observations that met measure criteria by entity}
 
+\item{show.all}{logical parameter indicating whether all variations of reliability estimates should be calculated; default is FALSE.}
+
 \item{ctrPerf}{parameters to control performance measure calculation}
 }
 \value{
@@ -39,11 +41,12 @@ Estimated parameters from the Beta-Binomial model, estimates of between and with
 \description{
 This function estimates reliability using a Beta-Binomial model.
 }
-\examples{
-# TBD
-}
 \references{
-None
+Adams JL. The Reliability of Provider Profiling: A Tutorial. 2009.
+
+Nieser KJ, Harris AH. Comparing methods for assessing the reliability of health care quality measures. Statistics in Medicine. 2024 Oct 15;43(23):4575-94.
+
+Zhou G, Lin Z. Improved beta-binomial estimation for reliability of healthcare quality measures. medRxiv. 2023 Jan 9:2023-01.
 }
 \author{
 Kenneth Nieser (nieser@stanford.edu)

@@ -35,11 +35,8 @@ calcReliability(
 \description{
 This function calculates several estimates of quality measure performance.
 }
-\examples{
-# TBD
-}
 \references{
-None
+Nieser KJ, Harris AH. Comparing methods for assessing the reliability of health care quality measures. Statistics in Medicine. 2024 Oct 15;43(23):4575-94.
 }
 \author{
 Kenneth Nieser (nieser@stanford.edu)

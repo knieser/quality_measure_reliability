@@ -10,9 +10,7 @@
 #' @param ctrPerf parameters to control performance measure calculation
 #' @param ctrRel parameters to control reliability estimation
 #' @author Kenneth Nieser (nieser@stanford.edu)
-#' @references None
-#' @examples
-#' # TBD
+#' @references Nieser KJ, Harris AH. Comparing methods for assessing the reliability of health care quality measures. Statistics in Medicine. 2024 Oct 15;43(23):4575-94.
 #' @export
 
 calcReliability <- function(df = NULL, model = NULL, entity = "entity", y = "y", data.type = 'binary', show.all = FALSE, ctrPerf = controlPerf(), ctrRel = controlRel()){

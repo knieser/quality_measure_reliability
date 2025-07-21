@@ -23,10 +23,23 @@ calcHLGMRel(
 
 \item{y}{data column containing the outcome variable}
 
+\item{show.all}{logical parameter indicating whether all variations of reliability estimates should be calculated; default is FALSE.}
+
 \item{ctrPerf}{parameters to control performance measure calculation}
+
+\item{ctrRel}{parameters to control reliability estimation}
 }
 \description{
 This function estimates reliability using a hierarchical logistic regression model.
+}
+\references{
+Goldstein H, Browne W, Rasbash J. Partitioning variation in multilevel models. Understanding statistics: statistical issues in psychology, education, and the social sciences. 2002 Dec 2;1(4):223-31.
+
+He K, Kalbfleisch JD, Yang Y, Fei Z, Kim S, Kang J, Li Y. Inter-unit reliability for quality measure testing. Journal of hospital administration. 2019 Jan 8;8(2):1.
+
+Hwang J, Adams JL, Paddock SM. Defining and estimating the reliability of physician quality measures in hierarchical logistic regression models. Health Services and Outcomes Research Methodology. 2021 Mar;21(1):111-30.
+
+Nieser KJ, Harris AH. Comparing methods for assessing the reliability of health care quality measures. Statistics in Medicine. 2024 Oct 15;43(23):4575-94.
 }
 \author{
 Kenneth Nieser (nieser@stanford.edu)

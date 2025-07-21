@@ -2,12 +2,12 @@
 % Please edit documentation in R/calcAOV.R
 \name{calcAOV}
 \alias{calcAOV}
-\title{Calculate reliability using ANOVA method}
+\title{Calculate reliability using one-way ANOVA method}
 \usage{
 calcAOV(df, entity = "entity", y = "y", ctrPerf = controlPerf())
 }
 \arguments{
-\item{df}{observation-level data; if null, will use the dataframe from the model object}
+\item{df}{observation-level data}
 
 \item{entity}{data column containing the accountable entity identifier}
 
@@ -22,13 +22,12 @@ A list with the following components:
 \item{est.aov}{reliability estimate}
 }
 \description{
-This function estimates reliability using the ANOVA method.
-}
-\examples{
-# TBD
+This function estimates reliability using the one-way ANOVA method.
 }
 \references{
-None
+He K, Kalbfleisch JD, Yang Y, Fei Z. Inter‐unit reliability for nonlinear models. Statistics in Medicine. 2019 Feb 28;38(5):844-54.
+
+Nieser KJ, Harris AH. Comparing methods for assessing the reliability of health care quality measures. Statistics in Medicine. 2024 Oct 15;43(23):4575-94.
 }
 \author{
 Kenneth Nieser (nieser@stanford.edu)

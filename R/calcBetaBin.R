@@ -8,12 +8,13 @@
 #' @param df.aggregate set this to TRUE if the data have already been aggregated to include only summary data (n, x) for each entity; default is FALSE.
 #' @param n if using aggregated data, data column containing the sample size by entity
 #' @param x if using aggregated data, data column containing the number of observations that met measure criteria by entity
+#' @param show.all logical parameter indicating whether all variations of reliability estimates should be calculated; default is FALSE.
 #' @param ctrPerf parameters to control performance measure calculation
 #' @returns Estimated parameters from the Beta-Binomial model, estimates of between and within-entity variance, and estimates of entity-specific reliability
 #' @author Kenneth Nieser (nieser@stanford.edu)
-#' @references None
-#' @examples
-#' # TBD
+#' @references Adams JL. The Reliability of Provider Profiling: A Tutorial. 2009.
+#' @references Nieser KJ, Harris AH. Comparing methods for assessing the reliability of health care quality measures. Statistics in Medicine. 2024 Oct 15;43(23):4575-94.
+#' @references Zhou G, Lin Z. Improved beta-binomial estimation for reliability of healthcare quality measures. medRxiv. 2023 Jan 9:2023-01.
 #' @importFrom stats optim median
 #' @export
 

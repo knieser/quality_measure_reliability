@@ -36,11 +36,10 @@ A list with the following components:
 \description{
 This function estimates reliability using the resampling inter-unit reliability method.
 }
-\examples{
-# TBD
-}
 \references{
-None
+He K, Kalbfleisch JD, Yang Y, Fei Z. Inter‐unit reliability for nonlinear models. Statistics in Medicine. 2019 Feb 28;38(5):844-54.
+
+Nieser KJ, Harris AH. Comparing methods for assessing the reliability of health care quality measures. Statistics in Medicine. 2024 Oct 15;43(23):4575-94.
 }
 \author{
 Kenneth Nieser (nieser@stanford.edu)

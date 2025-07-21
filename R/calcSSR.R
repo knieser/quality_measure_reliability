@@ -9,14 +9,14 @@
 #' @param ctrRel parameters to control reliability estimation
 #' @returns SSR reliability estimates
 #' @author Kenneth Nieser (nieser@stanford.edu)
-#' @references None
-#' @examples
-#' # TBD
+#' @references Nieser KJ, Harris AH. Split‐sample reliability estimation in health care quality measurement: Once is not enough. Health Services Research. 2024 Aug;59(4):e14310.
+#' @references Nieser KJ, Harris AH. Comparing methods for assessing the reliability of health care quality measures. Statistics in Medicine. 2024 Oct 15;43(23):4575-94.
 #' @importFrom parallel makeCluster
 #' @importFrom doParallel registerDoParallel
 #' @importFrom foreach foreach
 #' @importFrom psych ICC
 #' @export
+
 calcSSR <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', data.type = 'binary', ctrPerf = controlPerf(), ctrRel = controlRel()){
   if (is.null(df) & is.null(model)) stop ('Please provide either a dataframe or a model object')
   if (is.null(df)){df <- model@frame}
