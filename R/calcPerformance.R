@@ -132,6 +132,7 @@ calcPerformance <- function(df = NULL, model = NULL, entity = "entity", y = "y",
     est.boot.PE <- estPE(df.pb.pe, model, entities, entity, y)
 
     list(
+      pe.boot = est.boot.PE$pe,
       rs.pe.boot = est.boot.PE$rs.pe,
       rs.direct.boot = est.boot.PE$rs.direct
     )
