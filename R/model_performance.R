@@ -13,7 +13,7 @@
 #' @importFrom stats aggregate predict
 #' @export
 
-model_performance <- function(df, model, entity = 'entity', y = 'y', data.type = 'binary', predictor.clean = NA, ctrPerf = controlPerf()){
+model_performance <- function(df, model, entity = 'entity', y = 'y', data.type = 'binary', predictor.clean = NULL, ctrPerf = controlPerf()){
   cl <- match.call()
   alpha = ctrPerf$alpha
   z = qnorm(1 - alpha/2)
@@ -61,7 +61,7 @@ model_performance <- function(df, model, entity = 'entity', y = 'y', data.type =
   model.results$rank <- rank(model.results$est, ties.method = 'random')
   model.results$predictor.clean <- model.results$predictor
   predictor.original = model.results$predictor
-  if (is.na(predictor.clean)){predictor.clean = model.results$predictor}
+  if (is.null(predictor.clean)){predictor.clean = model.results$predictor}
   if (length(predictor.original) != length(predictor.clean)) stop('The length of predictor.clean does not match the number of predictors in the model.')
   for (k in 1:length(predictor.clean)){
     model.results$predictor.clean[model.results$predictor == predictor.original[k]] <- predictor.clean[k]
