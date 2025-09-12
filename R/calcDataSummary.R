@@ -34,7 +34,7 @@ calcDataSummary <- function(df, model = NULL, entity = 'entity', y = "y", data.t
     obs      <- agg$y
     p        <- obs / n
     p.ci <- tryCatch({
-      t(apply(cbind(obs, n), 1, function(x) prop.test(x[1], x[2], conf.level = 1-alpha)$conf.int))
+      t(apply(cbind(obs, n), 1, function(x) prop.test(x[1], x[2], conf.level = 1-alpha, correct = FALSE)$conf.int))
     },
     warning = function(w){
       message('...using Clopper-Pearson intervals instead of Wilson score intervals for performance CIs...')

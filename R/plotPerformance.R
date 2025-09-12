@@ -12,7 +12,7 @@
 #' @importFrom ggplot2 ggplot
 #' @export
 
-plotPerformance <- function(df = perf.results, plot.type = 'single', plot.y = 'p'){
+plotPerformance <- function(df = perf.results, plot.type = 'single', use.median = 0, plot.y = 'p'){
 
   marg.p = sum(df$observed) / sum(df$n)
 
@@ -30,7 +30,9 @@ plotPerformance <- function(df = perf.results, plot.type = 'single', plot.y = 'p
       df$upr = df$rs.oe.upr
       ylab = 'OE risk-standardized rate'
     } else if (plot.y == 'pe') {
-      df$y = df$rs.pe
+      if (use.median == 1){
+        df$y = df$pe.median * marg.p
+      } else {df$y = df$rs.pe}
       df$rank = df$rank.pe
       df$lwr = df$rs.pe.lwr
       df$upr = df$rs.pe.upr
