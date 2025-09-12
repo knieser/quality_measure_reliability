@@ -4,7 +4,12 @@
 \alias{plotPerformance}
 \title{Plot measure performance across accountable entities}
 \usage{
-plotPerformance(df = perf.results, plot.type = "single", plot.y = "p")
+plotPerformance(
+  df = perf.results,
+  plot.type = "single",
+  use.median = 0,
+  plot.y = "p"
+)
 }
 \arguments{
 \item{df}{perf.results dataframe from calcPerformance() output}
