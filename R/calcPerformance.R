@@ -133,7 +133,7 @@ calcPerformance <- function(df = NULL, model = NULL, entity = "entity", y = "y",
 
     list(
       rs.pe.boot = est.boot.PE$rs.pe,
-      rs.direct.boot = est.boot.OE$rs.direct
+      rs.direct.boot = est.boot.PE$rs.direct
     )
   }
   parallel::stopCluster(cl)
