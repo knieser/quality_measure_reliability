@@ -61,7 +61,7 @@ calcPerformance <- function(df = NULL, model = NULL, entity = "entity", y = "y",
   rs.direct = vector(length = length(entities))
   df.ds <- df
   for (i in 1:length(entities)){
-    df.ds$sta3n = entities[i]
+    df.ds$entity = entities[i]
     rs.direct[i] = mean(predict(fit, newdata = df.ds, type = 'response'))
   }
 
@@ -107,7 +107,7 @@ calcPerformance <- function(df = NULL, model = NULL, entity = "entity", y = "y",
       rs.direct = vector(length = length(entities))
       df.ds <- df
       for (j in 1:length(entities)){
-        df.ds$sta3n = entities[j]
+        df.ds$entity = entities[j]
         rs.direct[j] = mean(predict(fit, newdata = df.ds, type = 'response'))
       }
 
@@ -168,6 +168,10 @@ calcPerformance <- function(df = NULL, model = NULL, entity = "entity", y = "y",
   category.pe[rs.pe.upr < marg.p] <- 'Lower than average'
   category.pe[rs.pe.lwr > marg.p] <- 'Higher than average'
 
+  category.direct = rep('No different than average', length(entities))
+  category.direct[rs.direct.upr < marg.p] <- 'Lower than average'
+  category.direct[rs.direct.lwr > marg.p] <- 'Higher than average'
+
   m.re = as.data.frame(ranef(fit))
   m.re.intercept <- data.frame(est = m.re$condval[m.re$term == '(Intercept)'],
                                sd = m.re$condsd[m.re$term == '(Intercept)'],
@@ -196,14 +200,15 @@ calcPerformance <- function(df = NULL, model = NULL, entity = "entity", y = "y",
     rs.oe = rs.oe,
     rs.oe.lwr = rs.oe.lwr,
     rs.oe.upr = rs.oe.upr,
-    category.oe,
+    category.oe = category.oe,
     rs.pe = rs.pe, # from observed data
     rs.pe.lwr = rs.pe.lwr,
     rs.pe.upr = rs.pe.upr,
-    category.pe,
+    category.pe = category.pe,
     rs.direct = rs.direct,
     rs.direct.lwr = rs.direct.lwr,
     rs.direct.upr = rs.direct.upr,
+    category.direct = category.direct,
     intercept.OR = exp(m.re.intercept$est),
     intercept.OR.lwr = exp(m.re.intercept$est - z*m.re.intercept$sd),
     intercept.OR.upr = exp(m.re.intercept$est + z*m.re.intercept$sd)
