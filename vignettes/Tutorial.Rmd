@@ -22,8 +22,6 @@ library(knitr)
 This vignette shows how to use the functions in `QualityMeasure` to analyze quality measure performance and reliability. In the first half, we demonstrate how to use functions for measures without risk-adjustment. In the second half, we show how to incorporate risk-adjustment into the analyses.
 
 ```{r setup}
-library(devtools)
-load_all()
 library(QualityMeasure)
 ```
 
@@ -42,51 +40,37 @@ set.seed(123)
 n.entity = 100  
 
 # average number of patients/cases per accountable entity
-n.pts = 50
+n.obs = 50
 
-# parameters of the Beta distribution
-alpha = 1
-beta = 9
+# marginal probability of the outcome
+mu = .2
 
-# sample the number of patients/cases per accountable entity
-n = rpois(n.entity, n.pts) 
-total.n = sum(n)
-
-# sample the true performance for each entity
-p = rbeta(n.entity, alpha, beta) 
+# reliability
+r = .7
 
 # make sample data
-entity = rep(1:n.entity, times = n)
-y = rbinom(total.n, 1, rep(p, times = n))
-df1 = data.frame(entity = entity, y = y)
-```
-
-```{r, echo = FALSE, results = 'asis'}
-knitr::kable(head(df1, 10), caption = 'Simulated data 1')
+df1 <- simulateData(n.entity = n.entity, n.obs = n.obs, mu = mu, r = r)
 ```
 
 <br> <br>
 
 ## Provider profiling analyses
 
-The `profiling_analysis()` function can be used to obtain some basic provider profiling results.
-
-This analysis generates confidence intervals for entity-level performance using a parametric bootstrapping method. The number of bootstraps and the number of cores to use for parallel processing can be adjusted with the `controlPerf()` function within `profiling_analysis()` as shown below.
+The `profiling_analysis()` function can be used to obtain some basic provider profiling results, including confidence intervals for facility-level rates.
 
 ```{r}
-# adjust number of bootstraps and cores for parallel processing.
-n.boots = 1000
-n.cores = 5
-
 # run profiling analysis for the first dataset without risk-adjustment
-profiling.results <- profiling_analysis(df = df1, ctrPerf = controlPerf(n.boots = n.boots, n.cores = n.cores))
+profiling.results <- profiling_analysis(df = df1)
 perf.results <- profiling.results$perf.results
 ```
 
-The estimated marginal probability of the outcome is `r round(profiling.results$marg.p, 2)`. Recall that the true marginal probability according to our data-generation process is `r round(alpha/(alpha + beta), 2)`.
+The estimated marginal probability of the outcome is `r round(profiling.results$marg.p, 2)`. Recall that the true marginal probability according to our data-generation process is `r round(mu, 2)`.
 
 ```{r, echo = FALSE, results = 'asis'}
-knitr::kable(profiling.results$perf.summary, caption = 'Performance summary statistics across entities')
+rate.summary = summary(perf.results$p)
+perf.summary = cbind(Method = c('Unadjusted'), round(rate.summary, 3))
+perf.summary = as.data.frame(perf.summary)
+knitr::kable(perf.summary, caption = 'Performance summary statistics across entities')
 ```
 
 ### Number of observations per entity
@@ -104,8 +88,8 @@ plotPerformance(df = perf.results)
 
 Categorization of entities according to whether rates are lower, higher, or no different from the overall, unadjusted average can be found in the `perf.results` output from `profiling_analysis()` function.
 
-```{r, echo = FALSE, results = 'asis'}
-knitr::kable(table(perf.results$category.oe), col.names = c('Category', 'Number of entities'), caption = 'Categorization of entities based on their outcome rates')
+```{r, results = 'asis'}
+knitr::kable(table(perf.results$category.p), col.names = c('Category', 'Number of entities'), caption = 'Categorization of entities based on their outcome rates')
 ```
 
 
@@ -131,7 +115,7 @@ You can calculate the Beta-Binomial estimates by using the `calcBetaBin()` funct
 BB.results <- calcBetaBin(df = df1)
 ```
 
-The estimated alpha is `r round(BB.results$alpha, 3)` and beta is `r round(BB.results$beta, 3)`. Recall that the true values from the simulation are alpha = `r alpha` and beta = `r beta`.
+The estimated alpha is `r round(BB.results$alpha, 3)` and beta is `r round(BB.results$beta, 3)`. 
 
 Reliability summary statistics:
 
@@ -164,7 +148,7 @@ The number of resamples used to calculate the permutation split-sample reliabili
 # number of resamples to use for the permutation split-sample reliability estimate
 n.resamples = 200
 
-rel.out <- calcReliability(df = df1, ctrPerf = controlPerf(n.cores = n.cores), ctrRel = controlRel(n.resamples = n.resamples))
+rel.out <- calcReliability(df = df1, ctrRel = controlRel(n.resamples = n.resamples))
 ```
 
 ```{r, echo = FALSE, results = 'asis'}
@@ -201,24 +185,19 @@ We can use the built-in function `simulateData()` to simulate data from a hierar
 n.entity = 100  
 
 # average number of patients/cases per accountable entity
-avg.n = 50
+n.obs = 50
 
 # marginal probability of the outcome
-marg.p = .1 
+mu = .2 
 
-# reliability for entity with an average number of patients
+# reliability for entity with an median number of patients
 r = .6
 
-# implied between-entity variance
-var.btwn = r/(1 - r) * (1/(avg.n*marg.p*(1 - marg.p)))
+# parameter for risk-adjustment model---coefficient for x1 which is simulated from a standard Normal
+beta1 = log(1.5)
 
-mu = log(marg.p / (1 - marg.p))
-tau = c(mu, sqrt(var.btwn))
-
-# parameter for risk-adjustment model (i.e., coefficient for x1)
-theta = log(1.5)
-
-df2 <- simulateData(n.entity = n.entity, avg.n = avg.n, tau = tau, theta = theta)
+# make sample data
+df2 <- simulateData(n.entity = n.entity, n.obs = n.obs, mu = mu, r = r, beta1 = beta1)
 
 ```
 
@@ -241,19 +220,19 @@ This is a model that adjusts for `x1` and includes a random intercept for `entit
 
 ```{r}
 model.perf <- model_performance(df = df2, model = model)
-plotEstimates(model.perf$model.results)
+plotEstimates(model.perf)
 ```
 
-The estimated value of the regression coefficient, after exponentiating is, `r round(model.perf$model.results$est,2)` with a 95% confidence interval ranging from `r round(model.perf$model.results$lb,2)` to `r round(model.perf$model.results$ub,2)`. Recall that the true value from the simulation is `r exp(theta)`.
+The estimated value of the regression coefficient, after exponentiating is, `r round(model.perf$model.results$est,2)` with a 95% confidence interval ranging from `r round(model.perf$model.results$lb,2)` to `r round(model.perf$model.results$ub,2)`. 
 
-The estimated between-entity variance is `r round(lme4::VarCorr(model.perf$fit)[["entity"]][1,1], 3)`. Recall that the true value from the simulation is `r round(var.btwn, 3)`.
+The estimated between-entity variance is `r round(lme4::VarCorr(model.perf$fit)[["entity"]][1,1], 3)`. 
 
 ### Discrimination
 
 The estimated c-statistic is `r round(model.perf$c.statistic,2)`, and below is a plot of the distributions of predicted probabilities separately for observations with and without the outcome occurring.
 
 ```{r}
-plotPredictedDistribution(df = model.perf$df)
+plotPredictedDistribution(model.perf)
 ```
 
 ### Calibration
@@ -261,19 +240,27 @@ plotPredictedDistribution(df = model.perf$df)
 Below is a plot of the observed rate of the outcome for quantiles of the predicted probabilities from the model. The number of quantiles can be specified through the `quantiles` argument of the `plotCalibration()` function.
 
 ```{r}
-plotCalibration(df = model.perf$df, quantiles = 10)
+plotCalibration(model.perf, quantiles = 10)
 ```
 <br><br>
 
 ## Provider profiling analyses
 
+The `profiling_analysis()` function can be used to obtain some basic provider profiling results.
+
+This analysis generates confidence intervals for entity-level performance. Confidence intervals for the observed-to-expected (O/E) standardized rates are Wilson score intervals, while the confidence intervals for the predicted-to-expected (P/E) standardized rates use a parametric bootstrapping method. The number of bootstraps and the number of cores to use for parallel processing can be adjusted with the `controlPerf()` function within `profiling_analysis()` as shown below.
+
 ```{r}
+# adjust number of bootstraps and cores for parallel processing.
+n.boots = 100
+n.cores = 2
+
 # run profiling analysis for the first dataset without risk-adjustment
 profiling.results2 <- profiling_analysis(df = df2, model = model, ctrPerf = controlPerf(n.boots = n.boots, n.cores = n.cores))
 perf.results2 <- profiling.results2$perf.results
 ```
 
-The estimated marginal probability of the outcome is `r round(profiling.results2$marg.p, 2)`. Recall that the true value of the marginal probability from the simulation is `r marg.p`.
+The estimated marginal probability of the outcome is `r round(profiling.results2$marg.p, 2)`. Recall that the true value of the marginal probability from the simulation is `r mu`.
 
 ```{r, echo = FALSE, results = 'asis'}
 knitr::kable(profiling.results2$perf.summary, caption = 'Performance summary statistics across entities')
