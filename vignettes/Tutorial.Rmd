@@ -1,7 +1,7 @@
 ---
 title: "Tutorial of QualityMeasure functions"
 author: "Kenneth Nieser"
-output: rmarkdown::html_vignette
+output:  rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Tutorial of QualityMeasure functions}
   %\VignetteEngine{knitr::rmarkdown}
@@ -12,11 +12,9 @@ vignette: >
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  fig.width=8, 
-  fig.height=6
+  fig.width = 8, 
+  fig.height = 6
 )
-library(knitr)
-
 ```
 
 This vignette shows how to use the functions in `QualityMeasure` to analyze quality measure performance and reliability. In the first half, we demonstrate how to use functions for measures without risk-adjustment. In the second half, we show how to incorporate risk-adjustment into the analyses.
@@ -27,7 +25,7 @@ library(QualityMeasure)
 
 ------------------------------------------------------------------------
 
-# Example #1: Measures without risk-adjustment
+# Example #1: Measures without risk-adjustment 
 
 ## Simulate data
 
@@ -36,38 +34,34 @@ We'll simulate some data to use for the example analyses in this section.
 ```{r}
 set.seed(123)
 
-# number of accountable entities
-n.entity = 100  
+### Data parameters
+n.entity = 100  # number of accountable entities
+n.obs = 50      # average number of observations per accountable entity
+mu = .2         # marginal probability of the outcome
+r = .7          # median reliability
 
-# average number of patients/cases per accountable entity
-n.obs = 50
-
-# marginal probability of the outcome
-mu = .2
-
-# reliability
-r = .7
-
-# make sample data
+### Simulate data
 df1 <- simulateData(n.entity = n.entity, n.obs = n.obs, mu = mu, r = r)
 ```
 
-<br> <br>
 
 ## Provider profiling analyses
 
-The `profiling_analysis()` function can be used to obtain some basic provider profiling results, including confidence intervals for facility-level rates.
+The `profiling_analysis()` function can be used to obtain some basic provider profiling results, including confidence intervals for entity-level rates.
 
 ```{r}
-# run profiling analysis for the first dataset without risk-adjustment
 profiling.results <- profiling_analysis(df = df1)
 perf.results <- profiling.results$perf.results
 ```
 
 The estimated marginal probability of the outcome is `r round(profiling.results$marg.p, 2)`. Recall that the true marginal probability according to our data-generation process is `r round(mu, 2)`.
 
-```{r, echo = FALSE, results = 'asis'}
-rate.summary = summary(perf.results$p)
+<br>
+
+From here, you can obtain summary statistics, such as a five number summary of the performance distribution. We see that the outcome rate varies from `r round(min(perf.results$p), 3)` to `r round(max(perf.results$p), 3)` with a median entity-level rate of `r round(median(perf.results$p), 3)`.
+
+```{r, results = 'asis'}
+rate.summary = rbind(summary(perf.results$p))
 perf.summary = cbind(Method = c('Unadjusted'), round(rate.summary, 3))
 perf.summary = as.data.frame(perf.summary)
 knitr::kable(perf.summary, caption = 'Performance summary statistics across entities')
@@ -82,48 +76,44 @@ plotN(perf.results$n)
 ### Unadjusted rates across entities
 
 ```{r}
-# Unadjusted performance
 plotPerformance(df = perf.results)
 ```
 
-Categorization of entities according to whether rates are lower, higher, or no different from the overall, unadjusted average can be found in the `perf.results` output from `profiling_analysis()` function.
+Categorization of entities according to whether rates are lower, higher, or no different from the overall average can be found in the `perf.results` output from `profiling_analysis()` function.
 
 ```{r, results = 'asis'}
 knitr::kable(table(perf.results$category.p), col.names = c('Category', 'Number of entities'), caption = 'Categorization of entities based on their outcome rates')
 ```
 
 
-### Plot of ORs comparing each entity with the "average" entity
+### Plot of ORs comparing each entity with the average
 
-Another way to assess whether entities have measure performance that differs from an "average" entity is to examine the predicted random intercept values.
+Another way to assess whether entities have measure performance that differs from the national average is to examine the predicted random intercept values. These values likely will show fewer outliers, given that estimates are shrunken towards the mean.
 
-Entities highlighted in red have estimated ORs that are statistically different from 1.0 at alpha = 0.05.
+Entities highlighted in red have estimated ORs that are statistically different from 1.0 at alpha = 0.05. There are `r sum(perf.results$intercept.sig==1)` entities with outcome odds that are significantly different from the average entity performance.
 
 ```{r}
 plotPerformance(df = perf.results, plot.type = 'OR')
 ```
 
-There are `r sum(perf.results$intercept.sig==1)` entities with outcome odds that are significantly different from the average entity performance.
-
 <br> <br>
 
 ## Beta-binomial-based reliability estimates
 
-You can calculate the Beta-Binomial estimates by using the `calcBetaBin()` function. Note that these estimates do not account for any risk-adjustment.
+You can calculate reliability estimates based on a Beta-Binomial model by using the `calcBetaBin()` function. 
 
 ```{r}
 BB.results <- calcBetaBin(df = df1)
 ```
 
-The estimated alpha is `r round(BB.results$alpha, 3)` and beta is `r round(BB.results$beta, 3)`. 
+The estimated alpha is `r round(BB.results$alpha, 3)` and beta is `r round(BB.results$beta, 3)`, which you can find in `BB.results`.
 
-Reliability summary statistics:
-
-```{r, echo = FALSE}
+Summary statistics of the reliability distribution:
+```{r}
 summary(BB.results$est.BB)
 ```
 
-If you have data that is already aggregated by entity, you can calculate Beta-Binomial estimates as follows:
+Alternatively, if you have data that are aggregated by entity, you can calculate Beta-Binomial estimates as follows:
 
 ```{r}
 # Aggregated data
@@ -134,24 +124,29 @@ df.agg <- data.frame(n = aggregate(y ~ entity, data = df1, length)$y,
 BB.agg.results <- calcBetaBin(df = df.agg, df.aggregate = T, n = 'n', x = 'x')
 ```
 
-The estimated alpha is `r round(BB.agg.results$alpha, 3)` and beta is `r round(BB.agg.results$beta, 3)`. These estimates match our results from analyzing the data before aggregation.
+The estimated alpha is `r round(BB.agg.results$alpha, 3)` and beta is `r round(BB.agg.results$beta, 3)`. 
 
-<br> <br>
+```{r, echo = FALSE}
+summary(BB.agg.results$est.BB)
+```
+
+These estimates match our results from analyzing the data before aggregation. 
+
+<br> 
 
 ## Calculate reliability from all methods
 
-If you would like to calculate reliability estimates from all methods, you can use the `calcReliability()` function.
+If you would like to estimate reliability using all methods, you can use the `calcReliability()` function.
 
 The number of resamples used to calculate the permutation split-sample reliability estimate can be adjusted using the `controlRel()` function within `calcReliability()` as shown below.
 
 ```{r}
-# number of resamples to use for the permutation split-sample reliability estimate
-n.resamples = 200
+n.resamples = 20 # number of resamples to use for the permutation split-sample reliability estimate
 
 rel.out <- calcReliability(df = df1, ctrRel = controlRel(n.resamples = n.resamples))
 ```
 
-```{r, echo = FALSE, results = 'asis'}
+```{r, results = 'asis'}
 rel.results <- rel.out$rel.results
 rel.results.sub <- rel.results[,c('method', 'reliability', 'reliability_min', 'reliability_max')]
 rel.results.sub$reliability <- round(rel.results.sub$reliability, 3)
@@ -172,7 +167,7 @@ plotReliability(rel.out)
 
 <br><br>
 
-# Example #2: Measures with risk-adjustment
+# Example #2: Measures with risk-adjustment 
 
 In this next part of the tutorial, we will work with an example measure where risk-adjustment is required.
 
@@ -181,24 +176,17 @@ In this next part of the tutorial, we will work with an example measure where ri
 We can use the built-in function `simulateData()` to simulate data from a hierarchical logistic regression model with covariates for risk-adjustment. The simulated data will include a continuous covariate `x1` which is sampled from a standard Normal distribution.
 
 ```{r}
-# number of accountable entities
-n.entity = 100  
 
-# average number of patients/cases per accountable entity
-n.obs = 50
+### Data parameters 
+n.entity = 100  # number of accountable entities
+n.obs = 50 # average number of patients/cases per accountable entity
+mu = .2 # marginal probability of the outcome
+r = .7 # reliability for entity with an median number of patients
+beta1 = log(1.5) # parameter for risk-adjustment model---coefficient for x1 which is simulated from a standard Normal
 
-# marginal probability of the outcome
-mu = .2 
 
-# reliability for entity with an median number of patients
-r = .6
-
-# parameter for risk-adjustment model---coefficient for x1 which is simulated from a standard Normal
-beta1 = log(1.5)
-
-# make sample data
+### Simulate data 
 df2 <- simulateData(n.entity = n.entity, n.obs = n.obs, mu = mu, r = r, beta1 = beta1)
-
 ```
 
 ```{r, echo = FALSE, results = 'asis'}
@@ -225,8 +213,6 @@ plotEstimates(model.perf)
 
 The estimated value of the regression coefficient, after exponentiating is, `r round(model.perf$model.results$est,2)` with a 95% confidence interval ranging from `r round(model.perf$model.results$lb,2)` to `r round(model.perf$model.results$ub,2)`. 
 
-The estimated between-entity variance is `r round(lme4::VarCorr(model.perf$fit)[["entity"]][1,1], 3)`. 
-
 ### Discrimination
 
 The estimated c-statistic is `r round(model.perf$c.statistic,2)`, and below is a plot of the distributions of predicted probabilities separately for observations with and without the outcome occurring.
@@ -240,7 +226,7 @@ plotPredictedDistribution(model.perf)
 Below is a plot of the observed rate of the outcome for quantiles of the predicted probabilities from the model. The number of quantiles can be specified through the `quantiles` argument of the `plotCalibration()` function.
 
 ```{r}
-plotCalibration(model.perf, quantiles = 10)
+plotCalibration(model.perf, quantiles = 5)
 ```
 <br><br>
 
@@ -252,7 +238,7 @@ This analysis generates confidence intervals for entity-level performance. Confi
 
 ```{r}
 # adjust number of bootstraps and cores for parallel processing.
-n.boots = 100
+n.boots = 25
 n.cores = 2
 
 # run profiling analysis for the first dataset without risk-adjustment
@@ -302,28 +288,26 @@ knitr::kable(table(perf.results2$category.pe), col.names = c('Category', 'Number
 ```
 
 
-### Plot of ORs comparing each entity with the "average" entity
+### Plot of ORs comparing each entity with the average
 
-Another way to assess whether entities have measure performance that differs from an "average" entity is to examine the predicted random intercept values.
-
-Entities highlighted in red have estimated ORs that are statistically different from 1.0 at alpha = 0.05.
+Another way to assess whether entities have measure performance that differs from the average is to examine the predicted random intercept values. Entities highlighted in red have estimated ORs that are statistically different from 1.0 at alpha = 0.05. There are `r sum(perf.results2$intercept.sig==1)` entities with outcome adjusted odds that are significantly different from the average entity performance.
 
 ```{r}
 plotPerformance(df = perf.results2, plot.type = 'OR')
 ```
-There are `r sum(perf.results2$intercept.sig==1)` entities with outcome adjusted odds that are significantly different from the average entity performance.
+
 
 <br> <br>
 
 ## Calculate reliability from all methods
 
-Again, to calculate reliability estimates from all methods, we use the `calcReliability()` function. This time we specify the risk-adjustment model.
+Again, to calculate reliability estimates from all methods, we use the `calcReliability()` function. This time we specify the risk-adjustment model. Note that while the results from the Beta-Binomial method are included, these estimates currently do not account for risk-adjustment variables.
 
 ```{r}
 rel.out2 <- calcReliability(df = df2, model = model, ctrPerf = controlPerf(n.cores = n.cores), ctrRel = controlRel(n.resamples = n.resamples))
 ```
 
-```{r, echo = FALSE, results = 'asis'}
+```{r, results = 'asis'}
 rel.results2 <- rel.out2$rel.results
 rel.results.sub2 <- rel.results2[,c('method', 'reliability', 'reliability_min', 'reliability_max')]
 rel.results.sub2$reliability <- round(rel.results.sub2$reliability, 3)
