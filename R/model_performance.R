@@ -10,13 +10,13 @@
 #' @param ctrPerf parameters to control performance measure calculation
 #' @returns Estimated risk-standardized measure performance by accountable entity
 #' @author Kenneth Nieser (nieser@stanford.edu)
-#' @importFrom stats aggregate predict
+#' @importFrom stats aggregate predict qnorm pnorm wilcox.test
 #' @export
 
 model_performance <- function(df, model, entity = 'entity', y = 'y', data.type = 'binary', predictor.clean = NULL, ctrPerf = controlPerf()){
   cl <- match.call()
   alpha = ctrPerf$alpha
-  z = qnorm(1 - alpha/2)
+  z = stats::qnorm(1 - alpha/2)
 
   # clean data
   df = cleanData(df, entity = entity, y = y, ctrPerf = ctrPerf)
@@ -46,7 +46,7 @@ model_performance <- function(df, model, entity = 'entity', y = 'y', data.type =
     coef.estimates$lb <-  coef.estimates$Estimate - z * coef.estimates$`Std. Error`
     coef.estimates$ub <-  coef.estimates$Estimate + z * coef.estimates$`Std. Error`
     coef.estimates$z  <-  coef.estimates$Estimate / coef.estimates$`Std. Error`
-    coef.estimates$p  <- 2*pnorm(abs(coef.estimates$z), lower.tail = FALSE)
+    coef.estimates$p  <- 2*stats::pnorm(abs(coef.estimates$z), lower.tail = FALSE)
 
     model.results <- data.frame(
       predictor = row.names(coef.estimates)[-1],
@@ -76,7 +76,7 @@ model_performance <- function(df, model, entity = 'entity', y = 'y', data.type =
     n1 = length(p1)
     n0 = length(p0)
     pairs = n0 * n1
-    wilcox.out <- wilcox.test(predict ~ y, data = df)
+    wilcox.out <- stats::wilcox.test(predict ~ y, data = df)
     c.statistic = max(wilcox.out$statistic / pairs, 1 - wilcox.out$statistic / pairs)
 
     results = list(call = cl,

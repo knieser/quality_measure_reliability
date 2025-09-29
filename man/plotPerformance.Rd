@@ -4,26 +4,23 @@
 \alias{plotPerformance}
 \title{Plot measure performance across accountable entities}
 \usage{
-plotPerformance(
-  df = perf.results,
-  plot.type = "single",
-  use.median = 0,
-  plot.y = "p"
-)
+plotPerformance(df = perf.results, plot.type = "single", plot.y = "p")
 }
 \arguments{
-\item{df}{perf.results dataframe from calcPerformance() output}
+\item{df}{perf.results dataframe from \code{calcPerformance()} output}
 
 \item{plot.type}{select which plot to return:
-\item{single}{a plot of the performance across entities}
-\item{OR}{plot of ORs comparing each facility with the average facility}
-\item{correlation}{plot of standardization ratios against the entity random intercepts}
-\item{multiple}{plot of measure performance across different risk-adjustment methods}}
+\itemize{
+\item \code{single} (the default): a plot of the performance across entities
+\item \code{OR}: plot of ORs comparing each facility with the average facility
+\item \code{correlation}: plot of standardization ratios against the entity random intercepts
+\item \code{multiple}: plot of measure performance across different risk-adjustment methods
+}}
 
-\item{plot.y}{'p' plots the unadjusted performance, 'oe' plots the observed-to-expected ratio, 'pe' plots the predicted-to-expected ratio'}
+\item{plot.y}{\code{p} plots the unadjusted performance; \code{oe} plots the observed-to-expected ratio; \code{pe} plots the predicted-to-expected ratio}
 }
 \description{
-This function creates a plot of measure performance across accountable entities, using the perf.results dataframe from calcPerformance() output.
+This function creates a plot of measure performance across accountable entities, using the \code{perf.results} dataframe from \code{calcPerformance()} output.
 }
 \author{
 Kenneth Nieser (nieser@stanford.edu)

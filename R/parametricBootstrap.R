@@ -12,7 +12,7 @@ parametricBootstrap <- function(df, model, entities, entity, y, ctrPerf){
       df$entity    <- df[[entity]]
 
       # refit model
-      fit <- lme4::glmer(model, data = df, family = 'binomial', control = glmerControl(optimizer = 'bobyqa'), nAGQ = 0)
+      fit <- lme4::glmer(model, data = df, family = 'binomial', control = lme4::glmerControl(optimizer = 'bobyqa'), nAGQ = 0)
 
       # calculate predictions w/ and w/o random intercept
       df$expect    <- predict(fit, newdata = df, type = 'response', re.form = ~0)

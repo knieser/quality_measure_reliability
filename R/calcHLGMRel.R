@@ -5,7 +5,7 @@
 #' @param model model; if null, will use an unadjusted model
 #' @param entity data column containing the accountable entity identifier
 #' @param y data column containing the outcome variable
-#' @param show.all logical parameter indicating whether all variations of reliability estimates should be calculated; default is FALSE.
+#' @param show.all logical parameter indicating whether all variations of reliability estimates should be calculated; default is `FALSE`.
 #' @param ctrPerf parameters to control performance measure calculation
 #' @param ctrRel parameters to control reliability estimation
 #' @author Kenneth Nieser (nieser@stanford.edu)

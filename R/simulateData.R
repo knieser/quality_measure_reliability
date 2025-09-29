@@ -2,60 +2,66 @@
 #' @description
 #' This function simulates some data.
 #' @param n.entity total number of entities to simulate
-#' @param avg.n average number of observations per entity; entity sample sizes are simulated from a Poisson distribution with mean avg.n
-#' @param n vector of entity sample sizes; this parameter cannot be used if n.entity and avg.n are used.
-#' @param tau parameters for distribution of random intercepts. For binary observations, input a vector of length 2 where the 1st entry is the overall probability of the outcome on the log-odds scale and the 2nd entry is the between-entity standard deviation.
-#' For continuous observations, input a vector of length 2 where the 1st entry is the between-entity standard deviation and the 2nd entry is the within-entity (or residual) standard deviation.
-#' @param theta regression coefficient for covariate added to the linear predictor; default is 0.
-#' @param type type of data to simulate. Valid options include: 'binary' (default) and 'normal'.
+#' @param n.obs average number of observations per entity; entity sample sizes are simulated from a Poisson distribution with mean given by n.obs OR a vector of length n.entity with entity sample sizes
+#' @param mu average probability of the outcome for binary data OR average outcome value for Normal data
+#' @param r median reliability
+#' @param beta1 regression coefficient for covariate added to the linear predictor; default is 0.
+#' @param data.type type of data to simulate. Valid options include: `binary` (default) and `normal`.
+#' @param dist specifies the distribution family to use to simulate provider performance. Valid options include: `normal` (default) and `beta`.
 #' @author Kenneth Nieser (nieser@stanford.edu)
 #' @examples
 #' # number of accountable entities
 #' n.entity = 100
 #'
 #' # average number of patients or cases per accountable entity
-#' avg.n = 50
+#' n.obs = 50
 #'
 #' # marginal probability of the outcome
-#' p = 0.1
+#' mu = 0.1
 #'
-#' # approximate reliability for entity with an average number of patients
+#' # approximate reliability for entity with a median number of patients
 #' r = 0.6
 #'
-#' # implied between-entity variance
-#' var.btwn = r / (1 - r) * (1/(avg.n * p * (1 - p)))
-#'
-#' mu = log(p / (1-p))
-#' tau = c(mu, sqrt(var.btwn))
-#'
 #' # parameter for risk-adjustment model (i.e., coefficient for x1)
-#' theta = log(1.5)
+#' beta1 = log(1.5)
 #'
-#' df <- simulateData(n.entity = n.entity, avg.n = avg.n, tau = tau, theta = theta)
+#' df <- simulateData(n.entity = n.entity, n.obs = n.obs, mu = mu, r = r, beta1 = beta1)
 #' head(df)
 #'
-#' @importFrom stats aov
+#' @importFrom stats aov rnorm rbeta rpois
 #' @export
 
-simulateData <- function(n.entity = NULL, avg.n = NULL, n = NULL, tau, theta = 0, type = 'binary'){
+simulateData <- function(n.entity, n.obs, mu, r, beta1 = 0, data.type = 'binary', dist = 'normal'){
 
-  if (is.null(n.entity) & is.null(avg.n) & is.null(n)){stop('Please specify either n or both n.entity and avg.n.')}
-  if (!is.null(n.entity) & !is.null(n)){stop('The parameter n cannot be used if n.entity and avg.n are used.')}
-  if (!is.null(avg.n) & !is.null(n)){stop('The parameter n cannot be used if n.entity and avg.n are used.')}
-  if (length(tau) != 2){stop('tau must be a vector of length 2.')}
-  if (type != 'binary' &  type != 'normal'){stop('Valid options for data type include binary and normal.')}
+  if (length(n.obs)==1){
+    n = stats::rpois(n.entity, n.obs)
+    } else if (length(n.obs) == n.entity){
+      n = n.obs
+    } else {
+      stop('n.obs must either be a single number indicating the average sample size or a vector with the same length as the n.entity')
+    }
 
-  if (is.null(n)){n = rpois(n.entity, avg.n)}
-  if (is.null(n.entity)){n.entity = length(n)}
   total.n = sum(n)
+  median.n = median(n)
   entity = rep(1:n.entity, times = n)
-  x1 = rnorm(total.n, 0, 1)
+  x1 = stats::rnorm(total.n, 0, 1)
 
-  if (type == 'binary'){
-    z = rep(rnorm(n.entity, tau[1], tau[2]), times = n)
-    lp = z + theta * x1
-    p = exp(lp) / (1 + exp(lp))
-    y = rbinom(total.n, 1, p)
+  if (data.type == 'binary'){
+    beta0 = -log(1/mu - 1)
+    var.b = r/(1 - r) * (1/(median.n*mu*(1 - mu)))
+
+    if (dist == 'normal'){
+      z = rep(stats::rnorm(n.entity, 0, sqrt(var.b)), times = n)
+      lp = z + beta0 + beta1 * x1
+
+    } else if (dist == 'beta'){
+      a = median.n * mu * (1 - r) / r
+      b = median.n * (1 - mu) * (1 - r) / r
+      z = rep(stats::rbeta(n.entity, a, b), times = n)
+      lp = stats::qlogis(z) + beta1 * x1
+    }
+    p = stats::plogis(lp)
+    y = stats::rbinom(total.n, 1, p)
     df = data.frame(
       entity = as.factor(entity),
       z = z,
@@ -66,10 +72,12 @@ simulateData <- function(n.entity = NULL, avg.n = NULL, n = NULL, tau, theta = 0
     )
   }
 
-  if (type == 'normal'){
-    z = rep(rnorm(n.entity, 0, tau[1]), times = n)
-    lp = z + theta * x1
-    y = rnorm(total.n, mean = lp, sd = tau[2])
+  if (data.type == 'normal'){
+    beta0 = mu
+    var.b = 1 / (1 - r) * 1 / median.n
+    z = rep(stats::rnorm(n.entity, 0, sqrt(var.b)), times = n)
+    lp = z + beta0 + beta1 * x1
+    y = stats::rnorm(total.n, mean = lp, sd = tau[2])
     df = data.frame(
       entity = as.factor(entity),
       z = z,

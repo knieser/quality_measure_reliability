@@ -7,7 +7,7 @@
 plotCalibration(model.performance = model.performance, quantiles = 10)
 }
 \arguments{
-\item{model.performance}{results from model_performance()}
+\item{model.performance}{results from \code{model_performance()}}
 
 \item{quantiles}{number of quantiles to bin data; default is 10.}
 }

@@ -54,37 +54,39 @@ misclassification_analysis <- function(df = NULL, model = NULL, entity = "entity
   )
 
   # make figures
-  fig.p.percentile <- ggplot2::ggplot(data = percentile.df, aes(x = d, y = p, group = entities)) +
-    geom_point(aes(color = entities), size = 2) +
-    geom_line(aes(color = entities)) +
-    xlab('d (differences in percentiles)') +
-    ylab('Pr(|observed rank - true rank| < d)') +
-    theme_classic() +
-    theme(
-      axis.title = element_text(size = 16, face = 'bold'),
-      axis.text = element_text(size = 14, face = 'bold'),
-      legend.position = 'none')
+  fig.p.percentile <- ggplot2::ggplot(data = percentile.df, ggplot2::aes(x = d, y = p, group = entities)) +
+    ggplot2::geom_point(ggplot2::aes(color = entities), size = 2) +
+    ggplot2::geom_line(ggplot2::aes(color = entities)) +
+    ggplot2::xlab('d (differences in percentiles)') +
+    ggplot2::ylab('Pr(|observed rank - true rank| < d)') +
+    ggplot2::theme_classic() +
+    ggplot2::theme(
+      axis.title = ggplot2::element_text(size = 16, face = 'bold'),
+      axis.text = ggplot2::element_text(size = 14, face = 'bold'),
+      legend.position = 'none'
+      )
 
-  fig.oe.percentile <- ggplot2::ggplot(data = percentile.df, aes(x = d, y = oe, group = entities)) +
-    geom_point(aes(color = entities), size = 2) +
-    geom_line(aes(color = entities)) +
-    xlab('d (differences in percentiles)') +
-    ylab('Pr(|observed rank - true rank| < d)') +
-    theme_classic() +
-    theme(
-      axis.title = element_text(size = 16, face = 'bold'),
-      axis.text = element_text(size = 14, face = 'bold'),
-      legend.position = 'none')
+  fig.oe.percentile <- ggplot2::ggplot(data = percentile.df, ggplot2::aes(x = d, y = oe, group = entities)) +
+    ggplot2::geom_point(ggplot2::aes(color = entities), size = 2) +
+    ggplot2::geom_line(ggplot2::aes(color = entities)) +
+    ggplot2::xlab('d (differences in percentiles)') +
+    ggplot2::ylab('Pr(|observed rank - true rank| < d)') +
+    ggplot2::theme_classic() +
+    ggplot2::theme(
+      axis.title = ggplot2::element_text(size = 16, face = 'bold'),
+      axis.text = ggplot2::element_text(size = 14, face = 'bold'),
+      legend.position = 'none'
+      )
 
-  fig.pe.percentile <- ggplot2::ggplot(data = percentile.df, aes(x = d, y = pe, group = entities)) +
-    geom_point(aes(color = entities), size = 2) +
-    geom_line(aes(color = entities)) +
-    xlab('d (differences in percentiles)') +
-    ylab('Pr(|observed rank - true rank| < d)') +
-    theme_classic() +
-    theme(
-      axis.title = element_text(size = 16, face = 'bold'),
-      axis.text = element_text(size = 14, face = 'bold'),
+  fig.pe.percentile <- ggplot2::ggplot(data = percentile.df, ggplot2::aes(x = d, y = pe, group = entities)) +
+    ggplot2::geom_point(ggplot2::aes(color = entities), size = 2) +
+    ggplot2::geom_line(ggplot2::aes(color = entities)) +
+    ggplot2::xlab('d (differences in percentiles)') +
+    ggplot2::ylab('Pr(|observed rank - true rank| < d)') +
+    ggplot2::theme_classic() +
+    ggplot2::theme(
+      axis.title = ggplot2::element_text(size = 16, face = 'bold'),
+      axis.text = ggplot2::element_text(size = 14, face = 'bold'),
       legend.position = 'none')
 
   results = list(entities = entities,

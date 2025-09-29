@@ -5,27 +5,29 @@
 \title{Simulate data}
 \usage{
 simulateData(
-  n.entity = NULL,
-  avg.n = NULL,
-  n = NULL,
-  tau,
-  theta = 0,
-  type = "binary"
+  n.entity,
+  n.obs,
+  mu,
+  r,
+  beta1 = 0,
+  data.type = "binary",
+  dist = "normal"
 )
 }
 \arguments{
 \item{n.entity}{total number of entities to simulate}
 
-\item{avg.n}{average number of observations per entity; entity sample sizes are simulated from a Poisson distribution with mean avg.n}
+\item{n.obs}{average number of observations per entity; entity sample sizes are simulated from a Poisson distribution with mean given by n.obs OR a vector of length n.entity with entity sample sizes}
 
-\item{n}{vector of entity sample sizes; this parameter cannot be used if n.entity and avg.n are used.}
+\item{mu}{average probability of the outcome for binary data OR average outcome value for Normal data}
 
-\item{tau}{parameters for distribution of random intercepts. For binary observations, input a vector of length 2 where the 1st entry is the overall probability of the outcome on the log-odds scale and the 2nd entry is the between-entity standard deviation.
-For continuous observations, input a vector of length 2 where the 1st entry is the between-entity standard deviation and the 2nd entry is the within-entity (or residual) standard deviation.}
+\item{r}{median reliability}
 
-\item{theta}{regression coefficient for covariate added to the linear predictor; default is 0.}
+\item{beta1}{regression coefficient for covariate added to the linear predictor; default is 0.}
 
-\item{type}{type of data to simulate. Valid options include: 'binary' (default) and 'normal'.}
+\item{data.type}{type of data to simulate. Valid options include: \code{binary} (default) and \code{normal}.}
+
+\item{dist}{specifies the distribution family to use to simulate provider performance. Valid options include: \code{normal} (default) and \code{beta}.}
 }
 \description{
 This function simulates some data.
@@ -35,24 +37,18 @@ This function simulates some data.
 n.entity = 100
 
 # average number of patients or cases per accountable entity
-avg.n = 50
+n.obs = 50
 
 # marginal probability of the outcome
-p = 0.1
+mu = 0.1
 
-# approximate reliability for entity with an average number of patients
+# approximate reliability for entity with a median number of patients
 r = 0.6
 
-# implied between-entity variance
-var.btwn = r / (1 - r) * (1/(avg.n * p * (1 - p)))
-
-mu = log(p / (1-p))
-tau = c(mu, sqrt(var.btwn))
-
 # parameter for risk-adjustment model (i.e., coefficient for x1)
-theta = log(1.5)
+beta1 = log(1.5)
 
-df <- simulateData(n.entity = n.entity, avg.n = avg.n, tau = tau, theta = theta)
+df <- simulateData(n.entity = n.entity, n.obs = n.obs, mu = mu, r = r, beta1 = beta1)
 head(df)
 
 }

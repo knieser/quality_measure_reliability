@@ -15,7 +15,4 @@ psychreadmission
 \description{
 These data are from the Centers for Medicare and Medicaid Services (CMS) and show the percentage of patients who return to a hospital for an unplanned inpatient stay after discharge. Data are from 07/01/2021 to 06/30/2023
 }
-\details{
-Data can be accessed from this link: \link{https://data.cms.gov/provider-data}
-}
 \keyword{datasets}

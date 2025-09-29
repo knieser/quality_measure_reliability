@@ -10,8 +10,8 @@ cleanData <- function(df, entity = "entity", y = "y", ctrPerf = controlPerf()){
   if(!(y %in% df.names)) stop(paste0(y, ' is not in the dataframe. Check column name provided to identify the outcome variable.'))
 
   # check for missing data
-  n.missing <- sum(!complete.cases(df))
-  df = na.omit(df)
+  n.missing <- sum(!stats::complete.cases(df))
+  df = stats::na.omit(df)
   if (n.missing > 0) message(paste0(n.missing, " rows with missing values were removed."))
 
   # fix columns

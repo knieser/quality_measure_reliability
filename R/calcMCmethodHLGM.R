@@ -8,11 +8,11 @@ calcMCmethodHLGM <- function(df, n, var.b, reps){
 
   sims <- replicate(reps, {
     # Step 1: Simulate random intercepts
-    u <- rnorm(length(n), 0, sqrt(var.b))
+    u <- stats::rnorm(length(n), 0, sqrt(var.b))
 
     # Step 2: Compute outcome probabilities, along with means and variances of outcome probabilities
     df$expect.logit <- log(df$expect / (1 - df$expect))
-    df$p.s = plogis(df$expect.logit + u[df$id])
+    df$p.s = stats::plogis(df$expect.logit + u[df$id])
     df$v.s = df$p.s * (1 - df$p.s)
     m = aggregate(p.s ~ entity, data = df, mean)$p.s
     v = aggregate(v.s ~ entity, data = df, mean)$v.s

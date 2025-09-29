@@ -1,6 +1,11 @@
 #' Parameters for reliability calculations
 #' @description
-#' This function stores parameters for reliability calculations
+#' This function stores parameters for reliability calculations.
+#' @param n.resamples number of resamples for split-sample reliability method
+#' @param SSRmethod use either the `permutation` (default) or the `bootstrap` method for the split-sample reliability calculation
+#' @param fn aggregation function for observations within entities, default is `NA` and will produce entity-level means
+#' @param MC.reps number of Monte Carlo simulations to produce reliability estimates for data modeled with hierarchical logistic regression
+#' @param d.steps number of percentiles removed to check for misclassification probabilities
 #' @author Kenneth Nieser (nieser@stanford.edu)
 #' @export
 

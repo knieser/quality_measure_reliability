@@ -12,8 +12,19 @@ controlRel(
   d.steps = 10
 )
 }
+\arguments{
+\item{n.resamples}{number of resamples for split-sample reliability method}
+
+\item{SSRmethod}{use either the \code{permutation} (default) or the \code{bootstrap} method for the split-sample reliability calculation}
+
+\item{fn}{aggregation function for observations within entities, default is \code{NA} and will produce entity-level means}
+
+\item{MC.reps}{number of Monte Carlo simulations to produce reliability estimates for data modeled with hierarchical logistic regression}
+
+\item{d.steps}{number of percentiles removed to check for misclassification probabilities}
+}
 \description{
-This function stores parameters for reliability calculations
+This function stores parameters for reliability calculations.
 }
 \author{
 Kenneth Nieser (nieser@stanford.edu)

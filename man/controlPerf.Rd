@@ -4,7 +4,16 @@
 \alias{controlPerf}
 \title{Parameters for performance calculations}
 \usage{
-controlPerf(min.n = 2, alpha = 0.05, n.boots = 200, n.cores = 4)
+controlPerf(min.n = 2, alpha = 0.05, n.boots = 200, n.cores = 2)
+}
+\arguments{
+\item{min.n}{minimum number of observations per entity}
+
+\item{alpha}{statistical significance level to use for confidence intervals}
+
+\item{n.boots}{number of bootstraps to use for confidence interval estimation for P/E ratios}
+
+\item{n.cores}{number of cores to use for parallel processing}
 }
 \description{
 This function stores parameters for performance calculations

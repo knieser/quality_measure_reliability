@@ -8,23 +8,23 @@
 
 plotN <- function(n){
   df <- data.frame(n)
-  fig <- ggplot2::ggplot(data = df, aes(n)) +
-    geom_histogram(color = 'white', fill = 'black', binwidth = 5) +
-    scale_y_continuous(expand = c(0,0)) +
-    xlab('Number of observations') +
-    ylab('Entities') +
-    ggtitle('Sample size distribution') +
-    theme_classic() +
-    theme(
-      plot.title = element_text(size = 16, face ="bold"),
-      axis.text.y = element_text(size = 16),
-      axis.ticks.length = unit(.25,"cm"),
-      axis.text.x = element_text(size = 16),
-      axis.title = element_text(size = 18, face = "bold"),
-      strip.text = element_text(size = 18, face = "bold"),
+  fig <- ggplot2::ggplot(data = df, ggplot2::aes(n)) +
+    ggplot2::geom_histogram(color = 'white', fill = 'black', binwidth = 5) +
+    ggplot2::scale_y_continuous(expand = c(0,0)) +
+    ggplot2::xlab('Number of observations') +
+    ggplot2::ylab('Entities') +
+    ggplot2::ggtitle('Sample size distribution') +
+    ggplot2::theme_classic() +
+    ggplot2::theme(
+      plot.title = ggplot2::element_text(size = 16, face ="bold"),
+      axis.text.y = ggplot2::element_text(size = 16),
+      axis.ticks.length = ggplot2::unit(.25,"cm"),
+      axis.text.x = ggplot2::element_text(size = 16),
+      axis.title = ggplot2::element_text(size = 18, face = "bold"),
+      strip.text = ggplot2::element_text(size = 18, face = "bold"),
       legend.position = 'top',
-      legend.title = element_blank(),
-      legend.text = element_text(size = 18)
+      legend.title = ggplot2::element_blank(),
+      legend.text = ggplot2::element_text(size = 18)
     )
   return(fig)
 }

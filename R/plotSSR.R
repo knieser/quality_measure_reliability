@@ -54,23 +54,22 @@ plotSSR <- function(df, model = NULL, entity = 'entity', y = 'y', ctrPerf = cont
   )
   max = max(c(plot.df.SSR$t1, plot.df.SSR$t2))
 
-  fig.SSR <- ggplot2::ggplot(data = plot.df.SSR, aes(x = t1, y = t2, group = Method)) +
-    geom_point(aes(color = Method, shape = Method), size = 3) +
-    geom_abline(slope = 1, lty = 'dashed') +
-    coord_cartesian(xlim = c(0, max), ylim = c(0, max)) +
-    scale_color_manual(values = c('darkgrey', 'red')) +
-    xlab('Split 1') +
-    ylab('Split 2') +
-    theme_classic() +
-    theme(
-      plot.title = element_text(size = 16, face ="bold"),
-      axis.text = element_text(size = 16),
-      axis.ticks.length = unit(.25,"cm"),
-      axis.title = element_text(size = 18, face = "bold"),
+  fig.SSR <- ggplot2::ggplot(data = plot.df.SSR, ggplot2::aes(x = t1, y = t2, group = Method)) +
+    ggplot2::geom_point(ggplot2::aes(color = Method, shape = Method), size = 3) +
+    ggplot2::geom_abline(slope = 1, lty = 'dashed') +
+    ggplot2::coord_cartesian(xlim = c(0, max), ylim = c(0, max)) +
+    ggplot2::scale_color_manual(values = c('darkgrey', 'red')) +
+    ggplot2::xlab('Split 1') +
+    ggplot2::ylab('Split 2') +
+    ggplot2::theme_classic() +
+    ggplot2::theme(
+      plot.title = ggplot2::element_text(size = 16, face ="bold"),
+      axis.text = ggplot2::element_text(size = 16),
+      axis.ticks.length = ggplot2::unit(.25,"cm"),
+      axis.title = ggplot2::element_text(size = 18, face = "bold"),
       legend.position = 'top',
-      legend.text = element_text(size = 16),
-      legend.title = element_text(size = 18, face = 'bold')
+      legend.text = ggplot2::element_text(size = 16),
+      legend.title = ggplot2::element_text(size = 18, face = 'bold')
     )
 fig.SSR
-
 }

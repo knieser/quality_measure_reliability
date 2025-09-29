@@ -24,9 +24,9 @@ calcReliability(
 
 \item{y}{data column containing the outcome variable}
 
-\item{data.type}{acceptable values are "binary" for 0/1 data and "continuous" for continuous data (default: 'binary')}
+\item{data.type}{acceptable values are \code{binary} for 0/1 data and \code{continuous} for continuous data (default: \code{binary})}
 
-\item{show.all}{logical indicator for whether full list of reliability method estimates should be calculated (default: FALSE)}
+\item{show.all}{logical indicator for whether full list of reliability method estimates should be calculated (default: \code{FALSE})}
 
 \item{ctrPerf}{parameters to control performance measure calculation}
 

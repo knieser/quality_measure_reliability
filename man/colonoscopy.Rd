@@ -17,8 +17,6 @@ These data are from the Centers for Medicare and Medicaid Services (CMS). They c
 in calendar year 2023.
 }
 \details{
-Data can be accessed from this link: \link{https://data.cms.gov/provider-data/dataset/yv7e-xc69}
-
 \code{entity} indicates the accountable health care entity;
 \code{p} indicates the follow-up rate;
 \code{n} indicates the denominator count for the measure;

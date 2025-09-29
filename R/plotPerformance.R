@@ -1,18 +1,18 @@
 #' Plot measure performance across accountable entities
 #' @description
-#' This function creates a plot of measure performance across accountable entities, using the perf.results dataframe from calcPerformance() output.
-#' @param df perf.results dataframe from calcPerformance() output
+#' This function creates a plot of measure performance across accountable entities, using the `perf.results` dataframe from `calcPerformance()` output.
+#' @param df perf.results dataframe from `calcPerformance()` output
 #' @param plot.type select which plot to return:
-#' \item{single}{a plot of the performance across entities}
-#' \item{OR}{plot of ORs comparing each facility with the average facility}
-#' \item{correlation}{plot of standardization ratios against the entity random intercepts}
-#' \item{multiple}{plot of measure performance across different risk-adjustment methods}
-#' @param plot.y 'p' plots the unadjusted performance, 'oe' plots the observed-to-expected ratio, 'pe' plots the predicted-to-expected ratio'
+#' * `single` (the default): a plot of the performance across entities
+#' * `OR`: plot of ORs comparing each facility with the average facility
+#' * `correlation`: plot of standardization ratios against the entity random intercepts
+#' * `multiple`: plot of measure performance across different risk-adjustment methods
+#' @param plot.y `p` plots the unadjusted performance; `oe` plots the observed-to-expected ratio; `pe` plots the predicted-to-expected ratio
 #' @author Kenneth Nieser (nieser@stanford.edu)
-#' @importFrom ggplot2 ggplot
+#' @importFrom ggplot2 ggplot position_dodge
 #' @export
 
-plotPerformance <- function(df = perf.results, plot.type = 'single', use.median = 0, plot.y = 'p'){
+plotPerformance <- function(df = perf.results, plot.type = 'single', plot.y = 'p'){
 
   marg.p = sum(df$observed) / sum(df$n)
 
@@ -30,52 +30,51 @@ plotPerformance <- function(df = perf.results, plot.type = 'single', use.median 
       df$upr = df$rs.oe.upr
       ylab = 'OE risk-standardized rate'
     } else if (plot.y == 'pe') {
-      if (use.median == 1){
-        df$y = df$pe.median * marg.p
-      } else {df$y = df$rs.pe}
+      df$y = df$rs.pe
       df$rank = df$rank.pe
       df$lwr = df$rs.pe.lwr
       df$upr = df$rs.pe.upr
       ylab = 'PE risk-standardized rate'
     }
 
-    fig <- ggplot2::ggplot(data = df, aes(x = rank, y = y)) +
-      geom_point(color = 'black') +
-      geom_errorbar(aes(ymin = lwr, ymax = upr), width = 0.1) +
-      geom_hline(yintercept = marg.p, col = 'red', lty = 'dashed', size = 1.2, alpha = 0.7) +
-      xlab('Rank') +
-      ylab(ylab) +
-      theme_classic() +
-      theme(
-        plot.title = element_text(size = 16, face ="bold"),
-        axis.text = element_text(size = 16),
-        axis.ticks.length = unit(.25,"cm"),
-        axis.title = element_text(size = 18, face = "bold"),
-        strip.text = element_text(size = 18, face = "bold"),
+    fig <- ggplot2::ggplot(data = df, ggplot2::aes(x = rank, y = y)) +
+      ggplot2::geom_point(color = 'black') +
+      ggplot2::geom_errorbar(aes(ymin = lwr, ymax = upr), width = 0.1) +
+      ggplot2::geom_hline(yintercept = marg.p, col = 'red', lty = 'dashed', size = 1.2, alpha = 0.7) +
+      ggplot2::xlab('Rank') +
+      ggplot2::ylab(ylab) +
+      ggplot2::theme_classic() +
+      ggplot2::theme(
+        plot.title = ggplot2::element_text(size = 16, face ="bold"),
+        axis.text = ggplot2::element_text(size = 16),
+        axis.ticks.length = ggplot2::unit(.25,"cm"),
+        axis.title = ggplot2::element_text(size = 18, face = "bold"),
+        strip.text = ggplot2::element_text(size = 18, face = "bold"),
         legend.position = 'none'
       )
   }
 
   if(plot.type == 'OR'){
     # plot of ORs comparing each facility with the average facility
-    fig <- ggplot2::ggplot(data = df, aes(x = intercept.OR, y = entities)) +
-      geom_point(aes(color = intercept.sig), size = 2) +
-      geom_errorbar(aes(xmin = intercept.OR.lwr, xmax = intercept.OR.upr), width = 0.1, position = position_dodge(width = .7)) +
-      scale_color_manual(values = c('black', 'red')) +
-      scale_x_continuous(trans = 'log10') +
-      geom_vline(xintercept = 1, lty = 2) +
-      xlab('OR') +
-      ylab('Entity') +
-      theme_classic() +
-      theme(
-        plot.title = element_text(size = 16, face ="bold"),
-        axis.text = element_text(size = 16),
-        axis.text.y = element_blank(),
-        axis.ticks.length.y = unit(0,'cm'),
-        axis.ticks.length.x = unit(.25, 'cm'),
-        axis.title = element_text(size = 18, face = "bold"),
-        axis.text.x = element_text(angle = 55, vjust = 0.7),
-        strip.text = element_text(size = 18, face = "bold"),
+    df$or.rank = rank(df$intercept.OR, ties.method = 'random')
+    fig <- ggplot2::ggplot(data = df, ggplot2::aes(x = intercept.OR, y = or.rank)) +
+      ggplot2::geom_point(ggplot2::aes(color = intercept.sig), size = 2) +
+      ggplot2::geom_errorbar(ggplot2::aes(xmin = intercept.OR.lwr, xmax = intercept.OR.upr), width = 0.1, position = ggplot2::position_dodge(width = .7)) +
+      ggplot2::scale_color_manual(values = c('black', 'red')) +
+      ggplot2::scale_x_continuous(trans = 'log10') +
+      ggplot2::geom_vline(xintercept = 1, lty = 2) +
+      ggplot2::xlab('OR') +
+      ggplot2::ylab('Entity') +
+      ggplot2::theme_classic() +
+      ggplot2::theme(
+        plot.title = ggplot2::element_text(size = 16, face ="bold"),
+        axis.text = ggplot2::element_text(size = 16),
+        axis.text.y = ggplot2::element_blank(),
+        axis.ticks.length.y = ggplot2::unit(0,'cm'),
+        axis.ticks.length.x = ggplot2::unit(.25, 'cm'),
+        axis.title = ggplot2::element_text(size = 18, face = "bold"),
+        axis.text.x = ggplot2::element_text(angle = 55, vjust = 0.7),
+        strip.text = ggplot2::element_text(size = 18, face = "bold"),
         legend.position = 'none'
       )
   }
@@ -88,21 +87,21 @@ plotPerformance <- function(df = perf.results, plot.type = 'single', use.median 
       std.ratio = c(df$oe, df$pe)
     )
 
-    fig <- ggplot2::ggplot(data = plot.df.corr, aes(x = rand.int, y = std.ratio, group = Method)) +
-      geom_point(aes(color = Method, shape = Method), size = 3) +
-      stat_smooth(method = 'lm', formula = y ~ x, geom = 'smooth', se = F, aes(color = Method), lty = 'dashed') +
-      scale_color_manual(values = c('darkgrey', 'red')) +
-      xlab('Entity-specific random intercepts') +
-      ylab('Standardization ratio') +
-      theme_classic() +
-      theme(
-        plot.title = element_text(size = 16, face ="bold"),
-        axis.text = element_text(size = 16),
-        axis.ticks.length = unit(.25,"cm"),
-        axis.title = element_text(size = 18, face = "bold"),
+    fig <- ggplot2::ggplot(data = plot.df.corr, ggplot2::aes(x = rand.int, y = std.ratio, group = Method)) +
+      ggplot2::geom_point(ggplot2::aes(color = Method, shape = Method), size = 3) +
+      ggplot2::stat_smooth(method = 'lm', formula = y ~ x, geom = 'smooth', se = F, aes(color = Method), lty = 'dashed') +
+      ggplot2::scale_color_manual(values = c('darkgrey', 'red')) +
+      ggplot2::xlab('Entity-specific random intercepts') +
+      ggplot2::ylab('Standardization ratio') +
+      ggplot2::theme_classic() +
+      ggplot2::theme(
+        plot.title = ggplot2::element_text(size = 16, face ="bold"),
+        axis.text = ggplot2::element_text(size = 16),
+        axis.ticks.length = ggplot2::unit(.25,"cm"),
+        axis.title = ggplot2::element_text(size = 18, face = "bold"),
         legend.position = 'top',
-        legend.text = element_text(size = 16),
-        legend.title = element_text(size = 18, face = 'bold')
+        legend.text = ggplot2::element_text(size = 16),
+        legend.title = ggplot2::element_text(size = 18, face = 'bold')
       )
   }
 
@@ -118,22 +117,22 @@ plotPerformance <- function(df = perf.results, plot.type = 'single', use.median 
     rank.pe = rep(df$rank.pe, 3)
   )
 
-  fig <- ggplot2::ggplot(data = plot.df.p, aes(x = rank, y = p, group = method)) +
-    geom_point(size = 2) +
-    geom_errorbar(aes(ymin = lwr, ymax = upr), width = 0.1) +
-    geom_hline(yintercept = marg.p, col = 'red', lty = 'dashed', size = 1.2, alpha = 0.7) +
-    xlab('Entity rank') +
-    ylab('Measure performance') +
-    facet_wrap( ~ method, nrow = 1) +
-    theme_classic() +
-    theme(
-      plot.title = element_text(size = 16, face ="bold"),
-      axis.text = element_text(size = 16),
-      axis.ticks.length = unit(.25,"cm"),
-      axis.title = element_text(size = 18, face = "bold"),
-      strip.text = element_text(size = 18, face = "bold"),
-      legend.text = element_text(size = 16),
-      legend.title = element_blank(),
+  fig <- ggplot2::ggplot(data = plot.df.p, ggplot2::aes(x = rank, y = p, group = method)) +
+    ggplot2::geom_point(size = 2) +
+    ggplot2::geom_errorbar(ggplot2::aes(ymin = lwr, ymax = upr), width = 0.1) +
+    ggplot2::geom_hline(yintercept = marg.p, col = 'red', lty = 'dashed', size = 1.2, alpha = 0.7) +
+    ggplot2::xlab('Entity rank') +
+    ggplot2::ylab('Measure performance') +
+    ggplot2::facet_wrap( ~ method, nrow = 1) +
+    ggplot2::theme_classic() +
+    ggplot2::theme(
+      plot.title = ggplot2::element_text(size = 16, face ="bold"),
+      axis.text = ggplot2::element_text(size = 16),
+      axis.ticks.length = ggplot2::unit(.25,"cm"),
+      axis.title = ggplot2::element_text(size = 18, face = "bold"),
+      strip.text = ggplot2::element_text(size = 18, face = "bold"),
+      legend.text = ggplot2::element_text(size = 16),
+      legend.title = ggplot2::element_blank(),
       legend.position = 'bottom'
     )
   }

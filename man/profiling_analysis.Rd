@@ -14,7 +14,7 @@ profiling_analysis(
 )
 }
 \arguments{
-\item{df}{observation-level data; if null, will use the dataframe from the model object}
+\item{df}{observation-level data}
 
 \item{model}{model; if null, will use an unadjusted model}
 
@@ -22,12 +22,12 @@ profiling_analysis(
 
 \item{y}{data column containing the outcome variable}
 
-\item{data.type}{acceptable values are "binary" for 0/1 data and "continuous" for continuous data (default: 'binary')}
+\item{data.type}{acceptable values are \code{binary} for 0/1 data and \code{continuous} for continuous data (default: \code{binary})}
 
 \item{ctrPerf}{parameters to control performance measure calculation}
 }
 \value{
-Estimated risk-standardized measure performance by accountable entity
+Estimated measure performance by accountable entity
 }
 \description{
 This function calculates measure performance by accountable entity.

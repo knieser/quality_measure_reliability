@@ -9,18 +9,16 @@ Description: This package contains functions useful for analyzing quality
 License: GPL (>= 3)
 Depends: R (>= 4.0), ggplot2, doParallel, lme4, psych
 Imports: 
-    doParallel,
     foreach,
-    ggplot2,
-    lme4,
-    parallel,
-    psych
+    parallel
 Suggests: 
     knitr,
-    rmarkdown
+    rmarkdown,
+    testthat (>= 3.0.0)
 VignetteBuilder: 
     knitr
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
 LazyData: true
+Config/testthat/edition: 3

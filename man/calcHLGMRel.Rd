@@ -23,7 +23,7 @@ calcHLGMRel(
 
 \item{y}{data column containing the outcome variable}
 
-\item{show.all}{logical parameter indicating whether all variations of reliability estimates should be calculated; default is FALSE.}
+\item{show.all}{logical parameter indicating whether all variations of reliability estimates should be calculated; default is \code{FALSE}.}
 
 \item{ctrPerf}{parameters to control performance measure calculation}
 

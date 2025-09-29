@@ -5,7 +5,7 @@
 #' @param model model; if null, will use an unadjusted model
 #' @param entity data column containing the accountable entity identifier
 #' @param y data column containing the outcome variable
-#' @param data.type acceptable values are "binary" for 0/1 data and "continuous" for continuous data (default: 'binary')
+#' @param data.type acceptable values are `binary` for 0/1 data and `continuous` for continuous data (default: `binary`)
 #' @param ctrPerf parameters to control performance measure calculation
 #' @param ctrRel parameters to control reliability estimation
 #' @returns SSR reliability estimates
@@ -16,6 +16,7 @@
 #' @importFrom doParallel registerDoParallel
 #' @importFrom foreach foreach
 #' @importFrom psych ICC
+#' @importFrom stats reshape
 #' @export
 
 calcSSR <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', data.type = 'binary', ctrPerf = controlPerf(), ctrRel = controlRel()){
@@ -52,7 +53,7 @@ calcSSR <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', data.ty
 
     # calculate performance by entity and split-half
     entity.means <- aggregate(y ~ entity + s, data = df, function(x) fn(x))
-    entity.means.wide <- reshape(entity.means, idvar = "entity", timevar = "s", direction = "wide")
+    entity.means.wide <- stats::reshape(entity.means, idvar = "entity", timevar = "s", direction = "wide")
 
     agg   <- aggregate(y ~ entity + s, data = df, sum)
     agg$obs   <- agg$y

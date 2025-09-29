@@ -5,12 +5,13 @@
 #' @param model model; if null, will use an unadjusted model
 #' @param entity data column containing the accountable entity identifier
 #' @param y data column containing the outcome variable
-#' @param data.type acceptable values are "binary" for 0/1 data and "continuous" for continuous data (default: 'binary')
-#' @param show.all logical indicator for whether full list of reliability method estimates should be calculated (default: FALSE)
+#' @param data.type acceptable values are `binary` for 0/1 data and `continuous` for continuous data (default: `binary`)
+#' @param show.all logical indicator for whether full list of reliability method estimates should be calculated (default: `FALSE`)
 #' @param ctrPerf parameters to control performance measure calculation
 #' @param ctrRel parameters to control reliability estimation
 #' @author Kenneth Nieser (nieser@stanford.edu)
 #' @references Nieser KJ, Harris AH. Comparing methods for assessing the reliability of health care quality measures. Statistics in Medicine. 2024 Oct 15;43(23):4575-94.
+#' @importFrom stats quantile
 #' @export
 
 calcReliability <- function(df = NULL, model = NULL, entity = "entity", y = "y", data.type = 'binary', show.all = FALSE, ctrPerf = controlPerf(), ctrRel = controlRel()){
@@ -109,13 +110,13 @@ calcReliability <- function(df = NULL, model = NULL, entity = "entity", y = "y",
         ),
         reliability_25p = c(
           NA,
-          quantile(est.HLGM.delta, 0.25),
-          quantile(est.BB, 0.25)
+          stats::quantile(est.HLGM.delta, 0.25),
+          stats::quantile(est.BB, 0.25)
         ),
         reliability_75p = c(
           NA,
-          quantile(est.HLGM.delta, 0.75),
-          quantile(est.BB, 0.75)
+          stats::quantile(est.HLGM.delta, 0.75),
+          stats::quantile(est.BB, 0.75)
         ),
         reliability_max = c(
           NA,
@@ -245,16 +246,16 @@ calcReliability <- function(df = NULL, model = NULL, entity = "entity", y = "y",
           NA,
           NA,
           NA,
-          quantile(est.aov, 0.25),
-          quantile(est.HLGM.latent, 0.25),
-          quantile(est.HLGM.delta, 0.25),
-          quantile(est.HLGM.MC, 0.25),
-          quantile(est.HLGM.FE, 0.25),
-          quantile(est.HLGM.RE, 0.25),
-          quantile(est.BB, 0.25),
-          quantile(est.BB.FE, 0.25),
-          quantile(est.BB.RE, 0.25),
-          quantile(est.BB.J, 0.25)
+          stats::quantile(est.aov, 0.25),
+          stats::quantile(est.HLGM.latent, 0.25),
+          stats::quantile(est.HLGM.delta, 0.25),
+          stats::quantile(est.HLGM.MC, 0.25),
+          stats::quantile(est.HLGM.FE, 0.25),
+          stats::quantile(est.HLGM.RE, 0.25),
+          stats::quantile(est.BB, 0.25),
+          stats::quantile(est.BB.FE, 0.25),
+          stats::quantile(est.BB.RE, 0.25),
+          stats::quantile(est.BB.J, 0.25)
         ),
         reliability_75p = c(
           NA,
@@ -263,16 +264,16 @@ calcReliability <- function(df = NULL, model = NULL, entity = "entity", y = "y",
           NA,
           NA,
           NA,
-          quantile(est.aov, 0.75),
-          quantile(est.HLGM.latent, 0.75),
-          quantile(est.HLGM.delta, 0.75),
-          quantile(est.HLGM.MC, 0.75),
-          quantile(est.HLGM.FE, 0.75),
-          quantile(est.HLGM.RE, 0.75),
-          quantile(est.BB, 0.75),
-          quantile(est.BB.FE, 0.75),
-          quantile(est.BB.RE, 0.75),
-          quantile(est.BB.J, 0.75)
+          stats::quantile(est.aov, 0.75),
+          stats::quantile(est.HLGM.latent, 0.75),
+          stats::quantile(est.HLGM.delta, 0.75),
+          stats::quantile(est.HLGM.MC, 0.75),
+          stats::quantile(est.HLGM.FE, 0.75),
+          stats::quantile(est.HLGM.RE, 0.75),
+          stats::quantile(est.BB, 0.75),
+          stats::quantile(est.BB.FE, 0.75),
+          stats::quantile(est.BB.RE, 0.75),
+          stats::quantile(est.BB.J, 0.75)
         ),
         reliability_max = c(
           NA,
@@ -354,13 +355,13 @@ calcReliability <- function(df = NULL, model = NULL, entity = "entity", y = "y",
       ),
       reliability_25p = c(
         NA,
-        quantile(est.aov, 0.25),
-        quantile(est.HLM, 0.25)
+        stats::quantile(est.aov, 0.25),
+        stats::quantile(est.HLM, 0.25)
       ),
       reliability_75p = c(
         NA,
-        quantile(est.aov, 0.75),
-        quantile(est.HLM, 0.75)
+        stats::quantile(est.aov, 0.75),
+        stats::quantile(est.HLM, 0.75)
       ),
       reliability_max = c(
         NA,

@@ -12,7 +12,7 @@ calcDataSummary <- function(df, model = NULL, entity = 'entity', y = "y", data.t
   entities <- agg$entity
 
   if(data.type=='continuous'){
-    fit <- lmer(formula = model, data = df)
+    fit <- lme4::lmer(formula = model, data = df)
     df$expect  <- predict(fit, newdata = df, type = 'response', re.form = ~0)
     df$predict <- predict(fit, newdata = df, type = 'response')
 
@@ -26,7 +26,7 @@ calcDataSummary <- function(df, model = NULL, entity = 'entity', y = "y", data.t
   }
 
   if(data.type=='binary'){
-    fit <- lme4::glmer(formula = model, data = df, family = 'binomial', control = glmerControl(optimizer = "bobyqa"), nAGQ = 0)
+    fit <- lme4::glmer(formula = model, data = df, family = 'binomial', control = lme4::glmerControl(optimizer = "bobyqa"), nAGQ = 0)
     df$expect  <- predict(fit, newdata = df, type = 'response', re.form = ~0)
     df$predict <- predict(fit, newdata = df, type = 'response')
     df$predict.var <- df$predict * (1 - df$predict)
@@ -34,11 +34,11 @@ calcDataSummary <- function(df, model = NULL, entity = 'entity', y = "y", data.t
     obs      <- agg$y
     p        <- obs / n
     p.ci <- tryCatch({
-      t(apply(cbind(obs, n), 1, function(x) prop.test(x[1], x[2], conf.level = 1-alpha, correct = FALSE)$conf.int))
+      t(apply(cbind(obs, n), 1, function(x) stats::prop.test(x[1], x[2], conf.level = 1-alpha, correct = FALSE)$conf.int))
     },
     warning = function(w){
       message('...using Clopper-Pearson intervals instead of Wilson score intervals for performance CIs...')
-      t(apply(cbind(obs, n), 1, function(x) binom.test(x[1], x[2], conf.level = 1-alpha)$conf.int))
+      t(apply(cbind(obs, n), 1, function(x) stats::binom.test(x[1], x[2], conf.level = 1-alpha)$conf.int))
     }
     )
     p.lwr <- p.ci[,1]

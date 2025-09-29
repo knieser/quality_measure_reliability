@@ -22,7 +22,7 @@ calcPerformance(
 
 \item{y}{data column containing the outcome variable}
 
-\item{data.type}{acceptable values are "binary" for 0/1 data (default: 'binary')}
+\item{data.type}{acceptable values are \code{binary} for 0/1 data (default: \code{binary})}
 
 \item{ctrPerf}{parameters to control performance measure calculation}
 }

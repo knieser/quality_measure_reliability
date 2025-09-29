@@ -7,7 +7,7 @@
 plotPredictedDistribution(model.performance = model.performance)
 }
 \arguments{
-\item{model.performance}{results from model_performance()}
+\item{model.performance}{results from \code{model_performance()}}
 }
 \description{
 This function creates a plot of the distributions of predicted values by outcome group

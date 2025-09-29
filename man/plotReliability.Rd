@@ -7,7 +7,7 @@
 plotReliability(rel.out = rel.out)
 }
 \arguments{
-\item{rel.out}{results from calcReliability()}
+\item{rel.out}{results from \code{calcReliability()}}
 }
 \description{
 This function creates boxplots of reliability estimates across entities and different methods

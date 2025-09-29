@@ -7,7 +7,7 @@
 plotEstimates(model.performance = model.performance)
 }
 \arguments{
-\item{model.performance}{results from model_performance()}
+\item{model.performance}{results from \code{model_performance()}}
 }
 \description{
 This function creates a plot of model results
