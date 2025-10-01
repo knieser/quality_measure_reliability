@@ -25,13 +25,13 @@ calcBetaBin(
 
 \item{y}{data column containing the outcome variable}
 
-\item{df.aggregate}{set this to TRUE if the data have already been aggregated to include only summary data (n, x) for each entity; default is FALSE.}
+\item{df.aggregate}{set this to \code{TRUE} if the data have already been aggregated to include only summary data (n, x) for each entity; default is \code{FALSE}.}
 
 \item{n}{if using aggregated data, data column containing the sample size by entity}
 
 \item{x}{if using aggregated data, data column containing the number of observations that met measure criteria by entity}
 
-\item{show.all}{logical parameter indicating whether all variations of reliability estimates should be calculated; default is FALSE.}
+\item{show.all}{logical parameter indicating whether all variations of reliability estimates should be calculated; default is \code{FALSE}.}
 
 \item{ctrPerf}{parameters to control performance measure calculation}
 }
