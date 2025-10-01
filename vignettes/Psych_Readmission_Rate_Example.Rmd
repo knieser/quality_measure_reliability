@@ -15,7 +15,6 @@ knitr::opts_chunk$set(
   fig.width = 8,
   fig.height = 6
 )
-library(knitr)
 ```
 
 This vignette includes an example of hospital profiling based on a measure of thirty-day all-cause unplanned readmission following psychiatric hospitalization in an inpatient psychiatric facility (IPF Readmission). This claims-based measure is reported by hospitals to CMS as part of the Inpatient Psychiatric Facility Quality Reporting Program.

@@ -3,7 +3,7 @@ Title: A package to assist with the analysis of health care quality measure perf
 Version: 1.0.0
 Date: 2025-03-18
 Authors@R: 
-    person("Kenneth", "Nieser", , "nieser@stanford.edu", role = c("aut", "cre"))
+    person("Kenneth", "Nieser", , "nieser@stanford.edu", role = c("aut", "cre", "cph"))
 Description: This package contains functions useful for analyzing quality
     measures and estimating reliability of quality measures.
 License: GPL (>= 3)

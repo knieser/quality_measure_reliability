@@ -6,12 +6,13 @@
 #' @importFrom ggplot2 ggplot
 #' @export
 
-plotPredictedDistribution <- function(model.performance = model.performance){
+plotPredictedDistribution <- function(model.performance){
   data.type = model.performance$data.type
   if(data.type != 'binary') stop('This function only works for binary outcome data.')
-
   df = model.performance$df
-  fig.prediction <- ggplot2::ggplot(data = df, ggplot2::aes(x=predict, color = as.factor(y), fill = as.factor(y))) +
+  df$y <- as.factor(df$y)
+
+  fig.prediction <- ggplot2::ggplot(data = df, ggplot2::aes(x = predict, color = .data$y, fill = .data$y)) +
     ggplot2::geom_density(alpha = .3) +
     ggplot2::scale_color_manual('Observed outcome', values = c('black', 'red')) +
     ggplot2::scale_fill_manual('Observed outcome', values = c('black', 'red')) +

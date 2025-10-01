@@ -7,7 +7,7 @@
 #' @export
 
 
-plotEstimates <- function(model.performance = model.performance){
+plotEstimates <- function(model.performance){
   data.type = model.performance$data.type
   model.results = model.performance$model.results
 
@@ -22,9 +22,9 @@ plotEstimates <- function(model.performance = model.performance){
     xlab = 'Adjusted mean difference'
     xline = 0
   }
-  fig <- ggplot2::ggplot(data = model.results, ggplot2::aes(x = est, y = predictor.clean, group = sig)) +
+  fig <- ggplot2::ggplot(data = model.results, ggplot2::aes(x = .data$est, y = .data$predictor.clean, group = .data$sig)) +
     ggplot2::geom_point(ggplot2::aes(color = sig), size = 3) +
-    ggplot2::geom_errorbar(ggplot2::aes(xmin = lb, xmax = ub, color = sig),
+    ggplot2::geom_errorbar(ggplot2::aes(xmin = .data$lb, xmax = .data$ub, color = sig),
                   width = 0.5,
                   linetype = 1) +
     ggplot2::scale_color_manual(values = c('black', 'red')) +

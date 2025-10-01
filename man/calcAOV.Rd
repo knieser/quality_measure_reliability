@@ -16,7 +16,7 @@ calcAOV(
 )
 }
 \arguments{
-\item{df}{observation-level data}
+\item{df}{dataframe (assumed to be observation-level unless \code{df.aggregate} is changed below)}
 
 \item{entity}{data column containing the accountable entity identifier}
 
@@ -36,8 +36,6 @@ calcAOV(
 This function estimates reliability using the one-way ANOVA method.
 }
 \references{
-He K, Kalbfleisch JD, Yang Y, Fei Z. Inter‐unit reliability for nonlinear models. Statistics in Medicine. 2019 Feb 28;38(5):844-54.
-
 Nieser KJ, Harris AH. Comparing methods for assessing the reliability of health care quality measures. Statistics in Medicine. 2024 Oct 15;43(23):4575-94.
 }
 \author{

@@ -8,8 +8,6 @@
 #' @param ctrPerf parameters to control performance measure calculation
 #' @param ctrRel parameters to control reliability estimation
 #' @author Kenneth Nieser (nieser@stanford.edu)
-#' @references He K, Kalbfleisch JD, Yang Y, Fei Z. Inter‐unit reliability for nonlinear models. Statistics in Medicine. 2019 Feb 28;38(5):844-54.
-#' @references Nieser KJ, Harris AH. Comparing methods for assessing the reliability of health care quality measures. Statistics in Medicine. 2024 Oct 15;43(23):4575-94.
 #' @importFrom stats aggregate
 #' @export
 

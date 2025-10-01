@@ -7,7 +7,7 @@
 #' @importFrom ggplot2 ggplot aes geom_point geom_line geom_abline xlab ylab theme_classic theme element_line element_text unit element_blank
 #' @export
 
-plotCalibration <- function(model.performance = model.performance, quantiles = 10){
+plotCalibration <- function(model.performance, quantiles = 10){
   data.type = model.performance$data.type
   if (data.type != 'binary') stop ('This function only works for binary outcome data.')
 
@@ -24,7 +24,7 @@ plotCalibration <- function(model.performance = model.performance, quantiles = 1
     predicted = aggregate(predict ~ quantile, data = df, mean)$predict
   )
 
-  fig.calibration <- ggplot2::ggplot(data = calibration.df, ggplot2::aes(x = predicted, y = observed)) +
+  fig.calibration <- ggplot2::ggplot(data = calibration.df, ggplot2::aes(x = .data$predicted, y = .data$observed)) +
     ggplot2::geom_point(size = 3) +
     ggplot2::geom_line(lwd = 1) +
     ggplot2::geom_abline(slope = 1, intercept = 0, lty = 'dashed', lwd = 1) +

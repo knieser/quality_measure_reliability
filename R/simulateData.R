@@ -4,8 +4,9 @@
 #' @param n.entity total number of entities to simulate
 #' @param n.obs average number of observations per entity; entity sample sizes are simulated from a Poisson distribution with mean given by n.obs OR a vector of length n.entity with entity sample sizes
 #' @param mu average probability of the outcome for binary data OR average outcome value for Normal data
+#' @param sd within-entity standard deviation for Normal data (default is `1`).
 #' @param r median reliability
-#' @param beta1 regression coefficient for covariate added to the linear predictor; default is 0.
+#' @param beta1 regression coefficient for covariate added to the linear predictor; default is `0`. Note that for binary data, `beta1` is on the log odds scale (e.g., `beta1` = 0.4 corresponds to an odds ratio of about 1.5).
 #' @param data.type type of data to simulate. Valid options include: `binary` (default) and `normal`.
 #' @param dist specifies the distribution family to use to simulate provider performance. Valid options include: `normal` (default) and `beta`.
 #' @author Kenneth Nieser (nieser@stanford.edu)
@@ -31,7 +32,14 @@
 #' @importFrom stats aov rnorm rbeta rpois
 #' @export
 
-simulateData <- function(n.entity, n.obs, mu, r, beta1 = 0, data.type = 'binary', dist = 'normal'){
+simulateData <- function(n.entity, n.obs, mu, sd = 1, r, beta1 = 0, data.type = 'binary', dist = 'normal'){
+  if(n.entity <= 1) stop('n.entity must be greater than 1.')
+  if(data.type=='binary' & mu <= 0) stop('For binary data, mu is a probability and must be between 0 and 1.')
+  if(data.type=='binary' & mu >= 1) stop('For binary data, mu is a probability and must be between 0 and 1.')
+  if(r <= 0 || r >= 1) stop('r is a reliability and must be between 0 and 1.')
+  if(data.type != 'binary' & data.type != 'normal') stop('The only valid values for data.type are binary or normal.')
+  if(dist != 'normal' & dist != 'beta') stop('The only valid values for dist are normal or beta.')
+  if(data.type=='binary' & sd != 1) warning('sd selection will not be used; this parameter is only for use with data.type = normal.')
 
   if (length(n.obs)==1){
     n = stats::rpois(n.entity, n.obs)
@@ -74,10 +82,10 @@ simulateData <- function(n.entity, n.obs, mu, r, beta1 = 0, data.type = 'binary'
 
   if (data.type == 'normal'){
     beta0 = mu
-    var.b = 1 / (1 - r) * 1 / median.n
+    var.b = r / (1 - r) * sd / median.n
     z = rep(stats::rnorm(n.entity, 0, sqrt(var.b)), times = n)
     lp = z + beta0 + beta1 * x1
-    y = stats::rnorm(total.n, mean = lp, sd = tau[2])
+    y = stats::rnorm(total.n, mean = lp, sd = sd)
     df = data.frame(
       entity = as.factor(entity),
       z = z,

@@ -27,8 +27,6 @@ calcHLMRel(
 This function estimates reliability using a hierarchical linear regression model.
 }
 \references{
-Adams JL, Mehrotra A, Thomas JW, McGlynn EA. Physician cost profiling—reliability and risk of misclassification. New England Journal of Medicine. 2010 Mar 18;362(11):1014-21.
-
 Nieser KJ, Harris AH. Comparing methods for assessing the reliability of health care quality measures. Statistics in Medicine. 2024 Oct 15;43(23):4575-94.
 }
 \author{

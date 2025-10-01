@@ -23,7 +23,7 @@ model_performance(
 
 \item{y}{data column containing the outcome variable}
 
-\item{data.type}{acceptable values are "binary" for 0/1 data and "continuous" for continuous data (default: 'binary')}
+\item{data.type}{acceptable values are \code{binary} for 0/1 data and \code{continuous} for continuous data (default: \code{binary})}
 
 \item{predictor.clean}{optional list of formatted names of predictors in the model}
 

@@ -54,7 +54,7 @@ misclassification_analysis <- function(df = NULL, model = NULL, entity = "entity
   )
 
   # make figures
-  fig.p.percentile <- ggplot2::ggplot(data = percentile.df, ggplot2::aes(x = d, y = p, group = entities)) +
+  fig.p.percentile <- ggplot2::ggplot(data = percentile.df, ggplot2::aes(x = .data$d, y = .data$p, group = .data$entities)) +
     ggplot2::geom_point(ggplot2::aes(color = entities), size = 2) +
     ggplot2::geom_line(ggplot2::aes(color = entities)) +
     ggplot2::xlab('d (differences in percentiles)') +
@@ -66,7 +66,7 @@ misclassification_analysis <- function(df = NULL, model = NULL, entity = "entity
       legend.position = 'none'
       )
 
-  fig.oe.percentile <- ggplot2::ggplot(data = percentile.df, ggplot2::aes(x = d, y = oe, group = entities)) +
+  fig.oe.percentile <- ggplot2::ggplot(data = percentile.df, ggplot2::aes(x = .data$d, y = .data$oe, group = .data$entities)) +
     ggplot2::geom_point(ggplot2::aes(color = entities), size = 2) +
     ggplot2::geom_line(ggplot2::aes(color = entities)) +
     ggplot2::xlab('d (differences in percentiles)') +
@@ -78,7 +78,7 @@ misclassification_analysis <- function(df = NULL, model = NULL, entity = "entity
       legend.position = 'none'
       )
 
-  fig.pe.percentile <- ggplot2::ggplot(data = percentile.df, ggplot2::aes(x = d, y = pe, group = entities)) +
+  fig.pe.percentile <- ggplot2::ggplot(data = percentile.df, ggplot2::aes(x = .data$d, y = .data$pe, group = .data$entities)) +
     ggplot2::geom_point(ggplot2::aes(color = entities), size = 2) +
     ggplot2::geom_line(ggplot2::aes(color = entities)) +
     ggplot2::xlab('d (differences in percentiles)') +

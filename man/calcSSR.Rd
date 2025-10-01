@@ -36,8 +36,6 @@ SSR reliability estimates
 This function estimates reliability using the split-sample method.
 }
 \references{
-Nieser KJ, Harris AH. Split‐sample reliability estimation in health care quality measurement: Once is not enough. Health Services Research. 2024 Aug;59(4):e14310.
-
 Nieser KJ, Harris AH. Comparing methods for assessing the reliability of health care quality measures. Statistics in Medicine. 2024 Oct 15;43(23):4575-94.
 }
 \author{

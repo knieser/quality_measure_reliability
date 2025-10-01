@@ -4,7 +4,7 @@
 \alias{plotReliability}
 \title{Plot distributions of reliability estimates across entities}
 \usage{
-plotReliability(rel.out = rel.out)
+plotReliability(rel.out)
 }
 \arguments{
 \item{rel.out}{results from \code{calcReliability()}}

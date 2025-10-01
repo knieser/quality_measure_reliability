@@ -5,7 +5,7 @@
 #' @param model model; if null, will use an unadjusted model
 #' @param entity data column containing the accountable entity identifier
 #' @param y data column containing the outcome variable
-#' @param data.type acceptable values are "binary" for 0/1 data and "continuous" for continuous data (default: 'binary')
+#' @param data.type acceptable values are `binary` for 0/1 data and `continuous` for continuous data (default: `binary`)
 #' @param predictor.clean optional list of formatted names of predictors in the model
 #' @param ctrPerf parameters to control performance measure calculation
 #' @returns Estimated risk-standardized measure performance by accountable entity
@@ -14,6 +14,8 @@
 #' @export
 
 model_performance <- function(df, model, entity = 'entity', y = 'y', data.type = 'binary', predictor.clean = NULL, ctrPerf = controlPerf()){
+  if(data.type != 'binary' & data.type != 'continuous') stop('The only valid values for data.type are binary or continuous.')
+
   cl <- match.call()
   alpha = ctrPerf$alpha
   z = stats::qnorm(1 - alpha/2)

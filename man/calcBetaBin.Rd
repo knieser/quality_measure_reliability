@@ -17,7 +17,7 @@ calcBetaBin(
 )
 }
 \arguments{
-\item{df}{observation-level data; if null, will use the dataframe from the model object}
+\item{df}{dataframe (assumed to be observation-level unless \code{df.aggregate} is changed below); if null, will use the dataframe from the model object}
 
 \item{model}{model; if null, will use an unadjusted model (NOTE: currently, Beta-Binomial reliability estimates do not take risk-adjustment into account.)}
 
@@ -25,7 +25,7 @@ calcBetaBin(
 
 \item{y}{data column containing the outcome variable}
 
-\item{df.aggregate}{set this to \code{TRUE} if the data have already been aggregated to include only summary data (n, x) for each entity; default is \code{FALSE}.}
+\item{df.aggregate}{set this to \code{TRUE} if the data have already been aggregated to include only summary data (sample sizes and numerators) for each entity; default is \code{FALSE}.}
 
 \item{n}{if using aggregated data, data column containing the sample size by entity}
 
@@ -39,7 +39,7 @@ calcBetaBin(
 Estimated parameters from the Beta-Binomial model, estimates of between and within-entity variance, and estimates of entity-specific reliability
 }
 \description{
-This function estimates reliability using a Beta-Binomial model.
+This function estimates reliability using a Beta-Binomial model. NOTE: currently, Beta-Binomial reliability estimates do not take risk-adjustment into account.
 }
 \references{
 Adams JL. The Reliability of Provider Profiling: A Tutorial. 2009.

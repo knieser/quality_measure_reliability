@@ -8,6 +8,7 @@ simulateData(
   n.entity,
   n.obs,
   mu,
+  sd = 1,
   r,
   beta1 = 0,
   data.type = "binary",
@@ -21,9 +22,11 @@ simulateData(
 
 \item{mu}{average probability of the outcome for binary data OR average outcome value for Normal data}
 
+\item{sd}{within-entity standard deviation for Normal data (default is \code{1}).}
+
 \item{r}{median reliability}
 
-\item{beta1}{regression coefficient for covariate added to the linear predictor; default is 0.}
+\item{beta1}{regression coefficient for covariate added to the linear predictor; default is \code{0}. Note that for binary data, \code{beta1} is on the log odds scale (e.g., \code{beta1} = 0.4 corresponds to an odds ratio of about 1.5).}
 
 \item{data.type}{type of data to simulate. Valid options include: \code{binary} (default) and \code{normal}.}
 

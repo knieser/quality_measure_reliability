@@ -4,7 +4,7 @@
 \alias{plotPredictedDistribution}
 \title{Plot densities of predicted values by outcome group}
 \usage{
-plotPredictedDistribution(model.performance = model.performance)
+plotPredictedDistribution(model.performance)
 }
 \arguments{
 \item{model.performance}{results from \code{model_performance()}}

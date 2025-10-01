@@ -6,7 +6,7 @@
 #' @importFrom ggplot2 ggplot position_jitter
 #' @export
 
-plotReliability <- function(rel.out = rel.out){
+plotReliability <- function(rel.out){
 
 data.type = rel.out$data.type
 show.all = rel.out$show.all
@@ -66,7 +66,7 @@ if (data.type == 'continuous'){
 
 
 
-fig <- ggplot2::ggplot(data = rel.plot.df, ggplot2::aes(est, method)) +
+fig <- ggplot2::ggplot(data = rel.plot.df, ggplot2::aes(.data$est, .data$method)) +
   ggplot2::geom_boxplot(outlier.shape = NA) +
   ggplot2::geom_point(alpha = 0.6, position = ggplot2::position_jitter(height = 0.1, width = 0)) +
   ggplot2::xlab('Entity-specific reliability estimate') +

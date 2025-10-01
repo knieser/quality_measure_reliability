@@ -11,7 +11,7 @@
 #' @importFrom stats aggregate predict rbinom var sd
 #' @importFrom parallel makeCluster stopCluster
 #' @importFrom doParallel registerDoParallel
-#' @importFrom foreach foreach
+#' @importFrom foreach  %dopar%
 #' @export
 
 calcPerformance <- function(df = NULL, model = NULL, entity = "entity", y = "y", data.type = 'binary', ctrPerf = controlPerf()){

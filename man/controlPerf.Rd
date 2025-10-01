@@ -4,7 +4,7 @@
 \alias{controlPerf}
 \title{Parameters for performance calculations}
 \usage{
-controlPerf(min.n = 2, alpha = 0.05, n.boots = 200, n.cores = 2)
+controlPerf(min.n = 2, alpha = 0.05, n.boots = 1000, n.cores = 2)
 }
 \arguments{
 \item{min.n}{minimum number of observations per entity}

@@ -8,7 +8,7 @@
 #' @author Kenneth Nieser (nieser@stanford.edu)
 #' @export
 
-controlPerf <- function(min.n = 2, alpha = 0.05, n.boots = 200, n.cores = 2){
+controlPerf <- function(min.n = 2, alpha = 0.05, n.boots = 1000, n.cores = 2){
 
   total.cores = parallel::detectCores()
 

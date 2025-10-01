@@ -4,7 +4,7 @@
 \alias{plotEstimates}
 \title{Plot estimates from regression model used for risk-adjustment}
 \usage{
-plotEstimates(model.performance = model.performance)
+plotEstimates(model.performance)
 }
 \arguments{
 \item{model.performance}{results from \code{model_performance()}}

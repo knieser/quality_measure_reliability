@@ -1,7 +1,7 @@
 #' Calculate reliability using one-way ANOVA method
 #' @description
 #' This function estimates reliability using the one-way ANOVA method.
-#' @param df observation-level data
+#' @param df dataframe (assumed to be observation-level unless `df.aggregate` is changed below)
 #' @param entity data column containing the accountable entity identifier
 #' @param y data column containing the outcome variable
 #' @param df.aggregate set this to `TRUE` if the data have already been aggregated to include only summary data (sample size, means, and standard deviations) for each entity; default is `FALSE`.
@@ -10,7 +10,6 @@
 #' @param std.dev if using aggregated data, data column containing the sample standard deviations for each entity entity; default is `sd`.
 #' @param ctrPerf parameters to control performance measure calculation
 #' @author Kenneth Nieser (nieser@stanford.edu)
-#' @references He K, Kalbfleisch JD, Yang Y, Fei Z. Inter‐unit reliability for nonlinear models. Statistics in Medicine. 2019 Feb 28;38(5):844-54.
 #' @references Nieser KJ, Harris AH. Comparing methods for assessing the reliability of health care quality measures. Statistics in Medicine. 2024 Oct 15;43(23):4575-94.
 #' @importFrom stats aov
 #' @export

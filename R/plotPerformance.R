@@ -12,7 +12,7 @@
 #' @importFrom ggplot2 ggplot position_dodge
 #' @export
 
-plotPerformance <- function(df = perf.results, plot.type = 'single', plot.y = 'p'){
+plotPerformance <- function(df, plot.type = 'single', plot.y = 'p'){
 
   marg.p = sum(df$observed) / sum(df$n)
 
@@ -37,9 +37,9 @@ plotPerformance <- function(df = perf.results, plot.type = 'single', plot.y = 'p
       ylab = 'PE risk-standardized rate'
     }
 
-    fig <- ggplot2::ggplot(data = df, ggplot2::aes(x = rank, y = y)) +
+    fig <- ggplot2::ggplot(data = df, ggplot2::aes(x = .data$rank, y = .data$y)) +
       ggplot2::geom_point(color = 'black') +
-      ggplot2::geom_errorbar(aes(ymin = lwr, ymax = upr), width = 0.1) +
+      ggplot2::geom_errorbar(aes(ymin = .data$lwr, ymax = .data$upr), width = 0.1) +
       ggplot2::geom_hline(yintercept = marg.p, col = 'red', lty = 'dashed', size = 1.2, alpha = 0.7) +
       ggplot2::xlab('Rank') +
       ggplot2::ylab(ylab) +
@@ -57,9 +57,9 @@ plotPerformance <- function(df = perf.results, plot.type = 'single', plot.y = 'p
   if(plot.type == 'OR'){
     # plot of ORs comparing each facility with the average facility
     df$or.rank = rank(df$intercept.OR, ties.method = 'random')
-    fig <- ggplot2::ggplot(data = df, ggplot2::aes(x = intercept.OR, y = or.rank)) +
-      ggplot2::geom_point(ggplot2::aes(color = intercept.sig), size = 2) +
-      ggplot2::geom_errorbar(ggplot2::aes(xmin = intercept.OR.lwr, xmax = intercept.OR.upr), width = 0.1, position = ggplot2::position_dodge(width = .7)) +
+    fig <- ggplot2::ggplot(data = df, ggplot2::aes(x = .data$intercept.OR, y = .data$or.rank)) +
+      ggplot2::geom_point(ggplot2::aes(color = .data$intercept.sig), size = 2) +
+      ggplot2::geom_errorbar(ggplot2::aes(xmin = .data$intercept.OR.lwr, xmax = .data$intercept.OR.upr), width = 0.1, position = ggplot2::position_dodge(width = .7)) +
       ggplot2::scale_color_manual(values = c('black', 'red')) +
       ggplot2::scale_x_continuous(trans = 'log10') +
       ggplot2::geom_vline(xintercept = 1, lty = 2) +
@@ -87,9 +87,9 @@ plotPerformance <- function(df = perf.results, plot.type = 'single', plot.y = 'p
       std.ratio = c(df$oe, df$pe)
     )
 
-    fig <- ggplot2::ggplot(data = plot.df.corr, ggplot2::aes(x = rand.int, y = std.ratio, group = Method)) +
-      ggplot2::geom_point(ggplot2::aes(color = Method, shape = Method), size = 3) +
-      ggplot2::stat_smooth(method = 'lm', formula = y ~ x, geom = 'smooth', se = F, aes(color = Method), lty = 'dashed') +
+    fig <- ggplot2::ggplot(data = plot.df.corr, ggplot2::aes(x = .data$rand.int, y = .data$std.ratio, group = .data$Method)) +
+      ggplot2::geom_point(ggplot2::aes(color = .data$Method, shape = .data$Method), size = 3) +
+      ggplot2::stat_smooth(method = 'lm', formula = y ~ x, geom = 'smooth', se = F, aes(color = .data$Method), lty = 'dashed') +
       ggplot2::scale_color_manual(values = c('darkgrey', 'red')) +
       ggplot2::xlab('Entity-specific random intercepts') +
       ggplot2::ylab('Standardization ratio') +
@@ -117,9 +117,9 @@ plotPerformance <- function(df = perf.results, plot.type = 'single', plot.y = 'p
     rank.pe = rep(df$rank.pe, 3)
   )
 
-  fig <- ggplot2::ggplot(data = plot.df.p, ggplot2::aes(x = rank, y = p, group = method)) +
+  fig <- ggplot2::ggplot(data = plot.df.p, ggplot2::aes(x = .data$rank, y = .data$p, group = .data$method)) +
     ggplot2::geom_point(size = 2) +
-    ggplot2::geom_errorbar(ggplot2::aes(ymin = lwr, ymax = upr), width = 0.1) +
+    ggplot2::geom_errorbar(ggplot2::aes(ymin = .data$lwr, ymax = .data$upr), width = 0.1) +
     ggplot2::geom_hline(yintercept = marg.p, col = 'red', lty = 'dashed', size = 1.2, alpha = 0.7) +
     ggplot2::xlab('Entity rank') +
     ggplot2::ylab('Measure performance') +

@@ -54,8 +54,8 @@ plotSSR <- function(df, model = NULL, entity = 'entity', y = 'y', ctrPerf = cont
   )
   max = max(c(plot.df.SSR$t1, plot.df.SSR$t2))
 
-  fig.SSR <- ggplot2::ggplot(data = plot.df.SSR, ggplot2::aes(x = t1, y = t2, group = Method)) +
-    ggplot2::geom_point(ggplot2::aes(color = Method, shape = Method), size = 3) +
+  fig.SSR <- ggplot2::ggplot(data = plot.df.SSR, ggplot2::aes(x = .data$t1, y = .data$t2, group = .data$Method)) +
+    ggplot2::geom_point(ggplot2::aes(color = .data$Method, shape = .data$Method), size = 3) +
     ggplot2::geom_abline(slope = 1, lty = 'dashed') +
     ggplot2::coord_cartesian(xlim = c(0, max), ylim = c(0, max)) +
     ggplot2::scale_color_manual(values = c('darkgrey', 'red')) +

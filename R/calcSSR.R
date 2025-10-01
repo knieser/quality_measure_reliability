@@ -10,11 +10,10 @@
 #' @param ctrRel parameters to control reliability estimation
 #' @returns SSR reliability estimates
 #' @author Kenneth Nieser (nieser@stanford.edu)
-#' @references Nieser KJ, Harris AH. Split‐sample reliability estimation in health care quality measurement: Once is not enough. Health Services Research. 2024 Aug;59(4):e14310.
 #' @references Nieser KJ, Harris AH. Comparing methods for assessing the reliability of health care quality measures. Statistics in Medicine. 2024 Oct 15;43(23):4575-94.
 #' @importFrom parallel makeCluster
 #' @importFrom doParallel registerDoParallel
-#' @importFrom foreach foreach
+#' @importFrom foreach foreach %dopar%
 #' @importFrom psych ICC
 #' @importFrom stats reshape
 #' @export
@@ -101,10 +100,10 @@ calcSSR <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', data.ty
 
     for (j in 1:n.entity){
       entity.df <- df[df$entity == entities[j], ]
-      entity.boots <- replicate(boots, {entity.df$y[sample(nrow(entity.df), nrow(entity.df), replace = T)]})
+      entity.boots <- replicate(n.resamples, {entity.df$y[sample(nrow(entity.df), nrow(entity.df), replace = T)]})
       df.boots <- rbind(df.boots,
-                        data.frame(id = rep(entity.df$id, boots),
-                                   entity = rep(entities[j], boots),
+                        data.frame(id = rep(entity.df$id, n.resamples),
+                                   entity = rep(entities[j], n.resamples),
                                    boot = rep(1:boots, each = nrow(entity.df)),
                                    y = c(entity.boots)
                                    )

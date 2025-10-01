@@ -1,0 +1,71 @@
+---
+title: "Colonoscopy_Measure_Example"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Colonoscopy_Measure_Example}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 8,
+  fig.height = 6
+)
+```
+
+This vignette includes an example of hospital profiling based on a measure of whether patients receive appropriate recommendations for a follow-up colonoscopy.
+
+```{r setup}
+library(QualityMeasure)
+```
+
+
+-------------------------------------------------------------
+
+First, we'll load the dataset included with the QualityMeasure package.
+
+```{r}
+df <- colonoscopy
+knitr::kable(head(df), 'simple')
+```
+
+Next, we will calculate reliability using the Beta-Binomial method for aggregated data.
+
+```{r}
+BB.results <- calcBetaBin(df = df, df.aggregate = T, n = 'n', x = 'x')
+```
+
+Beta-Binomial parameter estimates are: alpha = `r round(BB.results$alpha,3)` and beta = `r round(BB.results$beta, 3)`. The between-entity variance in rates is `r round(BB.results$var.between, 3)`.
+
+Below is a summary of the distribution of entity-level reliability estimates.
+
+```{r}
+summary(BB.results$est.BB)
+```
+We can also plot entity-level reliability results by sample size.
+
+```{r}
+plot.df <- data.frame(
+  n = df$n,
+  rel = BB.results$est.BB
+)
+
+fig <- ggplot(data = plot.df, aes(x = n, y = rel)) +
+  geom_point(size = 3) +
+  geom_hline(yintercept = median(BB.results$est.BB), linetype = 'dashed', col = 'red', linewidth = 2) +
+  annotate('text', x = 1700, y = 0.92, label = 'Median reliability', size = 6, col = 'red', face = 'bold') +
+  xlab('Entity sample size') +
+  ylab('Reliability') +
+  theme_classic() +
+  theme(
+    panel.grid.major = element_line(),
+    panel.grid.minor = element_line(),
+    axis.text = element_text(size = 16),
+    axis.ticks.length = unit(.25, 'cm'),
+    axis.title = element_text(size = 18, face = 'bold')
+  )
+fig
+```

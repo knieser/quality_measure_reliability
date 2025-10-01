@@ -4,7 +4,7 @@
 \alias{plotCalibration}
 \title{Plot calibration curve for risk-adjustment model}
 \usage{
-plotCalibration(model.performance = model.performance, quantiles = 10)
+plotCalibration(model.performance, quantiles = 10)
 }
 \arguments{
 \item{model.performance}{results from \code{model_performance()}}

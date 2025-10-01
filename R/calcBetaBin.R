@@ -1,11 +1,11 @@
 #' Calculate reliability using a Beta-Binomial model
 #' @description
-#' This function estimates reliability using a Beta-Binomial model.
-#' @param df observation-level data; if null, will use the dataframe from the model object
+#' This function estimates reliability using a Beta-Binomial model. NOTE: currently, Beta-Binomial reliability estimates do not take risk-adjustment into account.
+#' @param df dataframe (assumed to be observation-level unless `df.aggregate` is changed below); if null, will use the dataframe from the model object
 #' @param model model; if null, will use an unadjusted model (NOTE: currently, Beta-Binomial reliability estimates do not take risk-adjustment into account.)
 #' @param entity data column containing the accountable entity identifier
 #' @param y data column containing the outcome variable
-#' @param df.aggregate set this to `TRUE` if the data have already been aggregated to include only summary data (n, x) for each entity; default is `FALSE`.
+#' @param df.aggregate set this to `TRUE` if the data have already been aggregated to include only summary data (sample sizes and numerators) for each entity; default is `FALSE`.
 #' @param n if using aggregated data, data column containing the sample size by entity
 #' @param x if using aggregated data, data column containing the number of observations that met measure criteria by entity
 #' @param show.all logical parameter indicating whether all variations of reliability estimates should be calculated; default is `FALSE`.

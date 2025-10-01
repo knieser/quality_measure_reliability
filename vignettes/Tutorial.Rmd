@@ -141,7 +141,7 @@ If you would like to estimate reliability using all methods, you can use the `ca
 The number of resamples used to calculate the permutation split-sample reliability estimate can be adjusted using the `controlRel()` function within `calcReliability()` as shown below.
 
 ```{r}
-n.resamples = 20 # number of resamples to use for the permutation split-sample reliability estimate
+n.resamples = 100 # number of resamples to use for the permutation split-sample reliability estimate
 
 rel.out <- calcReliability(df = df1, ctrRel = controlRel(n.resamples = n.resamples))
 ```
@@ -238,7 +238,7 @@ This analysis generates confidence intervals for entity-level performance. Confi
 
 ```{r}
 # adjust number of bootstraps and cores for parallel processing.
-n.boots = 25
+n.boots = 1000
 n.cores = 2
 
 # run profiling analysis for the first dataset without risk-adjustment
