@@ -5,10 +5,10 @@
 #' @param model model; if null, will use an unadjusted model (NOTE: currently, Beta-Binomial reliability estimates do not take risk-adjustment into account.)
 #' @param entity data column containing the accountable entity identifier
 #' @param y data column containing the outcome variable
-#' @param df.aggregate set this to TRUE if the data have already been aggregated to include only summary data (n, x) for each entity; default is FALSE.
+#' @param df.aggregate set this to `TRUE` if the data have already been aggregated to include only summary data (n, x) for each entity; default is `FALSE`.
 #' @param n if using aggregated data, data column containing the sample size by entity
 #' @param x if using aggregated data, data column containing the number of observations that met measure criteria by entity
-#' @param show.all logical parameter indicating whether all variations of reliability estimates should be calculated; default is FALSE.
+#' @param show.all logical parameter indicating whether all variations of reliability estimates should be calculated; default is `FALSE`.
 #' @param ctrPerf parameters to control performance measure calculation
 #' @returns Estimated parameters from the Beta-Binomial model, estimates of between and within-entity variance, and estimates of entity-specific reliability
 #' @author Kenneth Nieser (nieser@stanford.edu)
