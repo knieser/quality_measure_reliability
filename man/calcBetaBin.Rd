@@ -36,10 +36,29 @@ calcBetaBin(
 \item{ctrPerf}{parameters to control performance measure calculation}
 }
 \value{
-Estimated parameters from the Beta-Binomial model, estimates of between and within-entity variance, and estimates of entity-specific reliability
+A list containing estimates of Beta-Binomial model parameters (\code{alpha} and \code{beta}); between-entity variance (\code{var.between}), within-entity variance (\code{var.within}), and reliability (\code{est.BB}).
 }
 \description{
 This function estimates reliability using a Beta-Binomial model. NOTE: currently, Beta-Binomial reliability estimates do not take risk-adjustment into account.
+}
+\examples{
+# Simulate data
+df <- simulateData(n.entity = 50, n.obs = 100, mu = .2, r = .7)
+
+# Calculate reliability
+out <- calcBetaBin(df = df, entity = 'entity', y = 'y')
+summary(out$est.BB)
+
+## Reliability can also be calculated with data aggregated by entity
+df.agg <- data.frame(
+          entity = aggregate(y ~ entity, data = df, length)$entity
+          n = aggregate(y ~ entity, data = df, length)$y,
+          x = aggregate(y ~ entity, data = df, sum)$y
+          )
+
+out2 <- calcBetaBin(df = df.agg, df.aggregate = T, n = 'n', x = 'x')
+summary(out2$est.BB)
+
 }
 \references{
 Adams JL. The Reliability of Provider Profiling: A Tutorial. 2009.

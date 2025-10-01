@@ -32,8 +32,31 @@ calcAOV(
 
 \item{ctrPerf}{parameters to control performance measure calculation}
 }
+\value{
+A list containing estimates of the between-entity variance (\code{var.b.aov}), within-entity variance (\code{var.w.aov}), and reliability (\code{est.aov}).
+}
 \description{
 This function estimates reliability using the one-way ANOVA method.
+}
+\examples{
+# Simulate data
+df <- simulateData(n.entity = 50, n.obs = 100, mu = 25, r = .7, data.type = 'normal')
+
+# Calculate reliability
+out <- calcAOV(df = df, entity = 'entity', y = 'y')
+summary(out$est.aov)
+
+## Reliability can also be calculated with data aggregated by entity
+df.agg <- data.frame(
+          entity = aggregate(y ~ entity, data = df, length)$entity,
+          n = aggregate(y ~ entity, data = df, length)$y,
+          mean = aggregate(y ~ entity, data = df, mean)$y,
+          sd = aggregate(y ~ entity, data = df, sd)$y
+          )
+
+out2 <- calcAOV(df = df.agg, df.aggregate = T, n = 'n', mean = 'mean', std.dev = 'sd')
+summary(out2$est.aov)
+
 }
 \references{
 Nieser KJ, Harris AH. Comparing methods for assessing the reliability of health care quality measures. Statistics in Medicine. 2024 Oct 15;43(23):4575-94.

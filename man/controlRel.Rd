@@ -26,6 +26,9 @@ controlRel(
 \description{
 This function stores parameters for reliability calculations.
 }
+\examples{
+str(controlRel())
+}
 \author{
 Kenneth Nieser (nieser@stanford.edu)
 }

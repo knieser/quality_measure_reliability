@@ -6,6 +6,8 @@
 #' @param n.boots number of bootstraps to use for confidence interval estimation for P/E ratios
 #' @param n.cores number of cores to use for parallel processing
 #' @author Kenneth Nieser (nieser@stanford.edu)
+#' @examples
+#' str(controlPerf())
 #' @export
 
 controlPerf <- function(min.n = 2, alpha = 0.05, n.boots = 1000, n.cores = 2){

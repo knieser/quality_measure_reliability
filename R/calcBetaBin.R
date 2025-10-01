@@ -1,4 +1,5 @@
 #' Calculate reliability using a Beta-Binomial model
+#'
 #' @description
 #' This function estimates reliability using a Beta-Binomial model. NOTE: currently, Beta-Binomial reliability estimates do not take risk-adjustment into account.
 #' @param df dataframe (assumed to be observation-level unless `df.aggregate` is changed below); if null, will use the dataframe from the model object
@@ -10,11 +11,29 @@
 #' @param x if using aggregated data, data column containing the number of observations that met measure criteria by entity
 #' @param show.all logical parameter indicating whether all variations of reliability estimates should be calculated; default is `FALSE`.
 #' @param ctrPerf parameters to control performance measure calculation
-#' @returns Estimated parameters from the Beta-Binomial model, estimates of between and within-entity variance, and estimates of entity-specific reliability
+#' @returns A list containing estimates of Beta-Binomial model parameters (`alpha` and `beta`); between-entity variance (`var.between`), within-entity variance (`var.within`), and reliability (`est.BB`).
 #' @author Kenneth Nieser (nieser@stanford.edu)
 #' @references Adams JL. The Reliability of Provider Profiling: A Tutorial. 2009.
 #' @references Nieser KJ, Harris AH. Comparing methods for assessing the reliability of health care quality measures. Statistics in Medicine. 2024 Oct 15;43(23):4575-94.
 #' @references Zhou G, Lin Z. Improved beta-binomial estimation for reliability of healthcare quality measures. medRxiv. 2023 Jan 9:2023-01.
+#' @examples
+#' # Simulate data
+#' df <- simulateData(n.entity = 50, n.obs = 100, mu = .2, r = .7)
+#'
+#' # Calculate reliability
+#' out <- calcBetaBin(df = df, entity = 'entity', y = 'y')
+#' summary(out$est.BB)
+#'
+#' ## Reliability can also be calculated with data aggregated by entity
+#' df.agg <- data.frame(
+#'           entity = aggregate(y ~ entity, data = df, length)$entity
+#'           n = aggregate(y ~ entity, data = df, length)$y,
+#'           x = aggregate(y ~ entity, data = df, sum)$y
+#'           )
+#'
+#' out2 <- calcBetaBin(df = df.agg, df.aggregate = T, n = 'n', x = 'x')
+#' summary(out2$est.BB)
+#'
 #' @importFrom stats optim median
 #' @export
 
@@ -29,12 +48,14 @@ calcBetaBin <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', df.
   if (isFALSE(df.aggregate)){
     data.out <- calcDataSummary(df, model, entity, y, data.type = 'binary', ctrPerf)
     df <- data.out$df
+    entities <- data.out$entities
     n  <- data.out$n
     x <- data.out$obs
     p <- data.out$p
     p.re <- data.out$p.re
   } else{
     message('Note that aggregated data are being used, so Beta-Binomial reliability estimates with random effects predictions cannot be calculated.')
+    entities <- df[[entity]]
     n <- df[[n]]
     x <- df[[x]]
     p <- x / n
@@ -82,6 +103,7 @@ calcBetaBin <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', df.
     results <- list(call = cl,
                     alpha = a,
                     beta = b,
+                    entity = entities,
                     var.b.BB = var.b.BB,
                     var.w.BB = var.w.BB,
                     var.w.FE = var.w.FE,
@@ -95,6 +117,7 @@ calcBetaBin <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', df.
     results <- list(call = cl,
                     alpha = a,
                     beta = b,
+                    entity = entities,
                     var.between = var.b.BB,
                     var.within = var.w.BB,
                     est.BB = est.BB)

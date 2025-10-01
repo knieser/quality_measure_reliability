@@ -7,6 +7,8 @@
 #' @param MC.reps number of Monte Carlo simulations to produce reliability estimates for data modeled with hierarchical logistic regression
 #' @param d.steps number of percentiles removed to check for misclassification probabilities
 #' @author Kenneth Nieser (nieser@stanford.edu)
+#' @examples
+#' str(controlRel())
 #' @export
 
 controlRel <- function(n.resamples = 100, SSRmethod = 'permutation', fn = NA, MC.reps = 1000, d.steps = 10){

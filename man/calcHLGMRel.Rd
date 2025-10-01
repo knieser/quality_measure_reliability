@@ -29,8 +29,55 @@ calcHLGMRel(
 
 \item{ctrRel}{parameters to control reliability estimation}
 }
+\value{
+A list containing:
+\itemize{
+\item \code{fit}: fitted model
+\item \code{marg.p}: marginal probability of the outcome
+\item \code{n}: entity sample sizes
+\item \code{p}: entity-level sample proportions
+\item \code{p.re}: predicted entity-level outcome probabilities (i.e., shrunken estimates)
+\item \code{var.between}: between-entity variance on the outcome scale
+\item \code{var.within}: within-entity variance on the outcome scale
+\item \code{est.HLGM.delta}: reliability estimates on the outcome scale
+}
+
+If \code{show.all} is set to \code{TRUE}, then the outputted list will also contain:
+\itemize{
+\item \code{var.b.HLGM.latent}: between-entity variance on the latent log-odds scale
+\item \code{var.b.HLGM.delta}: between-entity variance on the outcome scale using delta method approximation
+\item \code{var.b.MC}: between-entity variance on the outcome scale using Monte Carlo approximation
+\item \code{var.w.latent}: within-entity variance on the latent log-odds scale
+\item \code{var.w.delta}: within-entity variance on the outcome scale using delta method approximation
+\item \code{var.w.MC}: within-entity variance on the outcome scale using Monte Carlo approximation
+\item \code{var.w.FE}: within-entity variance calculated using fixed effect estimates of entity-level performance
+\item \code{var.w.RE}: within-entity variance calculated using random effect estimates of entity-level performance
+\item \code{est.HLGM.latent}: reliability estimates on latent log-odds scale
+\item \code{est.HLGM.delta}: reliability estimates on outcome scale using delta approximation
+\item \code{est.HLGM.MC}: reliability estimates on outcome scale using Monte Carlo approximation
+\item \code{est.HLGM.FE}: reliability estimates on outcome scale using fixed effect estimates
+\item \code{est.HLGM.RE}: reliability estimates on outcome scale using random effect estimates
+}
+}
 \description{
-This function estimates reliability using a hierarchical logistic regression model.
+This function estimates reliability using a hierarchical logistic regression model with random intercepts for each accountable entity.
+}
+\examples{
+# Simulate data
+df <- simulateData(n.entity = 50, n.obs = 100, mu = .2, r = .7)
+
+# Calculate reliability
+out <- calcHLGMRel(df = df, entity = 'entity', y = 'y')
+summary(out$est.HLGM.delta)
+
+## Reliability estimates from additional methods can be obtained by toggling show.all parameter
+out.all <- calcHLGMRel(df = df, entity = 'entity', y = 'y', show.all = T)
+summary(out.all$est.HLGM.latent)
+summary(out.all$est.HLGM.delta)
+summary(out.all$est.HLGM.MC)
+summary(out.all$est.HLGM.FE)
+summary(out.all$est.HLGM.RE)
+
 }
 \references{
 Goldstein H, Browne W, Rasbash J. Partitioning variation in multilevel models. Understanding statistics: statistical issues in psychology, education, and the social sciences. 2002 Dec 2;1(4):223-31.
