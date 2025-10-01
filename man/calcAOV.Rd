@@ -4,7 +4,16 @@
 \alias{calcAOV}
 \title{Calculate reliability using one-way ANOVA method}
 \usage{
-calcAOV(df, entity = "entity", y = "y", ctrPerf = controlPerf())
+calcAOV(
+  df,
+  entity = "entity",
+  y = "y",
+  df.aggregate = FALSE,
+  n = "n",
+  mean = "mean",
+  std.dev = "sd",
+  ctrPerf = controlPerf()
+)
 }
 \arguments{
 \item{df}{observation-level data}
@@ -12,6 +21,14 @@ calcAOV(df, entity = "entity", y = "y", ctrPerf = controlPerf())
 \item{entity}{data column containing the accountable entity identifier}
 
 \item{y}{data column containing the outcome variable}
+
+\item{df.aggregate}{set this to \code{TRUE} if the data have already been aggregated to include only summary data (sample size, means, and standard deviations) for each entity; default is \code{FALSE}.}
+
+\item{n}{if using aggregated data, data column containing the sample sizes for each entity; default is \code{n}.}
+
+\item{mean}{if using aggregated data, data column containing the sample means for each entity; default is \code{mean}.}
+
+\item{std.dev}{if using aggregated data, data column containing the sample standard deviations for each entity entity; default is \code{sd}.}
 
 \item{ctrPerf}{parameters to control performance measure calculation}
 }
