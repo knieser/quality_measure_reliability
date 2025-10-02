@@ -1,7 +1,13 @@
 #' Calculate reliability using a Beta-Binomial model
 #'
 #' @description
-#' This function estimates reliability using a Beta-Binomial model. NOTE: currently, Beta-Binomial reliability estimates do not take risk-adjustment into account.
+#' This function estimates reliability using a Beta-Binomial model. **NOTE:** currently, Beta-Binomial reliability estimates do not take risk-adjustment into account.
+#' @details
+#' To fit the Beta-Binomial model, the function first calculates
+#' method-of-moments estimates for the alpha and beta parameters which are used as starting values.
+#' Then, we use the `optim()` function to calculate maximum likelihood estimates with `method = 'L-BFGS-B'`.
+#' Reliability estimates are calculated used the maximum likelihood estimates of alpha and beta.
+#'
 #' @param df dataframe (assumed to be observation-level unless `df.aggregate` is changed below); if null, will use the dataframe from the model object
 #' @param model model; if null, will use an unadjusted model (NOTE: currently, Beta-Binomial reliability estimates do not take risk-adjustment into account.)
 #' @param entity data column containing the accountable entity identifier
@@ -11,7 +17,22 @@
 #' @param x if using aggregated data, data column containing the number of observations that met measure criteria by entity
 #' @param show.all logical parameter indicating whether all variations of reliability estimates should be calculated; default is `FALSE`.
 #' @param ctrPerf parameters to control performance measure calculation
-#' @returns A list containing estimates of Beta-Binomial model parameters (`alpha` and `beta`); between-entity variance (`var.between`), within-entity variance (`var.within`), and reliability (`est.BB`).
+#' @returns A list containing:
+#' * `alpha`: estimated alpha from Beta-Binomial model
+#' * `beta`: estimated beta from Beta-Binomial model
+#' * `entity`: list of entities
+#' * `n`: sample sizes for each entity
+#' * `var.b.BB`: between-entity variance
+#' * `var.w.BB`: within-entity variance
+#' * `est.BB`: entity-level reliability estimates
+#'
+#' If `show.all` is set to `TRUE`, then the outputted list will also contain:
+#' * `var.w.FE`: within-entity variance using fixed effect estimates of entity-specific outcome probabilities
+#' * `var.w.RE`: within-entity variance using random effect estimates of entity-specific outcome probabilities
+#' * `var.w.J`: within-entity variance using Bayesian estimates of entity-specific outcome probabilities, with Jeffrey's prior
+#' * `est.BB.FE`: entity-level reliability estimates using fixed effect estimates of entity-specific outcome probabilities
+#' * `est.BB.RE`: entity-level reliability estimates using random effect estimates of entity-specific outcome probabilities
+#' * `est.BB.J`: entity-level reliability estimates using Bayesian estimates of entity-specific outcome probabilities, with Jeffrey's prior
 #' @author Kenneth Nieser (nieser@stanford.edu)
 #' @references Adams JL. The Reliability of Provider Profiling: A Tutorial. 2009.
 #' @references Nieser KJ, Harris AH. Comparing methods for assessing the reliability of health care quality measures. Statistics in Medicine. 2024 Oct 15;43(23):4575-94.
@@ -24,9 +45,13 @@
 #' out <- calcBetaBin(df = df, entity = 'entity', y = 'y')
 #' summary(out$est.BB)
 #'
+#' # Plot entity-level reliability by sample size
+#' plot(out$n, out$est.BB)
+#'
+#'
 #' ## Reliability can also be calculated with data aggregated by entity
 #' df.agg <- data.frame(
-#'           entity = aggregate(y ~ entity, data = df, length)$entity
+#'           entity = aggregate(y ~ entity, data = df, length)$entity,
 #'           n = aggregate(y ~ entity, data = df, length)$y,
 #'           x = aggregate(y ~ entity, data = df, sum)$y
 #'           )
@@ -103,7 +128,8 @@ calcBetaBin <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', df.
     results <- list(call = cl,
                     alpha = a,
                     beta = b,
-                    entity = entities,
+                    entity = as.vector(entities),
+                    n = n,
                     var.b.BB = var.b.BB,
                     var.w.BB = var.w.BB,
                     var.w.FE = var.w.FE,
@@ -117,9 +143,10 @@ calcBetaBin <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', df.
     results <- list(call = cl,
                     alpha = a,
                     beta = b,
-                    entity = entities,
-                    var.between = var.b.BB,
-                    var.within = var.w.BB,
+                    entity = as.vector(entities),
+                    n = n,
+                    var.b = var.b.BB,
+                    var.w = var.w.BB,
                     est.BB = est.BB)
   }
 

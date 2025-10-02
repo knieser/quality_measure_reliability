@@ -33,10 +33,25 @@ calcAOV(
 \item{ctrPerf}{parameters to control performance measure calculation}
 }
 \value{
-A list containing estimates of the between-entity variance (\code{var.b.aov}), within-entity variance (\code{var.w.aov}), and reliability (\code{est.aov}).
+A list containing:
+\itemize{
+\item \code{MSB}: mean squares between entities
+\item \code{MSW}: mean squares within entities
+\item \code{F.stat}: F-statistic from one-way ANOVA
+\item \code{entity}: list of entities
+\item \code{n}: sample sizes for each entity
+\item \code{n0}: aggregate sample size used in reliability calculation
+\item \code{var.b.aov}: between-entity variance
+\item \code{var.w.aov}: within-entity variance
+\item \code{est.aov}: entity-level reliability estimates
+}
 }
 \description{
 This function estimates reliability using the one-way ANOVA method.
+}
+\details{
+This function uses the \code{aov()} function from the \code{stats} package to calculate mean squares between
+and mean squares within entities.
 }
 \examples{
 # Simulate data
@@ -45,6 +60,10 @@ df <- simulateData(n.entity = 50, n.obs = 100, mu = 25, r = .7, data.type = 'nor
 # Calculate reliability
 out <- calcAOV(df = df, entity = 'entity', y = 'y')
 summary(out$est.aov)
+
+# Plot reliability by entity sample size
+plot(out$n, out$est.aov)
+
 
 ## Reliability can also be calculated with data aggregated by entity
 df.agg <- data.frame(

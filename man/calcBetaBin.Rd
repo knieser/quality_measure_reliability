@@ -36,10 +36,35 @@ calcBetaBin(
 \item{ctrPerf}{parameters to control performance measure calculation}
 }
 \value{
-A list containing estimates of Beta-Binomial model parameters (\code{alpha} and \code{beta}); between-entity variance (\code{var.between}), within-entity variance (\code{var.within}), and reliability (\code{est.BB}).
+A list containing:
+\itemize{
+\item \code{alpha}: estimated alpha from Beta-Binomial model
+\item \code{beta}: estimated beta from Beta-Binomial model
+\item \code{entity}: list of entities
+\item \code{n}: sample sizes for each entity
+\item \code{var.b.BB}: between-entity variance
+\item \code{var.w.BB}: within-entity variance
+\item \code{est.BB}: entity-level reliability estimates
+}
+
+#' If \code{show.all} is set to \code{TRUE}, then the outputted list will also contain:
+\itemize{
+\item \code{var.w.FE}: within-entity variance using fixed effect estimates of entity-specific outcome probabilities
+\item \code{var.w.RE}: within-entity variance using random effect estimates of entity-specific outcome probabilities
+\item \code{var.w.J}: within-entity variance using Bayesian estimates of entity-specific outcome probabilities, with Jeffrey's prior
+\item \code{est.BB.FE}: entity-level reliability estimates using fixed effect estimates of entity-specific outcome probabilities
+\item \code{est.BB.RE}: entity-level reliability estimates using random effect estimates of entity-specific outcome probabilities
+\item \code{est.BB.J}: entity-level reliability estimates using Bayesian estimates of entity-specific outcome probabilities, with Jeffrey's prior
+}
 }
 \description{
-This function estimates reliability using a Beta-Binomial model. NOTE: currently, Beta-Binomial reliability estimates do not take risk-adjustment into account.
+This function estimates reliability using a Beta-Binomial model. \strong{NOTE:} currently, Beta-Binomial reliability estimates do not take risk-adjustment into account.
+}
+\details{
+To fit the Beta-Binomial model, the function first calculates
+method-of-moments estimates for the alpha and beta parameters which are used as starting values.
+Then, we use the \code{optim()} function to calculate maximum likelihood estimates with \code{method = 'L-BFGS-B'}.
+Reliability estimates are calculated used the maximum likelihood estimates of alpha and beta.
 }
 \examples{
 # Simulate data
@@ -49,9 +74,13 @@ df <- simulateData(n.entity = 50, n.obs = 100, mu = .2, r = .7)
 out <- calcBetaBin(df = df, entity = 'entity', y = 'y')
 summary(out$est.BB)
 
+# Plot entity-level reliability by sample size
+plot(out$n, out$est.BB)
+
+
 ## Reliability can also be calculated with data aggregated by entity
 df.agg <- data.frame(
-          entity = aggregate(y ~ entity, data = df, length)$entity
+          entity = aggregate(y ~ entity, data = df, length)$entity,
           n = aggregate(y ~ entity, data = df, length)$y,
           x = aggregate(y ~ entity, data = df, sum)$y
           )

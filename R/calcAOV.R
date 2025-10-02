@@ -2,6 +2,10 @@
 #'
 #' @description
 #' This function estimates reliability using the one-way ANOVA method.
+#' @details
+#' This function uses the `aov()` function from the `stats` package to calculate mean squares between
+#' and mean squares within entities.
+#'
 #' @param df dataframe (assumed to be observation-level unless `df.aggregate` is changed below)
 #' @param entity data column containing the accountable entity identifier
 #' @param y data column containing the outcome variable
@@ -10,7 +14,17 @@
 #' @param mean if using aggregated data, data column containing the sample means for each entity; default is `mean`.
 #' @param std.dev if using aggregated data, data column containing the sample standard deviations for each entity entity; default is `sd`.
 #' @param ctrPerf parameters to control performance measure calculation
-#' @returns A list containing estimates of the between-entity variance (`var.b.aov`), within-entity variance (`var.w.aov`), and reliability (`est.aov`).
+#' @returns A list containing:
+#' * `MSB`: mean squares between entities
+#' * `MSW`: mean squares within entities
+#' * `F.stat`: F-statistic from one-way ANOVA
+#' * `entity`: list of entities
+#' * `n`: sample sizes for each entity
+#' * `n0`: aggregate sample size used in reliability calculation
+#' * `var.b.aov`: between-entity variance
+#' * `var.w.aov`: within-entity variance
+#' * `est.aov`: entity-level reliability estimates
+#'
 #' @author Kenneth Nieser (nieser@stanford.edu)
 #' @references Nieser KJ, Harris AH. Comparing methods for assessing the reliability of health care quality measures. Statistics in Medicine. 2024 Oct 15;43(23):4575-94.
 #' @examples
@@ -20,6 +34,10 @@
 #' # Calculate reliability
 #' out <- calcAOV(df = df, entity = 'entity', y = 'y')
 #' summary(out$est.aov)
+#'
+#' # Plot reliability by entity sample size
+#' plot(out$n, out$est.aov)
+#'
 #'
 #' ## Reliability can also be calculated with data aggregated by entity
 #' df.agg <- data.frame(
@@ -62,11 +80,22 @@ calcAOV <- function(df, entity = 'entity', y = 'y', df.aggregate = FALSE, n = 'n
   }
 
   n0 <- 1 / (length(n) - 1) * (sum(n) - sum(n^2) / sum(n))
+  F.stat = MSB / MSW
   var.b.aov = (MSB - MSW) / n0
   var.w.aov = MSW / n
   est.aov   = var.b.aov / (var.b.aov + var.w.aov)
 
-  output = list(call = cl, entity = entities, var.b.aov = var.b.aov, var.w.aov = var.w.aov, est.aov = est.aov)
+  output = list(call = cl,
+                MSB = MSB,
+                MSW = MSW,
+                F.stat = F.stat,
+                entity = as.vector(entities),
+                n = n,
+                n0 = n0,
+                var.b.aov = var.b.aov,
+                var.w.aov = var.w.aov,
+                est.aov = est.aov
+                )
 
   return(output)
 }
