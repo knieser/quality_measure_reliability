@@ -30,10 +30,62 @@ calcSSR(
 \item{ctrRel}{parameters to control reliability estimation}
 }
 \value{
-SSR reliability estimates
+A list containing:
+\itemize{
+\item \code{entity}: list of entities
+\item \code{n}: entity sample sizes
+\item \code{icc}: Spearman-Brown-adjusted intraclass correlation coefficients for each resample
+\item \code{icc.lb}: lower bound on confidence interval for Spearman-Brown-adjusted intraclass correlation coefficients for each resample
+\item \code{icc.ub}: upper bound on confidence interval for Spearman-Brown-adjusted intraclass correlation coefficients for each resample
+\item \code{est.SSR}: reliability estimate based on a single split
+\item \code{est.PSSR}: mean reliability estimate across resamples
+}
+
+If a risk-adjustment model is included then, the outputted list will contain:
+\itemize{
+\item \code{entity}: list of entities
+\item \code{n}: entity sample sizes
+\item \code{icc.oe}: Spearman-Brown-adjusted intraclass correlation coefficients for OE ratios for each resample
+\item \code{icc.oe.lb}: lower bound on confidence interval for Spearman-Brown-adjusted intraclass correlation coefficients for OE ratios for each resample
+\item \code{icc.oe.ub}: upper bound on confidence interval for Spearman-Brown-adjusted intraclass correlation coefficients for OE ratios for each resample
+\item \code{icc.pe}: Spearman-Brown-adjusted intraclass correlation coefficients for PE ratios for each resample
+\item \code{icc.pe.lb}: lower bound on confidence interval for Spearman-Brown-adjusted intraclass correlation coefficients for PE ratios for each resample
+\item \code{icc.pe.ub}: upper bound on confidence interval for Spearman-Brown-adjusted intraclass correlation coefficients for PE ratios for each resample
+\item \code{est.SSR.oe}: reliability estimate for OE ratio based on a single split
+\item \code{est.PSSR.oe}: mean reliability estimate for OE ratio across resamples
+\item \code{est.SSR.pe}: reliability estimate for PE ratio based on a single split
+\item \code{est.PSSR.pe}: mean reliability estimate for PE ratio across resamples
+}
 }
 \description{
 This function estimates reliability using the split-sample method.
+}
+\examples{
+# Simulate data
+df <- simulateData(n.entity = 50, n.obs = 100, mu = .2, r = .7)
+
+# Calculate reliability
+out <- calcSSR(df = df, entity = 'entity', y = 'y')
+out$est.PSSR
+
+# You can also plot the distribution of reliability estimates obtained from the permutation sampling.
+hist(out$icc)
+summary(out$icc)
+
+## Example with risk-adjustment
+# Simulate data
+df1 <- simulateData(n.entity = 50, n.obs = 100, mu = .2, r = .6, beta1 = log(2))
+
+# Calculate reliability for both observed-to-expected and predicted-to-expected ratios.
+out1 <- calcSSR(df = df1, model = 'y ~ x1 + (1 | entity)', entity = 'entity', y = 'y')
+out1$est.PSSR.oe
+out1$est.PSSR.pe
+
+# You can also plot the distribution of reliability estimates obtained from the permutation sampling.
+hist(out1$icc.oe)
+summary(out1$icc.oe)
+
+
 }
 \references{
 Nieser KJ, Harris AH. Comparing methods for assessing the reliability of health care quality measures. Statistics in Medicine. 2024 Oct 15;43(23):4575-94.

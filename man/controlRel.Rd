@@ -6,6 +6,7 @@
 \usage{
 controlRel(
   n.resamples = 100,
+  n.cores = 2,
   SSRmethod = "permutation",
   fn = NA,
   MC.reps = 1000,
@@ -14,6 +15,8 @@ controlRel(
 }
 \arguments{
 \item{n.resamples}{number of resamples for split-sample reliability method}
+
+\item{n.cores}{number of cores to use for parallel processing}
 
 \item{SSRmethod}{use either the \code{permutation} (default) or the \code{bootstrap} method for the split-sample reliability calculation}
 

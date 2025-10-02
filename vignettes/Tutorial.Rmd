@@ -304,7 +304,7 @@ plotPerformance(df = perf.results2, plot.type = 'OR')
 Again, to calculate reliability estimates from all methods, we use the `calcReliability()` function. This time we specify the risk-adjustment model. Note that while the results from the Beta-Binomial method are included, these estimates currently do not account for risk-adjustment variables.
 
 ```{r}
-rel.out2 <- calcReliability(df = df2, model = model, ctrPerf = controlPerf(n.cores = n.cores), ctrRel = controlRel(n.resamples = n.resamples))
+rel.out2 <- calcReliability(df = df2, model = model, ctrRel = controlRel(n.resamples = n.resamples, n.cores = n.cores))
 ```
 
 ```{r, results = 'asis'}

@@ -19,13 +19,14 @@
 #' * `var.total`: total variance
 #' * `IUR`: entity-level reliability
 #' @author Kenneth Nieser (nieser@stanford.edu)
+#' @references He K, Kalbfleisch JD, Yang Y, Fei Z. Inter unit reliability for nonlinear models. Stat Med. 2019 Feb 28;38(5):844-854.
 #' @examples
 #' # Simulate data
 #' df <- simulateData(n.entity = 50, n.obs = 100, mu = .2, r = .7)
 #'
 #' # Calculate reliability
 #' out <- calcResamplingIUR(df = df, entity = 'entity', y = 'y')
-#' summary(out$IUR)
+#' out$IUR
 #'
 #' @importFrom stats aggregate
 #' @export
