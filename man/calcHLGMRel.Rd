@@ -34,11 +34,12 @@ A list containing:
 \itemize{
 \item \code{fit}: fitted model
 \item \code{marg.p}: marginal probability of the outcome
+\item \code{entity}: list of entities
 \item \code{n}: entity sample sizes
 \item \code{p}: entity-level sample proportions
 \item \code{p.re}: predicted entity-level outcome probabilities (i.e., shrunken estimates)
-\item \code{var.between}: between-entity variance on the outcome scale
-\item \code{var.within}: within-entity variance on the outcome scale
+\item \code{var.b}: between-entity variance on the outcome scale
+\item \code{var.w}: within-entity variance on the outcome scale
 \item \code{est.HLGM.delta}: reliability estimates on the outcome scale
 }
 
@@ -62,6 +63,10 @@ If \code{show.all} is set to \code{TRUE}, then the outputted list will also cont
 \description{
 This function estimates reliability using a hierarchical logistic regression model with random intercepts for each accountable entity.
 }
+\details{
+Hierarchical logistic regression models are fit using \code{lme4::glmer()} with
+\code{control =  lme4::glmerControl(optimizer = "bobyqa")} and \code{nAGQ = 0}.
+}
 \examples{
 # Simulate data
 df <- simulateData(n.entity = 50, n.obs = 100, mu = .2, r = .7)
@@ -69,6 +74,9 @@ df <- simulateData(n.entity = 50, n.obs = 100, mu = .2, r = .7)
 # Calculate reliability
 out <- calcHLGMRel(df = df, entity = 'entity', y = 'y')
 summary(out$est.HLGM.delta)
+
+# Plot reliability
+plot(out$n, out$est.HLGM.delta)
 
 ## Reliability estimates from additional methods can be obtained by toggling show.all parameter
 out.all <- calcHLGMRel(df = df, entity = 'entity', y = 'y', show.all = T)

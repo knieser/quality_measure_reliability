@@ -47,7 +47,7 @@ A list containing:
 \item \code{est.BB}: entity-level reliability estimates
 }
 
-#' If \code{show.all} is set to \code{TRUE}, then the outputted list will also contain:
+If \code{show.all} is set to \code{TRUE}, then the outputted list will also contain:
 \itemize{
 \item \code{var.w.FE}: within-entity variance using fixed effect estimates of entity-specific outcome probabilities
 \item \code{var.w.RE}: within-entity variance using random effect estimates of entity-specific outcome probabilities

@@ -1,6 +1,10 @@
 #' Calculate reliability using a hierarchical logistic regression model
 #' @description
 #' This function estimates reliability using a hierarchical logistic regression model with random intercepts for each accountable entity.
+#' @details
+#' Hierarchical logistic regression models are fit using `lme4::glmer()` with
+#' `control =  lme4::glmerControl(optimizer = "bobyqa")` and `nAGQ = 0`.
+#'
 #' @param df observation-level data; if null, will use the dataframe from the model object
 #' @param model model; if null, will use an unadjusted model
 #' @param entity data column containing the accountable entity identifier
@@ -11,11 +15,12 @@
 #' @returns A list containing:
 #' * `fit`: fitted model
 #' * `marg.p`: marginal probability of the outcome
+#' * `entity`: list of entities
 #' * `n`: entity sample sizes
 #' * `p`: entity-level sample proportions
 #' * `p.re`: predicted entity-level outcome probabilities (i.e., shrunken estimates)
-#' * `var.between`: between-entity variance on the outcome scale
-#' * `var.within`: within-entity variance on the outcome scale
+#' * `var.b`: between-entity variance on the outcome scale
+#' * `var.w`: within-entity variance on the outcome scale
 #' * `est.HLGM.delta`: reliability estimates on the outcome scale
 #'
 #' If `show.all` is set to `TRUE`, then the outputted list will also contain:
@@ -45,6 +50,9 @@
 #' # Calculate reliability
 #' out <- calcHLGMRel(df = df, entity = 'entity', y = 'y')
 #' summary(out$est.HLGM.delta)
+#'
+#' # Plot reliability
+#' plot(out$n, out$est.HLGM.delta)
 #'
 #' ## Reliability estimates from additional methods can be obtained by toggling show.all parameter
 #' out.all <- calcHLGMRel(df = df, entity = 'entity', y = 'y', show.all = T)
@@ -104,7 +112,7 @@ calcHLGMRel <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', sho
       call = cl,
       fit = fit,
       marg.p = marg.p,
-      entity = entities,
+      entity = as.vector(entities),
       n = n,
       p = p,
       p.re = p.re,
@@ -127,12 +135,12 @@ calcHLGMRel <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', sho
       call = cl,
       fit = fit,
       marg.p = marg.p,
-      entity = entities,
+      entity = as.vector(entities),
       n = n,
       p = p,
       p.re = p.re,
-      var.between = var.b.HLGM.delta,
-      var.within = var.w.delta,
+      var.b = var.b.HLGM.delta,
+      var.w = var.w.delta,
       est.HLGM.delta = est.HLGM.delta
     )
   }

@@ -27,14 +27,18 @@ calcHLMRel(
 A list containing:
 \itemize{
 \item \code{fit}: fitted model
+\item \code{entity}: list of entities
 \item \code{n}: entity sample sizes
-\item \code{var.between}: between-entity variance
-\item \code{var.within}: within-entity variance
+\item \code{var.b}: between-entity variance
+\item \code{var.w}: within-entity variance
 \item \code{est.HLM}: entity-level reliability
 }
 }
 \description{
 This function estimates reliability using a hierarchical linear regression model with random intercepts for each accountable entity.
+}
+\details{
+Hierarchical linear regression models are fit using \code{lme4::lmer()}.
 }
 \examples{
 # Simulate data
@@ -43,6 +47,9 @@ df <- simulateData(n.entity = 50, n.obs = 100, mu = 12, r = .7, data.type = 'nor
 # Calculate reliability
 out <- calcHLMRel(df = df, entity = 'entity', y = 'y')
 summary(out$est.HLM)
+
+# Plot reliability
+plot(out$n, out$est.HLM)
 
 }
 \references{

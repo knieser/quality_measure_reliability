@@ -1,6 +1,9 @@
 #' Calculate reliability using a hierarchical linear regression model
 #' @description
 #' This function estimates reliability using a hierarchical linear regression model with random intercepts for each accountable entity.
+#' @details
+#' Hierarchical linear regression models are fit using `lme4::lmer()`.
+#'
 #' @param df observation-level data; if null, will use the dataframe from the model object
 #' @param model model; if null, will use an unadjusted model
 #' @param entity data column containing the accountable entity identifier
@@ -8,9 +11,10 @@
 #' @param ctrPerf parameters to control performance measure calculation
 #' @returns A list containing:
 #' * `fit`: fitted model
+#' * `entity`: list of entities
 #' * `n`: entity sample sizes
-#' * `var.between`: between-entity variance
-#' * `var.within`: within-entity variance
+#' * `var.b`: between-entity variance
+#' * `var.w`: within-entity variance
 #' * `est.HLM`: entity-level reliability
 #' @author Kenneth Nieser (nieser@stanford.edu)
 #' @references Nieser KJ, Harris AH. Comparing methods for assessing the reliability of health care quality measures. Statistics in Medicine. 2024 Oct 15;43(23):4575-94.
@@ -21,6 +25,9 @@
 #' # Calculate reliability
 #' out <- calcHLMRel(df = df, entity = 'entity', y = 'y')
 #' summary(out$est.HLM)
+#'
+#' # Plot reliability
+#' plot(out$n, out$est.HLM)
 #'
 #' @importFrom lme4 VarCorr
 #' @export
@@ -43,10 +50,10 @@ calcHLMRel <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', ctrP
   output = list(
     call = cl,
     fit = fit,
-    entity = entities,
+    entity = as.vector(entities),
     n = n,
-    var.between = var.b,
-    var.within = var.w,
+    var.b = var.b,
+    var.w = var.w,
     est.HLM = est.HLM
   )
 
