@@ -1,13 +1,32 @@
 #' Calculate reliability using resampling inter-unit reliability method
 #' @description
-#' This function estimates reliability using the resampling inter-unit reliability method.
+#' This function estimates reliability using the resampling inter-unit reliability method described in He et al. 2018.
+#' @details
+#' In the current version, this function assumes that the measure is a simple mean of outcome values
+#' within each entity. However, this method is more flexible as described in He et al. 2018.
+#'
 #' @param df observation-level data; if null, will use the dataframe from the model object
 #' @param model model; if null, will use an unadjusted model
 #' @param entity data column containing the accountable entity identifier
 #' @param y data column containing the outcome variable
 #' @param ctrPerf parameters to control performance measure calculation
 #' @param ctrRel parameters to control reliability estimation
+#' @returns A list containing:
+#' * `entity`: list of entities
+#' * `n`: entity sample sizes
+#' * `var.b`: between-entity variance
+#' * `var.w`: within-entity variance
+#' * `var.total`: total variance
+#' * `IUR`: entity-level reliability
 #' @author Kenneth Nieser (nieser@stanford.edu)
+#' @examples
+#' # Simulate data
+#' df <- simulateData(n.entity = 50, n.obs = 100, mu = .2, r = .7)
+#'
+#' # Calculate reliability
+#' out <- calcResamplingIUR(df = df, entity = 'entity', y = 'y')
+#' summary(out$IUR)
+#'
 #' @importFrom stats aggregate
 #' @export
 
@@ -19,17 +38,16 @@ calcResamplingIUR <- function(df = NULL, model = NULL,  entity = 'entity', y = '
   n.cores     <- ctrRel$n.cores
   n.resamples <- ctrRel$n.resamples
 
-  data.out <- calcDataSummary(df, model, entity, y, ctrPerf)
-  df <- data.out$df
-  n  <- data.out$n
+  df <- cleanData(df, entity, y, ctrPerf)
+  agg  <- aggregate(y ~ entity, data = df, length)
+  entities <- agg$entity
+  n <- agg$y
   n0 <- 1 / (length(n) - 1) * (sum(n) - sum(n^2) / sum(n))
-  marg.p <- data.out$marg.p
-
-  entities = unique(df$entity)
+  mu = mean(df$y)
   n.entity = length(entities)
 
   entity.means0 = aggregate(y ~ entity, data = df, mean)$y
-  var.total = 1/(n0*(n.entity - 1)) * sum(n * (entity.means0 - marg.p)^2)
+  var.total = 1/(n0*(n.entity - 1)) * sum(n * (entity.means0 - mu)^2)
 
   entity.means = matrix(data = NA, nrow = n.entity, ncol = n.resamples)
 
@@ -54,6 +72,8 @@ calcResamplingIUR <- function(df = NULL, model = NULL,  entity = 'entity', y = '
   IUR = (var.total - var.w) / var.total
 
   results = list(call = cl,
+                 entity = as.vector(entities),
+                 n = n,
                  var.b = var.total - var.w,
                  var.w = var.w,
                  var.total = var.total,

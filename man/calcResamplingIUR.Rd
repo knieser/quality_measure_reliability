@@ -26,8 +26,32 @@ calcResamplingIUR(
 
 \item{ctrRel}{parameters to control reliability estimation}
 }
+\value{
+A list containing:
+\itemize{
+\item \code{entity}: list of entities
+\item \code{n}: entity sample sizes
+\item \code{var.b}: between-entity variance
+\item \code{var.w}: within-entity variance
+\item \code{var.total}: total variance
+\item \code{IUR}: entity-level reliability
+}
+}
 \description{
-This function estimates reliability using the resampling inter-unit reliability method.
+This function estimates reliability using the resampling inter-unit reliability method described in He et al. 2018.
+}
+\details{
+In the current version, this function assumes that the measure is a simple mean of outcome values
+within each entity. However, this method is more flexible as described in He et al. 2018.
+}
+\examples{
+# Simulate data
+df <- simulateData(n.entity = 50, n.obs = 100, mu = .2, r = .7)
+
+# Calculate reliability
+out <- calcResamplingIUR(df = df, entity = 'entity', y = 'y')
+summary(out$IUR)
+
 }
 \author{
 Kenneth Nieser (nieser@stanford.edu)
