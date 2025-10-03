@@ -38,7 +38,7 @@ Next, we will calculate reliability using the Beta-Binomial method for aggregate
 BB.results <- calcBetaBin(df = df, df.aggregate = T, n = 'n', x = 'x')
 ```
 
-Beta-Binomial parameter estimates are: alpha = `r round(BB.results$alpha,3)` and beta = `r round(BB.results$beta, 3)`. The between-entity variance in rates is `r round(BB.results$var.between, 3)`.
+Beta-Binomial parameter estimates are: alpha = `r round(BB.results$alpha,3)` and beta = `r round(BB.results$beta, 3)`. The between-entity variance in rates is `r round(BB.results$var.b, 3)`.
 
 Below is a summary of the distribution of entity-level reliability estimates.
 

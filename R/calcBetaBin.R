@@ -56,7 +56,7 @@
 #'           x = aggregate(y ~ entity, data = df, sum)$y
 #'           )
 #'
-#' out2 <- calcBetaBin(df = df.agg, df.aggregate = T, n = 'n', x = 'x')
+#' out2 <- calcBetaBin(df = df.agg, df.aggregate = TRUE, n = 'n', x = 'x')
 #' summary(out2$est.BB)
 #'
 #' @importFrom stats optim median

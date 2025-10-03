@@ -68,7 +68,7 @@ df <- simulateData(n.entity = 50, n.obs = 100, mu = .2, r = .7)
 out <- calcSSR(df = df, entity = 'entity', y = 'y')
 out$est.PSSR
 
-# You can also plot the distribution of reliability estimates obtained from the permutation sampling.
+# Distribution of estimates obtained from the permutation sampling.
 hist(out$icc)
 summary(out$icc)
 
@@ -81,7 +81,7 @@ out1 <- calcSSR(df = df1, model = 'y ~ x1 + (1 | entity)', entity = 'entity', y 
 out1$est.PSSR.oe
 out1$est.PSSR.pe
 
-# You can also plot the distribution of reliability estimates obtained from the permutation sampling.
+# Distribution of estimates obtained from the permutation sampling.
 hist(out1$icc.oe)
 summary(out1$icc.oe)
 

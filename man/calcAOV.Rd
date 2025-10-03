@@ -73,7 +73,7 @@ df.agg <- data.frame(
           sd = aggregate(y ~ entity, data = df, sd)$y
           )
 
-out2 <- calcAOV(df = df.agg, df.aggregate = T, n = 'n', mean = 'mean', std.dev = 'sd')
+out2 <- calcAOV(df = df.agg, df.aggregate = TRUE, n = 'n', mean = 'mean', std.dev = 'sd')
 summary(out2$est.aov)
 
 }

@@ -55,7 +55,7 @@
 #' plot(out$n, out$est.HLGM.delta)
 #'
 #' ## Reliability estimates from additional methods can be obtained by toggling show.all parameter
-#' out.all <- calcHLGMRel(df = df, entity = 'entity', y = 'y', show.all = T)
+#' out.all <- calcHLGMRel(df = df, entity = 'entity', y = 'y', show.all = TRUE)
 #' summary(out.all$est.HLGM.latent)
 #' summary(out.all$est.HLGM.delta)
 #' summary(out.all$est.HLGM.MC)
