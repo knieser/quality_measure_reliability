@@ -11,3 +11,10 @@ test_that("function works for aggregated data", {
   expect_equal(AOV.results$var.w.aov, AOV.agg.results$var.w.aov)
   expect_equal(AOV.results$est.aov, AOV.agg.results$est.aov)
 })
+
+test_that('example analysis works',{
+  set.seed(123)
+  df <- simulateData(n.entity = 100, n.obs = 50, mu = 0.3, r = 0.6)
+  AOV.results <- calcAOV(df = df)
+  expect_equal(round(mean(AOV.results$est.aov),3),0.595)
+})

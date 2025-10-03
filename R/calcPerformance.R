@@ -285,7 +285,7 @@ calcPerformance <- function(df = NULL, model = NULL, entity = "entity", y = "y",
                    perf.results = perf.results)
   } else{
     results = list(call = cl,
-                   df = df.perf,
+                   df = df,
                    model = model,
                    fit = fit,
                    marg.p = marg.p,

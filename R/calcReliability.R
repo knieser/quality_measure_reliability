@@ -59,7 +59,6 @@ calcReliability <- function(df = NULL, model = NULL, entity = "entity", y = "y",
   message('calculating reliability based on split-sample method...')
   SSR.out <- suppressMessages(calcSSR(df = df, model = model, entity = entity, y = y, data.type = data.type, ctrPerf = ctrPerf, ctrRel = ctrRel))
 
-
   if (data.type == 'binary' && !is.null(model)){
     est.SSR  <- SSR.out$est.SSR.oe
     est.PSSR <- SSR.out$est.PSSR.oe

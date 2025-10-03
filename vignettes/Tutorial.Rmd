@@ -47,10 +47,10 @@ df1 <- simulateData(n.entity = n.entity, n.obs = n.obs, mu = mu, r = r)
 
 ## Provider profiling analyses
 
-The `profiling_analysis()` function can be used to obtain some basic provider profiling results, including confidence intervals for entity-level rates.
+The `calcPerformance()` function can be used to obtain some basic provider profiling results, including confidence intervals for entity-level rates.
 
 ```{r}
-profiling.results <- profiling_analysis(df = df1)
+profiling.results <- calcPerformance(df = df1)
 perf.results <- profiling.results$perf.results
 ```
 
@@ -79,7 +79,7 @@ plotN(perf.results$n)
 plotPerformance(df = perf.results)
 ```
 
-Categorization of entities according to whether rates are lower, higher, or no different from the overall average can be found in the `perf.results` output from `profiling_analysis()` function.
+Categorization of entities according to whether rates are lower, higher, or no different from the overall average can be found in the `perf.results` output from `calcPerformance()` function.
 
 ```{r, results = 'asis'}
 knitr::kable(table(perf.results$category.p), col.names = c('Category', 'Number of entities'), caption = 'Categorization of entities based on their outcome rates')
@@ -169,11 +169,11 @@ plotReliability(rel.out)
 
 # Example #2: Measures with risk-adjustment 
 
-In this next part of the tutorial, we will work with an example measure where risk-adjustment is required.
+In this next part of the tutorial, we will work with an example measure where risk adjustment is required.
 
 ## Simulate data
 
-We can use the built-in function `simulateData()` to simulate data from a hierarchical logistic regression model with covariates for risk-adjustment. The simulated data will include a continuous covariate `x1` which is sampled from a standard Normal distribution.
+We can use the built-in function `simulateData()` to simulate data from a hierarchical logistic regression model with covariates for risk adjustment. The simulated data will include a continuous covariate `x1` which is sampled from a standard Normal distribution.
 
 ```{r}
 
@@ -232,9 +232,9 @@ plotCalibration(model.perf, quantiles = 5)
 
 ## Provider profiling analyses
 
-The `profiling_analysis()` function can be used to obtain some basic provider profiling results.
+The `calcPerformance()` function can be used to obtain some basic provider profiling results.
 
-This analysis generates confidence intervals for entity-level performance. Confidence intervals for the observed-to-expected (O/E) standardized rates are Wilson score intervals, while the confidence intervals for the predicted-to-expected (P/E) standardized rates use a parametric bootstrapping method. The number of bootstraps and the number of cores to use for parallel processing can be adjusted with the `controlPerf()` function within `profiling_analysis()` as shown below.
+This analysis generates confidence intervals for entity-level performance. Confidence intervals for the observed-to-expected (O/E) standardized rates are Wilson score intervals, while the confidence intervals for the predicted-to-expected (P/E) standardized rates use a parametric bootstrapping method. The number of bootstraps and the number of cores to use for parallel processing can be adjusted with the `controlPerf()` function within `calcPerformance()` as shown below.
 
 ```{r}
 # adjust number of bootstraps and cores for parallel processing.
@@ -242,7 +242,7 @@ n.boots = 1000
 n.cores = 2
 
 # run profiling analysis for the first dataset without risk-adjustment
-profiling.results2 <- profiling_analysis(df = df2, model = model, ctrPerf = controlPerf(n.boots = n.boots, n.cores = n.cores))
+profiling.results2 <- calcPerformance(df = df2, model = model, ctrPerf = controlPerf(n.boots = n.boots, n.cores = n.cores))
 perf.results2 <- profiling.results2$perf.results
 ```
 
@@ -270,12 +270,11 @@ plotPerformance(df = perf.results2)
 plotPerformance(df = perf.results2, plot.y = 'oe')
 ```
 
-Categorization of entities according to whether their risk-standardized rates are lower, higher, or no different from the overall, unadjusted average can be found in the `perf.results` output from `profiling_analysis()` function.
+Categorization of entities according to whether their risk-standardized rates are lower, higher, or no different from the overall, unadjusted average can be found in the `perf.results` output from `calcPerformance()` function.
 
 ```{r, echo = FALSE, results = 'asis'}
 knitr::kable(table(perf.results2$category.oe), col.names = c('Category', 'Number of entities'), caption = 'Categorization of entities based on OE-risk-standardized rates')
 ```
-
 
 
 ### PE-risk-standardized rates across entities
@@ -304,7 +303,7 @@ plotPerformance(df = perf.results2, plot.type = 'OR')
 Again, to calculate reliability estimates from all methods, we use the `calcReliability()` function. This time we specify the risk-adjustment model. Note that while the results from the Beta-Binomial method are included, these estimates currently do not account for risk-adjustment variables.
 
 ```{r}
-rel.out2 <- calcReliability(df = df2, model = model, ctrRel = controlRel(n.resamples = n.resamples, n.cores = n.cores))
+rel.out2 <- calcReliability(df = df2, model = model)
 ```
 
 ```{r, results = 'asis'}

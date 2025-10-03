@@ -1,5 +1,5 @@
 ---
-title: "Colonoscopy_Measure_Example"
+title: "Colonoscopy follow-up measure example"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Colonoscopy_Measure_Example}
