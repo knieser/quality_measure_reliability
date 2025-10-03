@@ -32,8 +32,39 @@ calcReliability(
 
 \item{ctrRel}{parameters to control reliability estimation}
 }
+\value{
+A list with reliability estimates, including:
+}
 \description{
 This function calculates several estimates of quality measure performance.
+}
+\examples{
+### Simulate data with binary outcome
+df <- simulateData(n.entity = 50, n.obs = 100, mu = .2, r = .7)
+
+# Calculate reliability
+out <- calcReliability(df = df, entity = 'entity', y = 'y')
+
+# Plot estimates
+plotReliability(out)
+
+
+# Calculate reliability with expanded set of methods
+out1 <- calcReliability(df = df, entity = 'entity', y = 'y', show.all = T)
+
+# Plot estimates for expanded set of methods
+plotReliability(out1)
+
+
+### This function also works with continuous outcome data
+# simulate data from multilevel normal distribution
+df.c <- simulateData(n.entity = 50, n.obs = 100, mu = 25, r = .6, data.type = 'normal')
+
+# calculate reliability
+out.c <- calcReliability(df = df, entity = 'entity', y = 'y', data.type = 'continuous')
+plotReliability(out.c)
+
+
 }
 \references{
 Nieser KJ, Harris AH. Comparing methods for assessing the reliability of health care quality measures. Statistics in Medicine. 2024 Oct 15;43(23):4575-94.

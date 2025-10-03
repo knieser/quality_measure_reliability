@@ -5,6 +5,7 @@
 #' @param alpha statistical significance level to use for confidence intervals
 #' @param n.boots number of bootstraps to use for confidence interval estimation for P/E ratios
 #' @param n.cores number of cores to use for parallel processing
+#' @return control parameters for performance calculations
 #' @author Kenneth Nieser (nieser@stanford.edu)
 #' @examples
 #' str(controlPerf())

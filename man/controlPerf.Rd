@@ -15,6 +15,9 @@ controlPerf(min.n = 2, alpha = 0.05, n.boots = 1000, n.cores = 2)
 
 \item{n.cores}{number of cores to use for parallel processing}
 }
+\value{
+control parameters for performance calculations
+}
 \description{
 This function stores parameters for performance calculations
 }

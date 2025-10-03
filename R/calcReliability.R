@@ -9,8 +9,37 @@
 #' @param show.all logical indicator for whether full list of reliability method estimates should be calculated (default: `FALSE`)
 #' @param ctrPerf parameters to control performance measure calculation
 #' @param ctrRel parameters to control reliability estimation
+#' @return A list with reliability estimates, including:
+#'
 #' @author Kenneth Nieser (nieser@stanford.edu)
 #' @references Nieser KJ, Harris AH. Comparing methods for assessing the reliability of health care quality measures. Statistics in Medicine. 2024 Oct 15;43(23):4575-94.
+#' @examples
+#' ### Simulate data with binary outcome
+#' df <- simulateData(n.entity = 50, n.obs = 100, mu = .2, r = .7)
+#'
+#' # Calculate reliability
+#' out <- calcReliability(df = df, entity = 'entity', y = 'y')
+#'
+#' # Plot estimates
+#' plotReliability(out)
+#'
+#'
+#' # Calculate reliability with expanded set of methods
+#' out1 <- calcReliability(df = df, entity = 'entity', y = 'y', show.all = T)
+#'
+#' # Plot estimates for expanded set of methods
+#' plotReliability(out1)
+#'
+#'
+#' ### This function also works with continuous outcome data
+#' # simulate data from multilevel normal distribution
+#' df.c <- simulateData(n.entity = 50, n.obs = 100, mu = 25, r = .6, data.type = 'normal')
+#'
+#' # calculate reliability
+#' out.c <- calcReliability(df = df, entity = 'entity', y = 'y', data.type = 'continuous')
+#' plotReliability(out.c)
+#'
+#'
 #' @importFrom stats quantile
 #' @export
 
@@ -27,33 +56,41 @@ calcReliability <- function(df = NULL, model = NULL, entity = "entity", y = "y",
   #### resampling methods ####
   # split-sample reliability
   message('calculating reliability based on split-sample method...')
-  SSR.out <- suppressMessages(calcSSR(df, model, entity, y, data.type, ctrPerf, ctrRel))
-  est.SSR  <- SSR.out$est.SSR
-  est.PSSR <- SSR.out$est.PSSR
-  if (data.type == 'binary'){
-    est.SSR.oe  <- SSR.out$est.SSR.oe
-    est.PSSR.oe <- SSR.out$est.PSSR.oe
-    est.SSR.pe  <- SSR.out$est.SSR.pe
-    est.PSSR.pe <- SSR.out$est.PSSR.pe
+  SSR.out <- suppressMessages(calcSSR(df = df, model = model, entity = entity, y = y, data.type = data.type, ctrPerf = ctrPerf, ctrRel = ctrRel))
+
+
+  if (data.type == 'binary' && !is.null(model)){
+    est.SSR  <- SSR.out$est.SSR.oe
+    est.PSSR <- SSR.out$est.PSSR.oe
+  }
+
+  if (data.type == 'binary' && is.null(model)){
+    est.SSR  <- SSR.out$est.SSR
+    est.PSSR <- SSR.out$est.PSSR
+  }
+
+  if (data.type == 'continuous'){
+    est.SSR <- SSR.out$est.SSR
+    est.PSSR <- SSR.out$est.PSSR
   }
   message('...done')
 
   if (data.type == 'binary'){
     # hierarchical logistic regression model methods
     message('calculating reliability based on hierarchial logistic regression model...')
-    HLGM.out <- suppressMessages(calcHLGMRel(df, model, entity, y, show.all, ctrPerf))
+    HLGM.out <- suppressMessages(calcHLGMRel(df = df, model = model, entity = entity, y = y, show.all = show.all, ctrPerf = ctrPerf, ctrRel = ctrRel))
     est.HLGM.delta <- HLGM.out$est.HLGM.delta
     message('...done')
 
     # Beta-Binomial method
     message('calculating reliability based on Beta-Binomial method...')
-    BB.out <- suppressMessages(calcBetaBin(df, model, entity, y, df.aggregate = FALSE, show.all=show.all, ctrPerf = ctrPerf))
+    BB.out <- suppressMessages(calcBetaBin(df = df, model = model, entity = entity, y = y, df.aggregate = FALSE, show.all = show.all, ctrPerf = ctrPerf))
     est.BB <- BB.out$est.BB
     message('...done')
 
     if(show.all == TRUE){
-      est.HLGM.MC <- HLGM.out$est.HLGM.MC
       est.HLGM.latent <- HLGM.out$est.HLGM.latent
+      est.HLGM.MC <- HLGM.out$est.HLGM.MC
       est.HLGM.FE <- HLGM.out$est.HLGM.FE
       est.HLGM.RE <- HLGM.out$est.HLGM.RE
       est.BB.FE <- BB.out$est.BB.FE
@@ -62,39 +99,38 @@ calcReliability <- function(df = NULL, model = NULL, entity = "entity", y = "y",
 
       # anova
       message('calculating reliability based on one-way ANOVA method...')
-      AOV.out <- suppressMessages(calcAOV(df, entity, y, ctrPerf))
+      AOV.out <- suppressMessages(calcAOV(df = df, entity = entity, y = y, ctrPerf = ctrPerf))
       est.aov <- AOV.out$est.aov
       message('...done')
 
       # resampling IUR method from He et al 2019
-      # message('calculating reliability based on resampling IUR method...')
-      # RIUR.results <- calcResamplingIUR(df, model, entity, y, ctrPerf, ctrRel)
-      # est.RIUR <- RIUR.results$IUR
-      # est.RIUR <- NA
-      # message('...done')
+      message('calculating reliability based on resampling IUR method...')
+      RIUR.out <- calcResamplingIUR(df = df, model = model, entity = entity, y = y, ctrPerf = ctrPerf, ctrRel = ctrRel)
+      est.RIUR <- RIUR.out$IUR
+      message('...done')
     }
 
     ##### compile output ####
     if (show.all == FALSE){
       rel.results <- data.frame(
-        method = c('Permutation split-sample (O/E)', 'Hierarchical logit regression', 'Beta-Binomial'),
+        method = c('Permutation split-sample', 'Hierarchical logit regression', 'Beta-Binomial'),
         between_var = c(NA,
-                        median(HLGM.out$var.between),
-                        median(BB.out$var.between)),
+                        median(HLGM.out$var.b),
+                        median(BB.out$var.b)),
         within_var = c(NA,
-                       median(HLGM.out$var.within),
-                       median(BB.out$var.within)
+                       median(HLGM.out$var.w),
+                       median(BB.out$var.w)
         ),
         within_var_min = c(NA,
-                           min(HLGM.out$var.within),
-                           min(BB.out$var.within)
+                           min(HLGM.out$var.w),
+                           min(BB.out$var.w)
         ),
         within_var_max = c(NA,
-                           max(HLGM.out$var.within),
-                           max(BB.out$var.within)
+                           max(HLGM.out$var.w),
+                           max(BB.out$var.w)
         ),
         reliability = c(
-          est.PSSR.oe,
+          est.PSSR,
           median(est.HLGM.delta),
           median(est.BB)
         ),
@@ -136,10 +172,10 @@ calcReliability <- function(df = NULL, model = NULL, entity = "entity", y = "y",
       )
     } else{
       rel.results <- data.frame(
-        method = c('SSR', 'PSSR', 'SSR (O/E)', 'SSR (P/E)', 'PSSR (O/E)', 'PSSR (P/E)', 'ANOVA', 'Hier logit on latent scale', 'Hier logit w/ delta approx', 'Hier logit w/ Monte Carlo method', 'Hier logit w/ FE', 'Hier logit w/ RE', 'Beta-Binomial', 'Beta-Binomial w/ FE', 'Beta-Binomial w/ RE', 'Beta-Binomial w/ Jeffreys'),
-        between_var = c(NA, NA, NA, NA, NA, NA,
+        method = c('SSR', 'PSSR', 'ANOVA', 'Hier logit on latent scale', 'Hier logit w/ delta approx', 'Hier logit w/ Monte Carlo method', 'Hier logit w/ FE', 'Hier logit w/ RE', 'Beta-Binomial', 'Beta-Binomial w/ FE', 'Beta-Binomial w/ RE', 'Beta-Binomial w/ Jeffreys', 'Resampling IUR'),
+        between_var = c(NA, NA,
                         AOV.out$var.b.aov,
-                        HLGM.out$var.b.HLGM,
+                        HLGM.out$var.b.HLGM.latent,
                         median(HLGM.out$var.b.HLGM.delta),
                         median(HLGM.out$var.b.MC),
                         median(HLGM.out$var.b.HLGM.delta),
@@ -147,9 +183,10 @@ calcReliability <- function(df = NULL, model = NULL, entity = "entity", y = "y",
                         BB.out$var.b.BB,
                         BB.out$var.b.BB,
                         BB.out$var.b.BB,
-                        BB.out$var.b.BB
+                        BB.out$var.b.BB,
+                        NA
         ),
-        within_var = c(NA, NA, NA, NA, NA, NA,
+        within_var = c(NA, NA,
                        median(AOV.out$var.w.aov),
                        median(HLGM.out$var.w.latent),
                        median(HLGM.out$var.w.delta),
@@ -159,9 +196,10 @@ calcReliability <- function(df = NULL, model = NULL, entity = "entity", y = "y",
                        median(BB.out$var.w.BB),
                        median(BB.out$var.w.FE),
                        median(BB.out$var.w.RE),
-                       median(BB.out$var.w.J)
+                       median(BB.out$var.w.J),
+                       NA
         ),
-        within_var_min = c(NA, NA, NA, NA, NA, NA,
+        within_var_min = c(NA, NA,
                            min(AOV.out$var.w.aov),
                            min(HLGM.out$var.w.latent),
                            min(HLGM.out$var.w.delta),
@@ -171,9 +209,10 @@ calcReliability <- function(df = NULL, model = NULL, entity = "entity", y = "y",
                            min(BB.out$var.w.BB),
                            min(BB.out$var.w.FE),
                            min(BB.out$var.w.RE),
-                           min(BB.out$var.w.J)
+                           min(BB.out$var.w.J),
+                           NA
         ),
-        within_var_max = c(NA, NA, NA, NA, NA, NA,
+        within_var_max = c(NA, NA,
                            max(AOV.out$var.w.aov),
                            max(HLGM.out$var.w.latent),
                            max(HLGM.out$var.w.delta),
@@ -183,15 +222,12 @@ calcReliability <- function(df = NULL, model = NULL, entity = "entity", y = "y",
                            max(BB.out$var.w.BB),
                            max(BB.out$var.w.FE),
                            max(BB.out$var.w.RE),
-                           max(BB.out$var.w.J)
+                           max(BB.out$var.w.J),
+                           NA
         ),
         reliability = c(
           est.SSR,
           est.PSSR,
-          est.SSR.oe,
-          est.SSR.pe,
-          est.PSSR.oe,
-          est.PSSR.pe,
           median(est.aov),
           median(est.HLGM.latent),
           median(est.HLGM.delta),
@@ -201,13 +237,10 @@ calcReliability <- function(df = NULL, model = NULL, entity = "entity", y = "y",
           median(est.BB),
           median(est.BB.FE),
           median(est.BB.RE),
-          median(est.BB.J)
+          median(est.BB.J),
+          est.RIUR
         ),
         reliability_mean = c(
-          NA,
-          NA,
-          NA,
-          NA,
           NA,
           NA,
           mean(est.aov),
@@ -219,13 +252,10 @@ calcReliability <- function(df = NULL, model = NULL, entity = "entity", y = "y",
           mean(est.BB),
           mean(est.BB.FE),
           mean(est.BB.RE),
-          mean(est.BB.J)
+          mean(est.BB.J),
+          NA
         ),
         reliability_min = c(
-          NA,
-          NA,
-          NA,
-          NA,
           NA,
           NA,
           min(est.aov),
@@ -237,13 +267,10 @@ calcReliability <- function(df = NULL, model = NULL, entity = "entity", y = "y",
           min(est.BB),
           min(est.BB.FE),
           min(est.BB.RE),
-          min(est.BB.J)
+          min(est.BB.J),
+          NA
         ),
         reliability_25p = c(
-          NA,
-          NA,
-          NA,
-          NA,
           NA,
           NA,
           stats::quantile(est.aov, 0.25),
@@ -255,13 +282,10 @@ calcReliability <- function(df = NULL, model = NULL, entity = "entity", y = "y",
           stats::quantile(est.BB, 0.25),
           stats::quantile(est.BB.FE, 0.25),
           stats::quantile(est.BB.RE, 0.25),
-          stats::quantile(est.BB.J, 0.25)
+          stats::quantile(est.BB.J, 0.25),
+          NA
         ),
         reliability_75p = c(
-          NA,
-          NA,
-          NA,
-          NA,
           NA,
           NA,
           stats::quantile(est.aov, 0.75),
@@ -273,13 +297,10 @@ calcReliability <- function(df = NULL, model = NULL, entity = "entity", y = "y",
           stats::quantile(est.BB, 0.75),
           stats::quantile(est.BB.FE, 0.75),
           stats::quantile(est.BB.RE, 0.75),
-          stats::quantile(est.BB.J, 0.75)
+          stats::quantile(est.BB.J, 0.75),
+          NA
         ),
         reliability_max = c(
-          NA,
-          NA,
-          NA,
-          NA,
           NA,
           NA,
           max(est.aov),
@@ -291,7 +312,8 @@ calcReliability <- function(df = NULL, model = NULL, entity = "entity", y = "y",
           max(est.BB),
           max(est.BB.FE),
           max(est.BB.RE),
-          max(est.BB.J)
+          max(est.BB.J),
+          NA
         )
       )
 
@@ -303,21 +325,25 @@ calcReliability <- function(df = NULL, model = NULL, entity = "entity", y = "y",
         SSR.out = SSR.out,
         AOV.out = AOV.out,
         HLGM.out = HLGM.out,
-        BB.out = BB.out
+        BB.out = BB.out,
+        RIUR.out = RIUR.out
       )
     }
   }
 
   if (data.type == 'continuous'){
+
+    if (show.all == TRUE){message('Results are the same as when show.all = FALSE')}
+
     # anova
     message('calculating reliability based on one-way ANOVA method...')
-    AOV.out <- calcAOV(df, entity, y, ctrPerf)
+    AOV.out <- suppressMessages(calcAOV(df = df, entity = entity, y = y, ctrPerf = ctrPerf))
     est.aov <- AOV.out$est.aov
     message('...done')
 
     # hierarchical linear regression model method
     message('calculating reliability based on hierarchial linear regression model...')
-    HLM.out <- calcHLMRel(df, model, entity, y, ctrPerf)
+    HLM.out <- calcHLMRel(df = df, model = model, entity = entity, y = y, ctrPerf = ctrPerf)
     est.HLM <- HLM.out$est.HLM
     message('...done')
 
@@ -325,18 +351,18 @@ calcReliability <- function(df = NULL, model = NULL, entity = "entity", y = "y",
       method = c('Permutation split-sample', 'ANOVA', 'Hierarchical linear regression'),
       between_var = c(NA,
                       AOV.out$var.b.aov,
-                      median(HLM.out$var.between)),
+                      median(HLM.out$var.b)),
       within_var = c(NA,
                      median(AOV.out$var.w.aov),
-                     median(HLM.out$var.within)
+                     median(HLM.out$var.w)
       ),
       within_var_min = c(NA,
                          min(AOV.out$var.w.aov),
-                         min(HLM.out$var.within)
+                         min(HLM.out$var.w)
       ),
       within_var_max = c(NA,
                          max(AOV.out$var.w.aov),
-                         max(HLM.out$var.within)
+                         max(HLM.out$var.w)
       ),
       reliability = c(
         est.PSSR,

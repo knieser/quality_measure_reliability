@@ -7,6 +7,7 @@
 #' @param fn aggregation function for observations within entities, default is `NA` and will produce entity-level means
 #' @param MC.reps number of Monte Carlo simulations to produce reliability estimates for data modeled with hierarchical logistic regression
 #' @param d.steps number of percentiles removed to check for misclassification probabilities
+#' @return control parameters for performance calculations
 #' @author Kenneth Nieser (nieser@stanford.edu)
 #' @examples
 #' str(controlRel())

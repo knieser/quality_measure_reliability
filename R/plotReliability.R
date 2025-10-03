@@ -20,15 +20,12 @@ if (data.type == 'binary'){
 
   if (show.all == TRUE){
     AOV.out <- rel.out$AOV.out
+    RIUR.out <- rel.out$RIUR.out
     rel.plot.df <- data.frame(
       method = rep(method, each = n),
       est = c(
         rep(SSR.out$est.SSR, n),
         rep(SSR.out$est.PSSR, n),
-        rep(SSR.out$est.SSR.oe, n),
-        rep(SSR.out$est.SSR.pe, n),
-        rep(SSR.out$est.PSSR.oe, n),
-        rep(SSR.out$est.PSSR.pe, n),
         AOV.out$est.aov,
         HLGM.out$est.HLGM.latent,
         HLGM.out$est.HLGM.delta,
@@ -38,13 +35,15 @@ if (data.type == 'binary'){
         BB.out$est.BB,
         BB.out$est.BB.FE,
         BB.out$est.BB.RE,
-        BB.out$est.BB.J)
+        BB.out$est.BB.J,
+        rep(RIUR.out$IUR, n)
+        )
     )
   } else{
     rel.plot.df <- data.frame(
       method = rep(method, each = n),
       est = c(
-        rep(SSR.out$est.PSSR.oe, n),
+        rep(SSR.out$est.PSSR, n),
         HLGM.out$est.HLGM.delta,
         BB.out$est.BB)
     )

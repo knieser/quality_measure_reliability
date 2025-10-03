@@ -26,6 +26,9 @@ controlRel(
 
 \item{d.steps}{number of percentiles removed to check for misclassification probabilities}
 }
+\value{
+control parameters for performance calculations
+}
 \description{
 This function stores parameters for reliability calculations.
 }
