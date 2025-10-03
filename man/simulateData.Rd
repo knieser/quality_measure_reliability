@@ -32,6 +32,9 @@ simulateData(
 
 \item{dist}{specifies the distribution family to use to simulate provider performance. Valid options include: \code{normal} (default) and \code{beta}.}
 }
+\value{
+A dataframe of simulated data.
+}
 \description{
 This function simulates some data.
 }

@@ -9,6 +9,7 @@
 #' @param beta1 regression coefficient for covariate added to the linear predictor; default is `0`. Note that for binary data, `beta1` is on the log odds scale (e.g., `beta1` = 0.4 corresponds to an odds ratio of about 1.5).
 #' @param data.type type of data to simulate. Valid options include: `binary` (default) and `normal`.
 #' @param dist specifies the distribution family to use to simulate provider performance. Valid options include: `normal` (default) and `beta`.
+#' @returns A dataframe of simulated data.
 #' @author Kenneth Nieser (nieser@stanford.edu)
 #' @examples
 #' # number of accountable entities
