@@ -2,7 +2,7 @@
 title: "Colonoscopy follow-up measure example"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Colonoscopy_Measure_Example}
+  %\VignetteIndexEntry{Colonoscopy follow-up measure example}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
