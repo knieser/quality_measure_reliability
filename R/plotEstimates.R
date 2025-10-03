@@ -2,7 +2,19 @@
 #' @description
 #' This function creates a plot of model results
 #' @param model.performance results from `model_performance()`
+#' @returns A ggplot figure
 #' @author Kenneth Nieser (nieser@stanford.edu)
+#' @examples
+#' # Simulate data
+#' df <- simulateData(n.entity = 100, n.obs = 80, mu = 0.2, r = 0.6, beta1 = log(1.6))
+#'
+#' # Calculate risk-adjustment model performance
+#' model.perf <- model_performance(df = df, model = 'y ~ x1 + (1|entity)')
+#'
+#' # Plot estimated effects of predictors
+#' plotEstimates(model.perf)
+#'
+#'
 #' @importFrom ggplot2 ggplot
 #' @export
 

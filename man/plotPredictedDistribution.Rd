@@ -9,8 +9,26 @@ plotPredictedDistribution(model.performance)
 \arguments{
 \item{model.performance}{results from \code{model_performance()}}
 }
+\value{
+A ggplot figure
+}
 \description{
 This function creates a plot of the distributions of predicted values by outcome group
+}
+\details{
+This function only works for binary outcome data.
+}
+\examples{
+# Simulate data
+df <- simulateData(n.entity = 100, n.obs = 80, mu = 0.2, r = 0.6, beta1 = log(1.6))
+
+# Calculate risk-adjustment model performance
+model.perf <- model_performance(df = df, model = 'y ~ x1 + (1|entity)')
+
+# Plot predicted distributions
+plotPredictedDistribution(model.perf)
+
+
 }
 \author{
 Kenneth Nieser (nieser@stanford.edu)

@@ -11,8 +11,26 @@ plotCalibration(model.performance, quantiles = 10)
 
 \item{quantiles}{number of quantiles to bin data; default is 10.}
 }
+\value{
+A ggplot figure
+}
 \description{
 This function creates a plot of the model calibration curve
+}
+\details{
+This function only works for binary outcome data.
+}
+\examples{
+# Simulate data
+df <- simulateData(n.entity = 100, n.obs = 80, mu = 0.2, r = 0.6, beta1 = log(1.6))
+
+# Calculate risk-adjustment model performance
+model.perf <- model_performance(df = df, model = 'y ~ x1 + (1|entity)')
+
+# Calibration plots
+plotCalibration(model.perf)
+plotCalibration(model.perf, quantiles = 5)
+
 }
 \author{
 Kenneth Nieser (nieser@stanford.edu)

@@ -7,7 +7,24 @@
 #' @param y data column containing the outcome variable
 #' @param data.type acceptable values are `binary` for 0/1 data (default: `binary`)
 #' @param ctrPerf parameters to control performance measure calculation
+#' @returns A list including:
+#' *`df`: a cleaned dataframe used to calculate measure performance
+#' *`model`: the model used to calculate measure performance
+#' *`fit`: the fitted model results
+#' *`marg.p`: overall, unadjusted average performance across all entities
+#' *`perf.results`: performance results by entity
+#'
 #' @author Kenneth Nieser (nieser@stanford.edu)
+#' @examples
+#' # simulate data
+#' df <- simulateData(n.entity = 50, n.obs = 100, mu = .2, r = .7)
+#'
+#' # calculate measure performance
+#' out <- calcPerformance(df = df, entity = 'entity', y = 'y')
+#'
+#' # plot performance
+#' plotPerformance(out$perf.results)
+#'
 #' @importFrom stats aggregate predict rbinom var sd
 #' @importFrom parallel makeCluster stopCluster
 #' @importFrom doParallel registerDoParallel
@@ -16,14 +33,21 @@
 
 calcPerformance <- function(df = NULL, model = NULL, entity = "entity", y = "y", data.type = 'binary', ctrPerf = controlPerf()){
   if (is.null(df) & is.null(model)) stop ('Please provide either a dataframe or a model object')
+  if(data.type !='binary') stop('This function currently works with binary outcome data only.')
+
   cl <- match.call()
   alpha = ctrPerf$alpha
   ci.lwr = alpha/2
   ci.upr = 1 - alpha/2
   z = stats::qnorm(1 - alpha/2)
-  if (is.null(model)) {risk.adj = 0} else {risk.adj = 1}
+  n.boots = ctrPerf$n.boots
+  if(is.null(model)) {risk.adj = 0} else {risk.adj = 1}
+  if(risk.adj == 1){
+    message(paste0('
+    Note: OE and PE risk-standardized rates are being calculated using the specified risk-adjustment model. Confidence intervals for PE-standardized rates are being calculated with ', n.boots, ' parametric bootstraps. This could take a few mintues.
 
-  if(data.type !='binary') stop('This function currently works with binary outcome data only.')
+    You can change the number of bootstraps using the `controlPerf()` function, which is a parameter within `calcPerformance()`.'))
+    }
 
   data.out <- calcDataSummary(df, model, entity, y, data.type, ctrPerf)
   df = data.out$df

@@ -26,8 +26,27 @@ calcPerformance(
 
 \item{ctrPerf}{parameters to control performance measure calculation}
 }
+\value{
+A list including:
+*\code{df}: a cleaned dataframe used to calculate measure performance
+*\code{model}: the model used to calculate measure performance
+*\code{fit}: the fitted model results
+*\code{marg.p}: overall, unadjusted average performance across all entities
+*\code{perf.results}: performance results by entity
+}
 \description{
 This function calculates measure performance by accountable entity.
+}
+\examples{
+# simulate data
+df <- simulateData(n.entity = 50, n.obs = 100, mu = .2, r = .7)
+
+# calculate measure performance
+out <- calcPerformance(df = df, entity = 'entity', y = 'y')
+
+# plot performance
+plotPerformance(out$perf.results)
+
 }
 \author{
 Kenneth Nieser (nieser@stanford.edu)

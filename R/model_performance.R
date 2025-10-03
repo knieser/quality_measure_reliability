@@ -8,8 +8,26 @@
 #' @param data.type acceptable values are `binary` for 0/1 data and `continuous` for continuous data (default: `binary`)
 #' @param predictor.clean optional list of formatted names of predictors in the model
 #' @param ctrPerf parameters to control performance measure calculation
-#' @returns Estimated risk-standardized measure performance by accountable entity
+#' @returns A list containing:
+#' *`data.type`: type of data: binary or continuous
+#' *`model`: risk-adjustment model
+#' *`fit`: fitted model results
+#' *`marg.p`: overall, unadjusted outcome rate (for binary outcome data only)
+#' *`c.statistic`: c-statistic, a measure of discrimination
+#' *`model.results`: a dataframe with one row for each predictor in the model
+#'
 #' @author Kenneth Nieser (nieser@stanford.edu)
+#' @examples
+#' # Simulate data
+#' df <- simulateData(n.entity = 100, n.obs = 80, mu = 0.2, r = 0.6, beta1 = log(1.6))
+#'
+#' # Calculate risk-adjustment model performance
+#' model.perf <- model_performance(df = df, model = 'y ~ x1 + (1|entity)')
+#'
+#' # Plot estimated effects of predictors
+#' plotEstimates(model.perf)
+#'
+#'
 #' @importFrom stats aggregate predict qnorm pnorm wilcox.test
 #' @export
 
@@ -99,7 +117,6 @@ model_performance <- function(df, model, entity = 'entity', y = 'y', data.type =
                    fit = fit,
                    model.results = model.results)
   }
-
 
   return(results)
 }

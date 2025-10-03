@@ -4,13 +4,26 @@
 \alias{plotN}
 \title{Plot sample size distribution across accountable entities}
 \usage{
-plotN(n)
+plotN(n, bin.width = 10)
 }
 \arguments{
 \item{n}{vector of sample sizes}
+
+\item{bin.width}{width of bins; default is \code{10}}
+}
+\value{
+A ggplot figure
 }
 \description{
 This function creates a histogram of entity sample sizes.
+}
+\examples{
+# plot sample sizes from colonoscopy dataset
+plotN(colonoscopy$n)
+
+# plot sample sizes from psychiatric readmissions dataset
+plotN(psychreadmission$n, bin.width = 100)
+
 }
 \author{
 Kenneth Nieser (nieser@stanford.edu)

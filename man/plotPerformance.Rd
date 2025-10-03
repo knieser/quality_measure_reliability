@@ -4,23 +4,37 @@
 \alias{plotPerformance}
 \title{Plot measure performance across accountable entities}
 \usage{
-plotPerformance(df, plot.type = "single", plot.y = "p")
+plotPerformance(df, plot.type = "p")
 }
 \arguments{
 \item{df}{perf.results dataframe from \code{calcPerformance()} output}
 
-\item{plot.type}{select which plot to return:
+\item{plot.type}{specifies which plot to return:
 \itemize{
-\item \code{single} (the default): a plot of the performance across entities
-\item \code{OR}: plot of ORs comparing each facility with the average facility
+\item \code{p}: plots the entity-level unadjusted outcome rates
+\item \code{oe}: plots the entity-level observed-to-expected risk-standardized rates
+\item \code{pe}: plots the predicted-to-expected risk-standardized rates
+\item \code{OR}: plots the odds ratios comparing each entity with the average entity; i.e., exponentiated random intercepts from the hierarchical logistic regression model.
 \item \code{correlation}: plot of standardization ratios against the entity random intercepts
 \item \code{multiple}: plot of measure performance across different risk-adjustment methods
 }}
-
-\item{plot.y}{\code{p} plots the unadjusted performance; \code{oe} plots the observed-to-expected ratio; \code{pe} plots the predicted-to-expected ratio}
+}
+\value{
+A ggplot figure
 }
 \description{
 This function creates a plot of measure performance across accountable entities, using the \code{perf.results} dataframe from \code{calcPerformance()} output.
+}
+\examples{
+# simulate data
+df <- simulateData(n.entity = 50, n.obs = 100, mu = .2, r = .7)
+
+# calculate measure performance
+out <- calcPerformance(df = df, entity = 'entity', y = 'y')
+
+# plot performance
+plotPerformance(out$perf.results, plot.type = 'p')
+
 }
 \author{
 Kenneth Nieser (nieser@stanford.edu)

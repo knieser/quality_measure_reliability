@@ -30,10 +30,28 @@ model_performance(
 \item{ctrPerf}{parameters to control performance measure calculation}
 }
 \value{
-Estimated risk-standardized measure performance by accountable entity
+A list containing:
+*\code{data.type}: type of data: binary or continuous
+*\code{model}: risk-adjustment model
+*\code{fit}: fitted model results
+*\code{marg.p}: overall, unadjusted outcome rate (for binary outcome data only)
+*\code{c.statistic}: c-statistic, a measure of discrimination
+*\code{model.results}: a dataframe with one row for each predictor in the model
 }
 \description{
 This function calculates risk model performance.
+}
+\examples{
+# Simulate data
+df <- simulateData(n.entity = 100, n.obs = 80, mu = 0.2, r = 0.6, beta1 = log(1.6))
+
+# Calculate risk-adjustment model performance
+model.perf <- model_performance(df = df, model = 'y ~ x1 + (1|entity)')
+
+# Plot estimated effects of predictors
+plotEstimates(model.perf)
+
+
 }
 \author{
 Kenneth Nieser (nieser@stanford.edu)
