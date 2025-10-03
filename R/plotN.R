@@ -16,6 +16,7 @@
 #' @export
 
 plotN <- function(n, bin.width=10){
+  if(!is.vector(n, mode = 'numeric')) stop('`n` should be a vector of numerical sample sizes.')
   df <- data.frame(n)
   fig <- ggplot2::ggplot(data = df, ggplot2::aes(n)) +
     ggplot2::geom_histogram(color = 'white', fill = 'black', binwidth = bin.width) +

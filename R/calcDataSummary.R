@@ -5,7 +5,8 @@ calcDataSummary <- function(df, model = NULL, entity = 'entity', y = "y", data.t
   alpha <- ctrPerf$alpha
 
   df <- cleanData(df, entity, y, ctrPerf)
-  if (is.null(model)){model = paste0(y, ' ~ (1|', entity, ')')}
+  if(data.type == 'binary' && !all(unique(df$y) %in% c(0, 1))) stop ('Data include values outside of 0 and 1; please change data.type to continuous.')
+  if(is.null(model)){model = paste0(y, ' ~ (1|', entity, ')')}
 
   n        <- aggregate(y ~ entity, data = df, length)$y
   agg      <- aggregate(y ~ entity, data = df, sum)

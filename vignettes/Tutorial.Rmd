@@ -267,7 +267,7 @@ plotPerformance(df = perf.results2)
 ### OE-risk-standardized rates across entities
 
 ```{r}
-plotPerformance(df = perf.results2, plot.y = 'oe')
+plotPerformance(df = perf.results2, plot.type = 'oe')
 ```
 
 Categorization of entities according to whether their risk-standardized rates are lower, higher, or no different from the overall, unadjusted average can be found in the `perf.results` output from `calcPerformance()` function.
@@ -280,7 +280,7 @@ knitr::kable(table(perf.results2$category.oe), col.names = c('Category', 'Number
 ### PE-risk-standardized rates across entities
 
 ```{r}
-plotPerformance(df = perf.results2, plot.y = 'pe')
+plotPerformance(df = perf.results2, plot.type = 'pe')
 ```
 ```{r, echo = FALSE, results = 'asis'}
 knitr::kable(table(perf.results2$category.pe), col.names = c('Category', 'Number of entities'), caption = 'Categorization of entities based on PE-risk-standardized rates')
