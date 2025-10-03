@@ -9,8 +9,9 @@
 #' @param show.all logical indicator for whether full list of reliability method estimates should be calculated (default: `FALSE`)
 #' @param ctrPerf parameters to control performance measure calculation
 #' @param ctrRel parameters to control reliability estimation
-#' @return A list with reliability estimates
-#'
+#' @return A list with reliability estimates. `rel.results` is a dataframe summarizing estimates from the various methods. Output from each method's respective function is also included.
+#' More details on output from each method can be found within the help documentation for the respective function for that method. For example, see [calcSSR()] for more detail on `SSR.out`.
+#' @seealso [calcAOV()], [calcBetaBin()], [calcHLGMRel()], [calcHLMRel()], [calcResamplingIUR()], [calcSSR()]
 #' @author Kenneth Nieser (nieser@stanford.edu)
 #' @references Nieser KJ, Harris AH. Comparing methods for assessing the reliability of health care quality measures. Statistics in Medicine. 2024 Oct 15;43(23):4575-94.
 #' @examples

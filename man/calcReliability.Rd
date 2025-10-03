@@ -33,7 +33,8 @@ calcReliability(
 \item{ctrRel}{parameters to control reliability estimation}
 }
 \value{
-A list with reliability estimates
+A list with reliability estimates. \code{rel.results} is a dataframe summarizing estimates from the various methods. Output from each method's respective function is also included.
+More details on output from each method can be found within the help documentation for the respective function for that method. For example, see \code{\link[=calcSSR]{calcSSR()}} for more detail on \code{SSR.out}.
 }
 \description{
 This function calculates several estimates of quality measure performance.
@@ -68,6 +69,9 @@ plotReliability(out.c)
 }
 \references{
 Nieser KJ, Harris AH. Comparing methods for assessing the reliability of health care quality measures. Statistics in Medicine. 2024 Oct 15;43(23):4575-94.
+}
+\seealso{
+\code{\link[=calcAOV]{calcAOV()}}, \code{\link[=calcBetaBin]{calcBetaBin()}}, \code{\link[=calcHLGMRel]{calcHLGMRel()}}, \code{\link[=calcHLMRel]{calcHLMRel()}}, \code{\link[=calcResamplingIUR]{calcResamplingIUR()}}, \code{\link[=calcSSR]{calcSSR()}}
 }
 \author{
 Kenneth Nieser (nieser@stanford.edu)
