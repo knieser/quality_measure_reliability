@@ -33,7 +33,7 @@ calcReliability(
 \item{ctrRel}{parameters to control reliability estimation}
 }
 \value{
-A list with reliability estimates, including:
+A list with reliability estimates
 }
 \description{
 This function calculates several estimates of quality measure performance.

@@ -9,7 +9,7 @@
 #' @param show.all logical indicator for whether full list of reliability method estimates should be calculated (default: `FALSE`)
 #' @param ctrPerf parameters to control performance measure calculation
 #' @param ctrRel parameters to control reliability estimation
-#' @return A list with reliability estimates, including:
+#' @return A list with reliability estimates
 #'
 #' @author Kenneth Nieser (nieser@stanford.edu)
 #' @references Nieser KJ, Harris AH. Comparing methods for assessing the reliability of health care quality measures. Statistics in Medicine. 2024 Oct 15;43(23):4575-94.
@@ -172,7 +172,7 @@ calcReliability <- function(df = NULL, model = NULL, entity = "entity", y = "y",
       )
     } else{
       rel.results <- data.frame(
-        method = c('SSR', 'PSSR', 'ANOVA', 'Hier logit on latent scale', 'Hier logit w/ delta approx', 'Hier logit w/ Monte Carlo method', 'Hier logit w/ FE', 'Hier logit w/ RE', 'Beta-Binomial', 'Beta-Binomial w/ FE', 'Beta-Binomial w/ RE', 'Beta-Binomial w/ Jeffreys', 'Resampling IUR'),
+        method = c('SSR:Single', 'SSR:Permutation', 'ANOVA', 'HLGM:latent scale', 'HLGM:delta approx', 'HLGM:Monte Carlo approx', 'HLGM:use FE', 'HLGM:use RE', 'Beta-Binomial', 'Beta-Binomial:use FE', 'Beta-Binomial:use RE', 'Beta-Binomial:use Jeffreys', 'Resampling IUR'),
         between_var = c(NA, NA,
                         AOV.out$var.b.aov,
                         HLGM.out$var.b.HLGM.latent,
