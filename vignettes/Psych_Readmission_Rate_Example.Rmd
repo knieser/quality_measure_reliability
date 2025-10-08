@@ -27,7 +27,7 @@ library(QualityMeasure)
 
 -------------------------------------------------------------
 
-First, we'll load the dataset included with the QualityMeasure package.
+First, we'll load the dataset included with the `QualityMeasure` package.
 
 ```{r}
 df <- psychreadmission

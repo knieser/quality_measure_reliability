@@ -238,7 +238,7 @@ This analysis generates confidence intervals for entity-level performance. Confi
 
 ```{r}
 # adjust number of bootstraps and cores for parallel processing.
-n.boots = 1000
+n.boots = 10
 n.cores = 2
 
 # run profiling analysis for the first dataset without risk-adjustment

@@ -1,5 +1,6 @@
 ---
 title: "Colonoscopy follow-up measure example"
+author: "Kenneth Nieser"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Colonoscopy follow-up measure example}
@@ -25,7 +26,7 @@ library(QualityMeasure)
 
 -------------------------------------------------------------
 
-First, we'll load the dataset included with the QualityMeasure package.
+First, we'll load the dataset included with the `QualityMeasure` package.
 
 ```{r}
 df <- colonoscopy
@@ -56,7 +57,7 @@ plot.df <- data.frame(
 fig <- ggplot(data = plot.df, aes(x = n, y = rel)) +
   geom_point(size = 3) +
   geom_hline(yintercept = median(BB.results$est.BB), linetype = 'dashed', col = 'red', linewidth = 2) +
-  annotate('text', x = 1700, y = 0.92, label = 'Median reliability', size = 6, col = 'red', face = 'bold') +
+  annotate('text', x = 1700, y = 0.92, label = 'Median reliability', size = 6, col = 'red') +
   xlab('Entity sample size') +
   ylab('Reliability') +
   theme_classic() +
