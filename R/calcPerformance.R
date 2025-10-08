@@ -269,9 +269,8 @@ calcPerformance <- function(df = NULL, model = NULL, entity = "entity", y = "y",
     category.table = table(perf.results$category.oe, perf.results$category.pe)
     corr.oe.randint = stats::cor(perf.results$intercept.OR, perf.results$oe)
     corr.pe.randint = stats::cor(perf.results$intercept.OR, perf.results$pe)
-    icc.oe.randint = psych::ICC(perf.results[,c('intercept.OR', 'oe')])
-    icc.pe.randint = psych::ICC(perf.results[,c('intercept.OR', 'pe')])
-
+    icc.oe.randint = calcICC(perf.results[,c('intercept.OR', 'oe')])
+    icc.pe.randint = calcICC(perf.results[,c('intercept.OR', 'pe')])
   }
 
   perf.results$intercept.sig = as.factor(ifelse(perf.results$intercept.OR.lwr > 1 | perf.results$intercept.OR.upr < 1, 1, 0))

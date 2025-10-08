@@ -62,7 +62,6 @@
 #' @importFrom parallel makeCluster
 #' @importFrom doParallel registerDoParallel
 #' @importFrom foreach foreach %dopar%
-#' @importFrom psych ICC
 #' @importFrom stats reshape
 #' @export
 
@@ -85,7 +84,40 @@ calcSSR <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', data.ty
   cl <- parallel::makeCluster(n.cores)
   doParallel::registerDoParallel(cl)
 
-  out <- foreach::foreach(s = 1:n.resamples, .combine = rbind, .packages = c('psych')) %dopar% {
+  out <- foreach::foreach(s = 1:n.resamples, .combine = rbind) %dopar% {
+    calcICC <- function(df, SB = TRUE, alpha = 0.05){
+      x1 = df[,1]
+      x2 = df[,2]
+      n = nrow(df)
+
+      df <- data.frame(
+        grp = rep(c(1:n), 2),
+        y = c(x1, x2)
+      )
+      df$grp <- as.factor(df$grp)
+
+      aov.out <- aov(y ~ grp, data = df)
+      aov.summary <- matrix(unlist(summary(aov.out)), ncol=2, byrow = T)
+      MSB = aov.summary[3,1]
+      MSW = aov.summary[3,2]
+      df.n = aov.summary[1,1]
+      df.d = aov.summary[1,2]
+      ICC = (MSB - MSW) / (MSB + MSW)
+      F.stat = MSB / MSW
+      F.lwr <- F.stat / qf(1 - alpha/2, df.n, df.d)
+      F.upr <- F.stat * qf(1 - alpha/2, df.d, df.n)
+      ICC.lwr <- (F.lwr - 1)/(F.lwr + 1)
+      ICC.upr <- (F.upr - 1)/(F.upr + 1)
+
+      if (SB == TRUE){
+        ICC = 2*ICC / (1 + ICC)
+        ICC.lwr <- 2*ICC.lwr / (1 + ICC.lwr)
+        ICC.upr <- 2*ICC.upr / (1 + ICC.upr)
+      }
+
+      results <- list(ICC = ICC, ICC.lwr = ICC.lwr, ICC.upr = ICC.upr)
+      return(results)
+    }
 
     if (method=='permutation'){
       # randomly assign each record into either s=1 or s=2 for each entity
@@ -107,42 +139,33 @@ calcSSR <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', data.ty
         agg$pe    <- agg$pred / agg$exp
         entity.means.wide <- reshape(agg, idvar = "entity", timevar = "s", direction = "wide")
 
-        # calculate ICCs using psych package
-        ## OE
-        aov.out.oe <- psych::ICC(entity.means.wide[,c('oe.1', 'oe.2')], lmer = F)
-        aov.ICC.oe    = aov.out.oe$results$ICC
-        aov.ICC.oe.lb = aov.out.oe$results$`lower bound`
-        aov.ICC.oe.ub = aov.out.oe$results$`upper bound`
-        icc.aov.oe    = c(aov.ICC.oe[4])
-        icc.aov.oe.lb = c(aov.ICC.oe.lb[4])
-        icc.aov.oe.ub = c(aov.ICC.oe.ub[4])
-
-        ## PE
-        aov.out.pe <- psych::ICC(entity.means.wide[,c('pe.1', 'pe.2')], lmer = F)
-        aov.ICC.pe    = aov.out.pe$results$ICC
-        aov.ICC.pe.lb = aov.out.pe$results$`lower bound`
-        aov.ICC.pe.ub = aov.out.pe$results$`upper bound`
-        icc.aov.pe    = c(aov.ICC.pe[4])
-        icc.aov.pe.lb = c(aov.ICC.pe.lb[4])
-        icc.aov.pe.ub = c(aov.ICC.pe.ub[4])
-
+        # calculate ICCs
         icc.aov    = NA
         icc.aov.lb = NA
         icc.aov.ub = NA
+
+        ## OE
+        aov.out.oe <- calcICC(entity.means.wide[,c('oe.1', 'oe.2')])
+        icc.aov.oe    = aov.out.oe$ICC
+        icc.aov.oe.lb = aov.out.oe$ICC.lwr
+        icc.aov.oe.ub = aov.out.oe$ICC.upr
+
+        ## PE
+        aov.out.pe <- calcICC(entity.means.wide[,c('pe.1', 'pe.2')])
+        icc.aov.pe    = aov.out.pe$ICC
+        icc.aov.pe.lb = aov.out.pe$ICC.lwr
+        icc.aov.pe.ub = aov.out.pe$ICC.upr
+
         } else{
           # calculate performance by entity and split-half
           entity.means <- aggregate(y ~ entity + s, data = df, function(x) fn(x))
           entity.means.wide <- stats::reshape(entity.means, idvar = "entity", timevar = "s", direction = "wide")
 
-          # calculate ICCs using psych package
-          aov.out  <- psych::ICC(entity.means.wide[,-1], lmer = F)
-          aov.ICC = aov.out$results$ICC
-          aov.ICC.lb = aov.out$results$`lower bound`
-          aov.ICC.ub = aov.out$results$`upper bound`
-
-          icc.aov       = c(aov.ICC[4]) # Spearman-Brown correction
-          icc.aov.lb    = c(aov.ICC.lb[4])
-          icc.aov.ub    = c(aov.ICC.ub[4])
+          # calculate ICCs
+          aov.out  <- calcICC(entity.means.wide[,-1])
+          icc.aov = aov.out$ICC
+          icc.aov.lb = aov.out$ICC.lwr
+          icc.aov.ub = aov.out$ICC.upr
           icc.aov.oe    = NA
           icc.aov.oe.lb = NA
           icc.aov.oe.ub = NA
@@ -177,42 +200,32 @@ calcSSR <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', data.ty
         agg$pe    <- agg$pred / agg$exp
         entity.means.wide <- reshape(agg, idvar = "entity", timevar = "s", direction = "wide")
 
-        # calculate ICCs using psych package
-        ## OE
-        aov.out.oe <- psych::ICC(entity.means.wide[,c('oe.1', 'oe.2')], lmer = F)
-        aov.ICC.oe    = aov.out.oe$results$ICC
-        aov.ICC.oe.lb = aov.out.oe$results$`lower bound`
-        aov.ICC.oe.ub = aov.out.oe$results$`upper bound`
-        icc.aov.oe    = c(aov.ICC.oe[4])
-        icc.aov.oe.lb = c(aov.ICC.oe.lb[4])
-        icc.aov.oe.ub = c(aov.ICC.oe.ub[4])
-
-        ## PE
-        aov.out.pe <- psych::ICC(entity.means.wide[,c('pe.1', 'pe.2')], lmer = F)
-        aov.ICC.pe    = aov.out.pe$results$ICC
-        aov.ICC.pe.lb = aov.out.pe$results$`lower bound`
-        aov.ICC.pe.ub = aov.out.pe$results$`upper bound`
-        icc.aov.pe    = c(aov.ICC.pe[4])
-        icc.aov.pe.lb = c(aov.ICC.pe.lb[4])
-        icc.aov.pe.ub = c(aov.ICC.pe.ub[4])
-
+        # calculate ICCs
         icc.aov    = NA
         icc.aov.lb = NA
         icc.aov.ub = NA
+
+        ## OE
+        aov.out.oe <- calcICC(entity.means.wide[,c('oe.1', 'oe.2')], SB = FALSE)
+        icc.aov.oe    = aov.out.oe$ICC
+        icc.aov.oe.lb = aov.out.oe$ICC.lwr
+        icc.aov.oe.ub = aov.out.oe$ICC.upr
+
+        ## PE
+        aov.out.pe <- calcICC(entity.means.wide[,c('pe.1', 'pe.2')], SB = FALSE)
+        icc.aov.pe    = aov.out.pe$ICC
+        icc.aov.pe.lb = aov.out.pe$ICC.lwr
+        icc.aov.pe.ub = aov.out.pe$ICC.upr
+
       } else{
         entity.means <- aggregate(y ~ entity + s, data = df.boots, function(x) fn(x))
         entity.means.wide <- reshape(entity.means, idvar = "entity", timevar = "s", direction = "wide")
 
-        # calculate ICCs using psych package
-        aov.out  <- psych::ICC(entity.means.wide[,-1], lmer = F)
-        aov.ICC = aov.out$results$ICC
-        aov.ICC.lb = aov.out$results$`lower bound`
-        aov.ICC.ub = aov.out$results$`upper bound`
-
-        icc.aov = c(aov.ICC[1]) # no Spearman-Brown correction for bootstrap method
-        icc.aov.lb = c(aov.ICC.lb[1])
-        icc.aov.ub = c(aov.ICC.ub[1])
-
+        # calculate ICCs
+        aov.out  <- calcICC(entity.means.wide[,-1], SB = FALSE)
+        icc.aov = aov.out$ICC
+        icc.aov.lb = aov.out$ICC.lwr
+        icc.aov.ub = aov.out$ICC.upr
         icc.aov.oe    = NA
         icc.aov.oe.lb = NA
         icc.aov.oe.ub = NA
