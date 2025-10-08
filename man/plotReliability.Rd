@@ -27,7 +27,7 @@ plotReliability(out)
 
 
 # Calculate reliability with expanded set of methods
-out1 <- calcReliability(df = df, entity = 'entity', y = 'y', show.all = T)
+out1 <- calcReliability(df = df, entity = 'entity', y = 'y', show.all = TRUE)
 
 # Plot estimates for expanded set of methods
 plotReliability(out1)

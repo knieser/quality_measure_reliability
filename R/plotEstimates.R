@@ -35,8 +35,8 @@ plotEstimates <- function(model.performance){
     xline = 0
   }
   fig <- ggplot2::ggplot(data = model.results, ggplot2::aes(x = .data$est, y = .data$predictor.clean, group = .data$sig)) +
-    ggplot2::geom_point(ggplot2::aes(color = sig), size = 3) +
-    ggplot2::geom_errorbar(ggplot2::aes(xmin = .data$lb, xmax = .data$ub, color = sig),
+    ggplot2::geom_point(ggplot2::aes(color = .data$sig), size = 3) +
+    ggplot2::geom_errorbar(ggplot2::aes(xmin = .data$lb, xmax = .data$ub, color = .data$sig),
                   width = 0.5,
                   linetype = 1) +
     ggplot2::scale_color_manual(values = c('black', 'red')) +
