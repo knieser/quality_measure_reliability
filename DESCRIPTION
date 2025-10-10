@@ -1,14 +1,13 @@
 Package: QualityMeasure
-Title: A package to assist with the analysis of health care quality measure performance
-Version: 1.0.0
-Date: 2025-03-18
+Title: Methods for Analyzing Quality Measure Performance
+Version: 2.0.1
+Date: 2025-10-09
 Authors@R: 
     person("Kenneth", "Nieser", , "nieser@stanford.edu", role = c("aut", "cre", "cph"))
-Description: This package contains functions useful for analyzing quality
-    measures and estimating reliability of quality measures.
+Description: Quality of care is compared across accountable entities, including hospitals, provider groups, and insurance plans, using standardized quality measures. However, observed variations in quality measure performance might be the result of chance sampling or measurement errors. Contains functions for estimating the reliability of unadjusted and risk-standardized quality measures.
 License: GPL (>= 3)
 Depends: R (>= 4.0), ggplot2, doParallel, lme4
-Imports: foreach, parallel 
+Imports: foreach, parallel, rlang
 Suggests: 
     knitr,
     rmarkdown,

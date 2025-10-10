@@ -44,26 +44,10 @@ This function calculates several estimates of quality measure performance.
 df <- simulateData(n.entity = 50, n.obs = 100, mu = .2, r = .7)
 
 # Calculate reliability
-out <- calcReliability(df = df, entity = 'entity', y = 'y')
+out <- calcReliability(df = df, entity = 'entity', y = 'y', ctrRel = controlRel(n.resamples = 10))
 
 # Plot estimates
 plotReliability(out)
-
-
-# Calculate reliability with expanded set of methods
-out1 <- calcReliability(df = df, entity = 'entity', y = 'y', show.all = TRUE)
-
-# Plot estimates for expanded set of methods
-plotReliability(out1)
-
-
-### This function also works with continuous outcome data
-# simulate data from multilevel normal distribution
-df.c <- simulateData(n.entity = 50, n.obs = 100, mu = 25, r = .6, data.type = 'normal')
-
-# calculate reliability
-out.c <- calcReliability(df = df, entity = 'entity', y = 'y', data.type = 'continuous')
-plotReliability(out.c)
 
 
 }

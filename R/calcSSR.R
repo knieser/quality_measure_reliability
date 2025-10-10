@@ -38,25 +38,12 @@
 #' df <- simulateData(n.entity = 50, n.obs = 100, mu = .2, r = .7)
 #'
 #' # Calculate reliability
-#' out <- calcSSR(df = df, entity = 'entity', y = 'y')
+#' out <- calcSSR(df = df, entity = 'entity', y = 'y', ctrRel = controlRel(n.resamples = 10))
 #' out$est.PSSR
 #'
 #' # Distribution of estimates obtained from the permutation sampling.
 #' hist(out$icc)
 #' summary(out$icc)
-#'
-#' ## Example with risk-adjustment
-#' # Simulate data
-#' df1 <- simulateData(n.entity = 50, n.obs = 100, mu = .2, r = .6, beta1 = log(2))
-#'
-#' # Calculate reliability for both observed-to-expected and predicted-to-expected ratios.
-#' out1 <- calcSSR(df = df1, model = 'y ~ x1 + (1 | entity)', entity = 'entity', y = 'y')
-#' out1$est.PSSR.oe
-#' out1$est.PSSR.pe
-#'
-#' # Distribution of estimates obtained from the permutation sampling.
-#' hist(out1$icc.oe)
-#' summary(out1$icc.oe)
 #'
 #'
 #' @importFrom parallel makeCluster

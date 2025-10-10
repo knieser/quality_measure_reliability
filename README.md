@@ -1,6 +1,6 @@
 # Analyzing health care quality measures
 
-QualityMeasure is an R package to help with analyzing health care quality measures. The package includes functions for calculating measure performance, both unadjusted and adjusted, and estimating reliability with several different methods. More detail on each reliability estimation method can be found in [Comparing methods for assessing the reliability of health care quality measures](https://doi.org/10.1002/sim.10197).
+QualityMeasure is an R package to help with analyzing health care quality measures. The package includes functions for calculating measure performance, both unadjusted and adjusted, and estimating reliability with several different methods. More detail on each reliability estimation method can be found in [Comparing methods for assessing the reliability of health care quality measures](https://pubmed.ncbi.nlm.nih.gov/39145538/).
 
 <b> This package is a work-in-progress. Please email me at nieser\@stanford.edu with any questions if you plan to use this code. </b>
 

@@ -20,6 +20,7 @@
 #' plotCalibration(model.perf, quantiles = 5)
 #'
 #' @importFrom ggplot2 ggplot aes geom_point geom_line geom_abline xlab ylab theme_classic theme element_line element_text unit element_blank
+#' @importFrom rlang .data
 #' @export
 
 plotCalibration <- function(model.performance, quantiles = 10){

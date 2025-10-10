@@ -11,6 +11,7 @@
 #' @examples
 #' # TBD
 #' @importFrom ggplot2 ggplot
+#' @importFrom rlang .data
 
 
 plotSSR <- function(df, model = NULL, entity = 'entity', y = 'y', ctrPerf = controlPerf()){

@@ -12,6 +12,8 @@
 #' @references None
 #' @examples
 #' # TBD
+#' @importFrom rlang .data
+
 
 misclassification_analysis <- function(df = NULL, model = NULL, entity = "entity", y = "y", ctrPerf = controlPerf(), ctrRel = controlRel()){
   if (is.null(df) & is.null(model)) stop ('Please provide either a dataframe or a model object')

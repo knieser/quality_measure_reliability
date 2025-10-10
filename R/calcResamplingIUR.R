@@ -25,7 +25,7 @@
 #' df <- simulateData(n.entity = 50, n.obs = 100, mu = .2, r = .7)
 #'
 #' # Calculate reliability
-#' out <- calcResamplingIUR(df = df, entity = 'entity', y = 'y')
+#' out <- calcResamplingIUR(df = df, entity = 'entity', y = 'y', ctrRel = controlRel(n.resamples = 10))
 #' out$IUR
 #'
 #' @importFrom stats aggregate
@@ -34,6 +34,7 @@
 calcResamplingIUR <- function(df = NULL, model = NULL,  entity = 'entity', y = 'y', ctrPerf = controlPerf(), ctrRel = controlRel()){
   if (is.null(df) & is.null(model)) stop ('Please provide either a dataframe or a model object')
   if (is.null(df)){df <- model@frame}
+  message('\tCurrently, Beta-Binomial reliability estimates do not account for risk-adjustment (even if you specified a model). Updates to this function to account for risk-adjustment are in progress.')
 
   cl <- match.call()
   n.cores     <- ctrRel$n.cores

@@ -16,6 +16,7 @@
 #'
 #'
 #' @importFrom ggplot2 ggplot
+#' @importFrom rlang .data
 #' @export
 
 

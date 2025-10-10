@@ -63,10 +63,10 @@
 #' @export
 
 calcBetaBin <- function(df = NULL, model = NULL, entity = 'entity', y = 'y', df.aggregate = FALSE, n = 'n', x = 'x', show.all=FALSE, ctrPerf = controlPerf()){
-  message('\tCurrently, Beta-Binomial reliability estimates do not account for risk-adjustment (even if you specified a model). Updates to this function to account for risk-adjustment are in progress.')
   if (is.null(df) & is.null(model)) stop ('Please provide either a dataframe or a model object')
   if (is.null(df)){df <- model@frame}
   if(!is.logical(show.all)) stop('show.all needs to be TRUE or FALSE')
+  message('\tCurrently, Beta-Binomial reliability estimates do not account for risk-adjustment (even if you specified a model). Updates to this function to account for risk-adjustment are in progress.')
 
   cl <- match.call()
 

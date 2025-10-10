@@ -22,6 +22,7 @@
 #' plotPerformance(out$perf.results, plot.type = 'p')
 #'
 #' @importFrom ggplot2 ggplot position_dodge element_line element_text unit aes
+#' @importFrom rlang .data
 #' @export
 
 plotPerformance <- function(df, plot.type = 'p'){

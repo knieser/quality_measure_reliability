@@ -49,7 +49,7 @@ within each entity. However, this method is more flexible as described in He et 
 df <- simulateData(n.entity = 50, n.obs = 100, mu = .2, r = .7)
 
 # Calculate reliability
-out <- calcResamplingIUR(df = df, entity = 'entity', y = 'y')
+out <- calcResamplingIUR(df = df, entity = 'entity', y = 'y', ctrRel = controlRel(n.resamples = 10))
 out$IUR
 
 }
