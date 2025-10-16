@@ -1,7 +1,7 @@
 Package: QualityMeasure
 Title: Methods for Analyzing Quality Measure Performance
-Version: 2.0.1
-Date: 2025-10-09
+Version: 2.0.2
+Date: 2025-10-16
 Authors@R: 
     person("Kenneth", "Nieser", , "nieser@stanford.edu", role = c("aut", "cre", "cph"))
 Description: Quality of care is compared across accountable entities, including hospitals, provider groups, and insurance plans, using standardized quality measures. However, observed variations in quality measure performance might be the result of chance sampling or measurement errors. Contains functions for estimating the reliability of unadjusted and risk-standardized quality measures.
